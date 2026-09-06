@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>حسابات الصرافين - إدارة كشوف الحسابات وحساب المقابل بالبر</title>
+  
+  <!-- Google Fonts: Cairo & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Main Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+  
+  <!-- SheetJS (Local with CDN Fallback) -->
+  <script src="./libs/xlsx.full.min.js"></script>
+  <script>
+    if (typeof XLSX === 'undefined') {
+      document.write('<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"><\/script>');
+    }
+  </script>
+</head>
+<body class="theme-light">
+
+  <!-- ==================== رأس الصفحة والتنقل ==================== -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="header-brand">
+        <div class="brand-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="4" width="20" height="16" rx="2"/>
+            <line x1="2" y1="10" x2="22" y2="10"/>
+            <line x1="6" y1="15" x2="10" y2="15"/>
+            <line x1="14" y1="15" x2="18" y2="15"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h1 id="app-title-display">حسابات الصرافين</h1>
+          <p class="brand-subtitle">معالجة كشوف الحسابات وحساب المقابل بالبر وتصدير الإكسل المنسق</p>
+        </div>
+      </div>
+
+      <div class="header-controls">
+        <!-- سعر المصارفة السريع في الهيدر -->
+        <div class="quick-rate-pill" title="تعديل سعر المصارفة مباشرة لجميع السجلات">
+          <label for="header-rate-input">سعر المصارفة:</label>
+          <div class="rate-input-wrap">
+            <input type="number" id="header-rate-input" value="48" step="0.01" min="0.01">
+            <span class="rate-unit">بر</span>
+          </div>
+        </div>
+
+        <!-- أزرار الإجراءات العلوية -->
+        <button id="btn-theme-toggle" class="icon-btn" title="تبديل الوضع الليلي / الفاتح" aria-label="تبديل المظهر">
+          <span class="theme-icon light-icon">☀️</span>
+          <span class="theme-icon dark-icon">🌙</span>
+        </button>
+
+        <button id="btn-open-settings" class="icon-btn settings-btn" title="فتح الإعدادات" aria-label="الإعدادات">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- شريط التبويبات -->
+    <nav class="app-nav">
+      <div class="nav-container">
+        <button class="nav-tab active" data-tab="tab-paste">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+            <rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
+          </svg>
+          <span>لصق واستيراد البيانات</span>
+        </button>
+
+        <button class="nav-tab" data-tab="tab-table">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 3h18v18H3zM3 9h18M3 15h18M9 3v18M15 3v18"/>
+          </svg>
+          <span>جدول حسابات الصرافين</span>
+          <span class="badge-count" id="nav-count-badge">0</span>
+        </button>
+
+        <button class="nav-tab" data-tab="tab-settings">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+          </svg>
+          <span>الإعدادات العامة</span>
+        </button>
+
+        <button class="nav-tab" data-tab="tab-help">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+            <line x1="12" y1="17" x2="12.01" y2="17"/>
+          </svg>
+          <span>دليل الاستخدام</span>
+        </button>
+      </div>
+    </nav>
+  </header>
+
+  <!-- ==================== بطاقات الإحصائيات العلوية ==================== -->
+  <main class="main-content">
+    <section class="metrics-grid">
+      <!-- كرت 1: عدد الحسابات -->
+      <div class="metric-card card-accounts">
+        <div class="metric-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+        </div>
+        <div class="metric-info">
+          <span class="metric-label">إجمالي الحسابات</span>
+          <span class="metric-value" id="stat-count">0</span>
+          <span class="metric-hint">مستفيد مسجل</span>
+        </div>
+      </div>
+
+      <!-- كرت 2: إجمالي المبالغ -->
+      <div class="metric-card card-amounts">
+        <div class="metric-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="1" x2="12" y2="23"/>
+            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+          </svg>
+        </div>
+        <div class="metric-info">
+          <span class="metric-label">إجمالي المبالغ</span>
+          <span class="metric-value" id="stat-total-amount">0</span>
+          <span class="metric-hint" id="stat-currency-label">ريال سعودي</span>
+        </div>
+      </div>
+
+      <!-- كرت 3: إجمالي المقابل بالبر -->
+      <div class="metric-card card-birr">
+        <div class="metric-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/>
+            <path d="M12 6v2m0 8v2"/>
+          </svg>
+        </div>
+        <div class="metric-info">
+          <span class="metric-label">المقابل الإجمالي بالبر (ETB)</span>
+          <span class="metric-value" id="stat-total-birr">0</span>
+          <span class="metric-hint">المبلغ × سعر المصارفة</span>
+        </div>
+      </div>
+
+      <!-- كرت 4: سعر المصارفة الحالي -->
+      <div class="metric-card card-rate">
+        <div class="metric-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/>
+            <polyline points="16 7 22 7 22 13"/>
+          </svg>
+        </div>
+        <div class="metric-info">
+          <span class="metric-label">سعر المصارفة المعتمد</span>
+          <span class="metric-value" id="stat-rate-display">48</span>
+          <span class="metric-hint">بر لكل 1 وحدة عملة</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== التبويب الأول: لصق واستيراد البيانات ==================== -->
+    <section id="tab-paste" class="tab-pane active">
+      <div class="panel-card">
+        <div class="panel-header">
+          <div class="panel-title-wrap">
+            <h2 class="panel-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+                <rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
+              </svg>
+              منطقة لصق النص الخام واستخراجه تلقائياً
+            </h2>
+            <p class="panel-desc">
+              الصق نص الكشف المالي كما هو، وسيقوم النظام تلقائياً باستخراج التاريخ، الأسماء، المبالغ، وأرقام الحسابات وإدراجها مباشرة في الجدول.
+            </p>
+          </div>
+
+          <div class="panel-actions">
+            <button id="btn-load-sample" class="btn btn-secondary" title="تحميل النموذج الإثيوبي الدقيق (34 مستفيد)">
+              ✨ تجربة بالبيانات النموذجية
+            </button>
+            <button id="btn-paste-clipboard" class="btn btn-secondary" title="لصق المحتوى من حافظة الجهاز">
+              📋 لصق من الحافظة
+            </button>
+            <button id="btn-clear-text" class="btn btn-ghost text-danger" title="مسح النص المدخل">
+              🗑️ مسح
+            </button>
+          </div>
+        </div>
+
+        <div class="paste-area-wrapper">
+          <textarea 
+            id="raw-text-input" 
+            class="code-textarea" 
+            placeholder="الصق كشف الحسابات هنا... مثال:
+ዓዲ ዝሕወሎም ዝርዝር 01/13/18
+1,'Maekelesh Ftwi=7,667
+1000608369582
+
+2,kiros berhe=9,584
+1000039884996
+...
+total=227,620"
+            rows="10"
+            spellcheck="false"
+          ></textarea>
+        </div>
+
+        <!-- خيارات التحليل السريع -->
+        <div class="paste-options-bar">
+          <div class="option-item">
+            <label class="checkbox-label">
+              <input type="checkbox" id="opt-auto-date" checked>
+              <span>كشف التاريخ تلقائياً من رأس النص (مثال: 01/13/18)</span>
+            </label>
+          </div>
+
+          <div class="option-item inline-field">
+            <label for="input-custom-date">تاريخ محدد (اختياري):</label>
+            <input type="text" id="input-custom-date" placeholder="مثال: 01/13/18 أو 2026/09/07" class="form-input-sm">
+          </div>
+
+          <div class="option-item inline-field">
+            <label for="input-batch-currency">العملة:</label>
+            <input type="text" id="input-batch-currency" value="ريال سعودي" class="form-input-sm">
+          </div>
+
+          <div class="option-item inline-field">
+            <label for="input-batch-rate">سعر المصارفة:</label>
+            <input type="number" id="input-batch-rate" value="48" step="0.01" class="form-input-sm" style="width: 80px;">
+          </div>
+        </div>
+
+        <!-- زر المعالجة الأساسي -->
+        <div class="paste-submit-row">
+          <button id="btn-process-text" class="btn btn-primary btn-large">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+            </svg>
+            <span>استخراج وتحليل وإدراج تلقائي في الأعمدة</span>
+          </button>
+          
+          <div id="parse-status-message" class="status-msg hidden"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== التبويب الثاني: جدول حسابات الصرافين ==================== -->
+    <section id="tab-table" class="tab-pane">
+      <div class="panel-card">
+        
+        <!-- شريط أدوات الجدول -->
+        <div class="table-toolbar">
+          <div class="search-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"/>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            <input type="text" id="table-search-input" placeholder="بحث بالاسم، برقم الحساب، أو بالمبلغ...">
+            <button id="btn-clear-search" class="clear-search-btn hidden">✕</button>
+          </div>
+
+          <div class="toolbar-actions">
+            <!-- تصدير إكسل منسق -->
+            <button id="btn-export-excel" class="btn btn-excel">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="16" y1="13" x2="8" y2="13"/>
+                <line x1="16" y1="17" x2="8" y2="17"/>
+                <polyline points="10 9 9 9 8 9"/>
+              </svg>
+              <span>تصدير إكسل منسق (.xlsx)</span>
+            </button>
+
+            <!-- نسخ الجدول للحافظة -->
+            <button id="btn-copy-table" class="btn btn-secondary" title="نسخ الجدول لنسخه مباشرة في إكسل">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+              </svg>
+              <span>نسخ كجدول</span>
+            </button>
+
+            <!-- طباعة -->
+            <button id="btn-print-table" class="btn btn-secondary" title="طباعة كشف الحساب">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 6 2 18 2 18 9"/>
+                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+                <rect x="6" y="14" width="12" height="8"/>
+              </svg>
+              <span>طباعة</span>
+            </button>
+
+            <!-- إضافة صف يدوي -->
+            <button id="btn-add-row" class="btn btn-outline" title="إضافة سطر جديد يدوياً">
+              <span>➕ إضافة سطر</span>
+            </button>
+
+            <!-- مسح السجلات -->
+            <button id="btn-clear-all" class="btn btn-ghost text-danger" title="مسح جميع السجلات">
+              <span>🗑️ تفريغ الجدول</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- ==================== جدول حسابات الصرافين (مطابق للصورة) ==================== -->
+        <div class="table-responsive-wrapper" id="printable-table-area">
+          <table class="sharaf-table" id="accounts-table">
+            <thead>
+              <!-- ترويسة الجدول العريضة (مطابقة للصورة: شريط خوخي/برتقالي بعنوان حسابات الصرافين) -->
+              <tr class="table-title-row">
+                <th colspan="9" class="banner-th">حسابات الصرافين</th>
+              </tr>
+
+              <!-- شريط الأعمدة (مطابق للصورة: خلفية خضراء هادئة + أسهم الفرز/التصفية) -->
+              <tr class="table-columns-row">
+                <th class="col-seq" style="width: 50px;">
+                  <span class="th-content">م</span>
+                </th>
+                <th class="col-date" data-sort="date">
+                  <span class="th-content">
+                    <span class="filter-arrow">▼</span>
+                    التاريخ
+                  </span>
+                </th>
+                <th class="col-name" data-sort="name">
+                  <span class="th-content">
+                    <span class="filter-arrow">▼</span>
+                    اسم الحساب
+                  </span>
+                </th>
+                <th class="col-acc" data-sort="id">
+                  <span class="th-content">
+                    <span class="filter-arrow">▼</span>
+                    رقم الحساب
+                  </span>
+                </th>
+                <th class="col-amount" data-sort="amount">
+                  <span class="th-content">
+                    <span class="filter-arrow">▼</span>
+                    المبلغ
+                  </span>
+                </th>
+                <th class="col-curr" data-sort="currency">
+                  <span class="th-content">
+                    <span class="filter-arrow">▼</span>
+                    العملة
+                  </span>
+                </th>
+                <th class="col-rate" data-sort="rate">
+                  <span class="th-content">
+                    <span class="filter-arrow">▼</span>
+                    سعر المصارفة
+                  </span>
+                </th>
+                <th class="col-birr" data-sort="birr">
+                  <span class="th-content">
+                    <span class="filter-arrow">▼</span>
+                    المقابل بالبر
+                  </span>
+                </th>
+                <th class="col-actions no-print" style="width: 90px;">
+                  <span class="th-content">إجراءات</span>
+                </th>
+              </tr>
+            </thead>
+
+            <!-- جسم الجدول الذي تُدرج فيه السجلات ديناميكياً -->
+            <tbody id="table-body">
+              <tr class="empty-row">
+                <td colspan="9" class="empty-state">
+                  <div class="empty-content">
+                    <div class="empty-icon">📑</div>
+                    <p class="empty-text">لا توجد سجلات حالياً في الجدول</p>
+                    <p class="empty-subtext">قم بلصق كشف الحسابات في تبويب "لصق واستيراد البيانات" أو اضغط على "تجربة بالبيانات النموذجية"</p>
+                    <button class="btn btn-secondary btn-sm mt-3" onclick="app.loadSampleDataAndSwitch()">✨ تجربة النموذج فوراً</button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+
+            <!-- تذييل الجدول لحساب الإجماليات والمطابقة -->
+            <tfoot id="table-footer">
+              <tr class="total-row">
+                <td colspan="4" class="total-label">
+                  <strong>الإجمالي العام (<span id="footer-count">0</span> حساب)</strong>
+                </td>
+                <td class="total-amount" id="footer-total-amount">0</td>
+                <td class="total-curr" id="footer-currency">ريال سعودي</td>
+                <td class="total-rate-avg">-</td>
+                <td class="total-birr" id="footer-total-birr">0</td>
+                <td class="no-print"></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==================== التبويب الثالث: صفحة الإعدادات ==================== -->
+    <section id="tab-settings" class="tab-pane">
+      <div class="panel-card max-width-container">
+        <div class="panel-header">
+          <div class="panel-title-wrap">
+            <h2 class="panel-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="3"/>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+              </svg>
+              الإعدادات العامة للنظام
+            </h2>
+            <p class="panel-desc">تخصيص القيم الافتراضية، سعر المصارفة، العملة، وعناوين ملفات الإكسل المصدّرة.</p>
+          </div>
+        </div>
+
+        <form id="settings-form" class="settings-form-grid" onsubmit="event.preventDefault(); app.saveSettings();">
+          
+          <!-- 1. سعر المصارفة الافتراضي -->
+          <div class="form-group">
+            <label for="setting-default-rate" class="form-label">
+              <strong>سعر المصارفة الافتراضي (معامل الضرب):</strong>
+            </label>
+            <div class="input-with-addon">
+              <input type="number" id="setting-default-rate" value="48" step="0.01" min="0.01" required class="form-input">
+              <span class="input-addon">بر لكل 1 وحدة</span>
+            </div>
+            <p class="form-help">القيمة الافتراضية لحساب (المقابل بالبر = المبلغ × سعر المصارفة). يمكنك أيضاً تعديلها مباشرة من رأس الصفحة.</p>
+          </div>
+
+          <!-- 2. العملة الافتراضية -->
+          <div class="form-group">
+            <label for="setting-default-currency" class="form-label">
+              <strong>العملة الافتراضية:</strong>
+            </label>
+            <div class="input-with-select">
+              <select id="setting-currency-select" class="form-select" onchange="document.getElementById('setting-default-currency').value = this.value">
+                <option value="ريال سعودي">ريال سعودي (SAR)</option>
+                <option value="درهم إماراتي">درهم إماراتي (AED)</option>
+                <option value="دولار أمريكي">دولار أمريكي (USD)</option>
+                <option value="دينار كويتي">دينار كويتي (KWD)</option>
+                <option value="يورو">يورو (EUR)</option>
+                <option value="custom">أخرى (كتابة يدوية)...</option>
+              </select>
+              <input type="text" id="setting-default-currency" value="ريال سعودي" required class="form-input mt-2">
+            </div>
+          </div>
+
+          <!-- 3. اسم الصراف / المنشأة -->
+          <div class="form-group">
+            <label for="setting-shop-name" class="form-label">
+              <strong>اسم الصراف / المنشأة (للترويسة والطباعة والإكسل):</strong>
+            </label>
+            <input type="text" id="setting-shop-name" value="حسابات الصرافين" class="form-input">
+            <p class="form-help">يظهر هذا الاسم كعنوان رئيسي في ملف الإكسل المصدّر وفي تقارير الطباعة.</p>
+          </div>
+
+          <!-- 4. خيارات التاريخ -->
+          <div class="form-group">
+            <label class="form-label">
+              <strong>آلية تحديد التاريخ للسجلات المستوردة:</strong>
+            </label>
+            <div class="radio-group">
+              <label class="radio-label">
+                <input type="radio" name="date-mode" value="auto" checked>
+                <span>استخراج التاريخ تلقائياً من رأس النص إن وُجد (مثل 01/13/18)، وإلا استخدام تاريخ اليوم</span>
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="date-mode" value="today">
+                <span>استخدام تاريخ اليوم دائماً</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- 5. تنسيق الأرقام والإكسل -->
+          <div class="form-group">
+            <label class="form-label">
+              <strong>خيارات تصدير الإكسل والعرض:</strong>
+            </label>
+            <div class="checkbox-group">
+              <label class="checkbox-label">
+                <input type="checkbox" id="setting-excel-colors" checked>
+                <span>تضمين الألوان المتطابقة (شريط العنوان الخوخي + رؤوس الأعمدة الخضراء) في ملف الإكسل</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" id="setting-excel-total-row" checked>
+                <span>إضافة صف الإجمالي العام في نهاية ملف الإكسل</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" id="setting-thousands-sep" checked>
+                <span>عرض الأرقام والمبالغ مع فواصل الآلاف (مثال: 227,620)</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- أزرار الإعدادات -->
+          <div class="settings-actions-bar">
+            <button type="submit" class="btn btn-primary">
+              💾 حفظ الإعدادات
+            </button>
+            <button type="button" class="btn btn-secondary" onclick="app.applyRateToExistingRecords()">
+              🔄 تطبيق سعر المصارفة الحالي على جميع السجلات المسجلة بالجدول
+            </button>
+            <button type="button" class="btn btn-ghost" onclick="app.resetSettingsToDefault()">
+              استعادة الإعدادات الافتراضية
+            </button>
+          </div>
+
+        </form>
+      </div>
+    </section>
+
+    <!-- ==================== التبويب الرابع: دليل الاستخدام ==================== -->
+    <section id="tab-help" class="tab-pane">
+      <div class="panel-card max-width-container">
+        <div class="panel-header">
+          <div class="panel-title-wrap">
+            <h2 class="panel-title">📖 دليل الاستخدام وطريقة العمل</h2>
+            <p class="panel-desc">شرح سريع لكيفية الاستفادة القصوى من النظام ومعالجة الحوالات بدقة.</p>
+          </div>
+        </div>
+
+        <div class="help-content">
+          <div class="help-step">
+            <div class="step-num">1</div>
+            <div class="step-details">
+              <h3>لصق النص المالي</h3>
+              <p>انتقل إلى تبويب "لصق واستيراد البيانات"، ثم الصق كشف العمليات كما وصلك. يدعم النظام مختلف التنسيقات والرموز والمسافات وفواصل الترقيم.</p>
+            </div>
+          </div>
+
+          <div class="help-step">
+            <div class="step-num">2</div>
+            <div class="step-details">
+              <h3>الاستخراج الذكي</h3>
+              <p>اضغط على زر <strong>«استخراج وتحليل وإدراج تلقائي»</strong>، سيقوم النظام تلقائياً بفرز الأسماء، المبالغ، وأرقام الحسابات، وحساب (المقابل بالبر = المبلغ × سعر المصارفة).</p>
+            </div>
+          </div>
+
+          <div class="help-step">
+            <div class="step-num">3</div>
+            <div class="step-details">
+              <h3>تعديل سعر المصارفة</h3>
+              <p>يمكنك تغيير سعر المصارفة (الافتراضي 48) في أي لحظة من الحقل السريع برأس الصفحة أو من الإعدادات، وسيتم تحديث عمود "المقابل بالبر" لجميع السجلات فورياً.</p>
+            </div>
+          </div>
+
+          <div class="help-step">
+            <div class="step-num">4</div>
+            <div class="step-details">
+              <h3>تصدير إكسل أو النسخ المباشر</h3>
+              <p>اضغط على زر <strong>«تصدير إكسل منسق (.xlsx)»</strong> لتحميل ملف إكسل احترافي بنفس الترويسة والألوان المعتمدة ومحاذاة RTL، أو اضغط <strong>«نسخ كجدول»</strong> للصق السجلات فوراً في أي برنامج خارجي.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ==================== نافذة التعديل / الإضافة اليدوية ==================== -->
+  <div id="row-modal" class="modal-backdrop hidden">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 id="modal-title">تعديل سجل</h3>
+        <button class="modal-close-btn" onclick="app.closeRowModal()">✕</button>
+      </div>
+      <form id="row-edit-form" onsubmit="event.preventDefault(); app.saveRowModal();">
+        <input type="hidden" id="edit-row-index">
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="edit-date" class="form-label">التاريخ:</label>
+            <input type="text" id="edit-date" required class="form-input">
+          </div>
+          <div class="form-group">
+            <label for="edit-name" class="form-label">اسم الحساب:</label>
+            <input type="text" id="edit-name" required class="form-input">
+          </div>
+          <div class="form-group">
+            <label for="edit-acc-id" class="form-label">رقم الحساب:</label>
+            <input type="text" id="edit-acc-id" required class="form-input" style="font-family: 'JetBrains Mono', monospace;">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="edit-amount" class="form-label">المبلغ:</label>
+              <input type="number" id="edit-amount" step="any" required class="form-input" oninput="app.updateModalBirr()">
+            </div>
+            <div class="form-group">
+              <label for="edit-currency" class="form-label">العملة:</label>
+              <input type="text" id="edit-currency" required class="form-input">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="edit-rate" class="form-label">سعر المصارفة:</label>
+              <input type="number" id="edit-rate" step="0.01" required class="form-input" oninput="app.updateModalBirr()">
+            </div>
+            <div class="form-group">
+              <label for="edit-birr" class="form-label">المقابل بالبر (تلقائي):</label>
+              <input type="text" id="edit-birr" readonly class="form-input bg-readonly">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="app.closeRowModal()">إلغاء</button>
+          <button type="submit" class="btn btn-primary">حفظ السجل</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- حاوية الإشعارات السريعة (Toasts) -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- تذييل الصفحة -->
+  <footer class="app-footer no-print">
+    <div class="footer-container">
+      <p>نظام حسابات الصرافين © 2026 — مصمم وفق أعلى معايير السرعة، التجاوب، والدقة الحسابية</p>
+    </div>
+  </footer>
+
+  <!-- Main JavaScript Application Logic -->
+  <script src="app.js"></script>
+</body>
+</html>

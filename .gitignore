@@ -1,0 +1,8 @@
+# Git ignore for Currency Bureau Accounts System
+node_modules/
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+.vscode/
+.idea/

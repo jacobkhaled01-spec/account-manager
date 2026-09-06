@@ -1,0 +1,1417 @@
+/* ==========================================================================
+   نظام حسابات الصرافين - ورقة الأنماط العصرية والمتجاوبة
+   Design System: Modern Glassmorphism + Excel-Exact Palette + Mobile-First
+   ========================================================================== */
+
+:root {
+  /* ألوان النظام الفاتح (Light Theme) */
+  --bg-primary: #f8fafc;
+  --bg-card: #ffffff;
+  --bg-card-glass: rgba(255, 255, 255, 0.85);
+  --bg-muted: #f1f5f9;
+  --bg-hover: #e2e8f0;
+  
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
+  
+  --border-color: #e2e8f0;
+  --border-focus: #3b82f6;
+
+  /* الألوان المستوحاة من صورة جدول إكسل الصرافين بدقة */
+  --excel-title-bg: #f8d7be;      /* لون الترويسة الخوخي البرتقالي */
+  --excel-title-text: #000000;    /* خط ترويسة العنوان الرئيسي */
+  --excel-header-bg: #cbe6cb;     /* لون رؤوس الأعمدة الأخضر الفاتح */
+  --excel-header-text: #000000;   /* خط رؤوس الأعمدة */
+  --excel-grid-border: #7f9b7f;   /* حدود خلايا الجدول المطابقة للإكسل */
+  --excel-row-hover: #f0fdf4;     /* لون التمرير فوق الصف */
+  --excel-total-bg: #eaf5ea;      /* خلفية سطر الإجمالي */
+
+  /* ألوان الحالة والإبراز */
+  --color-primary: #2563eb;
+  --color-primary-hover: #1d4ed8;
+  --color-success: #16a34a;
+  --color-success-hover: #15803d;
+  --color-warning: #d97706;
+  --color-danger: #dc2626;
+  --color-danger-hover: #b91c1c;
+
+  /* ألوان كروت الإحصائيات */
+  --card-acc-grad: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  --card-amt-grad: linear-gradient(135deg, #10b981 0%, #047857 100%);
+  --card-birr-grad: linear-gradient(135deg, #f59e0b 0%, #b45309 100%);
+  --card-rate-grad: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+
+  --font-family: 'Cairo', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* سمة الوضع الليلي (Dark Theme) */
+body.theme-dark {
+  --bg-primary: #0b1120;
+  --bg-card: #1e293b;
+  --bg-card-glass: rgba(30, 41, 59, 0.88);
+  --bg-muted: #0f172a;
+  --bg-hover: #334155;
+
+  --text-primary: #f8fafc;
+  --text-secondary: #cbd5e1;
+  --text-muted: #64748b;
+
+  --border-color: #334155;
+  --border-focus: #60a5fa;
+
+  --excel-title-bg: #8c5228;
+  --excel-title-text: #ffffff;
+  --excel-header-bg: #2d5a3f;
+  --excel-header-text: #ffffff;
+  --excel-grid-border: #475569;
+  --excel-row-hover: #1e3a2f;
+  --excel-total-bg: #193325;
+}
+
+/* ==========================================================================
+   إعادة الضبط الأساسية
+   ========================================================================== */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-family);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* زر إمكانية الوصول */
+button, input, select, textarea {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+/* ==========================================================================
+   رأس الصفحة (App Header)
+   ========================================================================== */
+.app-header {
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border-color);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  box-shadow: var(--shadow-sm);
+}
+
+.header-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0.85rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.brand-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, #10b981 0%, #047857 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  box-shadow: 0 4px 10px rgba(16, 185, 129, 0.35);
+}
+
+.brand-icon svg {
+  width: 26px;
+  height: 26px;
+}
+
+.brand-text h1 {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.brand-subtitle {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* شارة سعر المصارفة السريعة في الهيدر */
+.quick-rate-pill {
+  background: var(--bg-muted);
+  border: 1px solid var(--border-color);
+  padding: 0.35rem 0.75rem;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: var(--transition);
+}
+
+.quick-rate-pill:focus-within {
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+.quick-rate-pill label {
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.rate-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.rate-input-wrap input {
+  width: 70px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 0.2rem 0.4rem;
+  text-align: center;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  color: var(--color-primary);
+  outline: none;
+}
+
+.rate-unit {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* أزرار الأيقونات */
+.icon-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  background: var(--bg-muted);
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.icon-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+  transform: translateY(-1px);
+}
+
+.icon-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+.theme-icon {
+  font-size: 1.15rem;
+  line-height: 1;
+}
+
+body.theme-light .dark-icon { display: none; }
+body.theme-light .light-icon { display: block; }
+body.theme-dark .light-icon { display: none; }
+body.theme-dark .dark-icon { display: block; }
+
+/* ==========================================================================
+   شريط التبويبات (Navigation Tabs)
+   ========================================================================== */
+.app-nav {
+  background: var(--bg-card);
+  border-top: 1px solid var(--border-color);
+}
+
+.nav-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 1.25rem;
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.nav-container::-webkit-scrollbar {
+  display: none;
+}
+
+.nav-tab {
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: var(--text-secondary);
+  padding: 0.85rem 1rem;
+  font-size: 0.92rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: var(--transition);
+}
+
+.nav-tab svg {
+  width: 18px;
+  height: 18px;
+}
+
+.nav-tab:hover {
+  color: var(--color-primary);
+  background: rgba(37, 99, 235, 0.04);
+}
+
+.nav-tab.active {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+}
+
+.badge-count {
+  background: var(--color-primary);
+  color: #ffffff;
+  font-size: 0.72rem;
+  font-family: var(--font-mono);
+  padding: 0.1rem 0.45rem;
+  border-radius: 9999px;
+  font-weight: 700;
+}
+
+/* ==========================================================================
+   المحتوى الرئيسي وبطاقات الإحصائيات (Metrics Dashboard)
+   ========================================================================== */
+.main-content {
+  flex: 1;
+  max-width: 1400px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 1.5rem 1.25rem;
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.metric-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition);
+}
+
+.metric-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.metric-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  flex-shrink: 0;
+}
+
+.metric-icon svg {
+  width: 26px;
+  height: 26px;
+}
+
+.card-accounts .metric-icon { background: var(--card-acc-grad); }
+.card-amounts .metric-icon { background: var(--card-amt-grad); }
+.card-birr .metric-icon { background: var(--card-birr-grad); }
+.card-rate .metric-icon { background: var(--card-rate-grad); }
+
+.metric-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.metric-label {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.metric-value {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  line-height: 1.2;
+}
+
+.metric-hint {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+/* ==========================================================================
+   الألواح والتبويبات (Panels & Tabs)
+   ========================================================================== */
+.tab-pane {
+  display: none;
+}
+
+.tab-pane.active {
+  display: block;
+  animation: fadeIn 0.25s ease forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.panel-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.panel-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.25rem;
+}
+
+.panel-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.panel-title svg {
+  width: 22px;
+  height: 22px;
+  color: var(--color-primary);
+}
+
+.panel-desc {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-top: 0.25rem;
+}
+
+.panel-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+/* ==========================================================================
+   منطقة اللصق الذكية (Smart Paste Area)
+   ========================================================================== */
+.paste-area-wrapper {
+  margin-bottom: 1rem;
+}
+
+.code-textarea {
+  width: 100%;
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--border-color);
+  background: var(--bg-muted);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  resize: vertical;
+  min-height: 220px;
+  outline: none;
+  transition: var(--transition);
+}
+
+.code-textarea:focus {
+  border-color: var(--border-focus);
+  background: var(--bg-card);
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12);
+}
+
+.paste-options-bar {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  padding: 0.85rem 1rem;
+  background: var(--bg-muted);
+  border-radius: var(--radius-md);
+  margin-bottom: 1.25rem;
+  border: 1px solid var(--border-color);
+}
+
+.option-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.inline-field {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.inline-field label {
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.form-input-sm {
+  padding: 0.25rem 0.6rem;
+  font-size: 0.85rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  outline: none;
+}
+
+.form-input-sm:focus {
+  border-color: var(--border-focus);
+}
+
+.paste-submit-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.status-msg {
+  padding: 0.6rem 1rem;
+  border-radius: var(--radius-md);
+  font-size: 0.88rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.status-msg.success {
+  background: #dcfce7;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+}
+
+.status-msg.error {
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+/* ==========================================================================
+   أزرار الإجراءات (Buttons)
+   ========================================================================== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.55rem 1rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: var(--transition);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.btn svg {
+  width: 17px;
+  height: 17px;
+}
+
+.btn-primary {
+  background: var(--color-primary);
+  color: #ffffff;
+}
+
+.btn-primary:hover {
+  background: var(--color-primary-hover);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+  transform: translateY(-1px);
+}
+
+.btn-large {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.btn-secondary {
+  background: var(--bg-muted);
+  border-color: var(--border-color);
+  color: var(--text-primary);
+}
+
+.btn-secondary:hover {
+  background: var(--bg-hover);
+  transform: translateY(-1px);
+}
+
+.btn-excel {
+  background: #107c41; /* لون برنامج إكسل الرسمي */
+  color: #ffffff;
+}
+
+.btn-excel:hover {
+  background: #0b582e;
+  box-shadow: 0 4px 12px rgba(16, 124, 65, 0.35);
+  transform: translateY(-1px);
+}
+
+.btn-outline {
+  background: transparent;
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.btn-outline:hover {
+  background: rgba(37, 99, 235, 0.08);
+}
+
+.btn-ghost {
+  background: transparent;
+  border-color: transparent;
+  color: var(--text-secondary);
+}
+
+.btn-ghost:hover {
+  background: var(--bg-muted);
+}
+
+.btn-sm {
+  padding: 0.35rem 0.75rem;
+  font-size: 0.8rem;
+}
+
+.text-danger {
+  color: var(--color-danger) !important;
+}
+
+.text-danger:hover {
+  background: #fee2e2 !important;
+}
+
+/* ==========================================================================
+   شريط أدوات الجدول (Table Toolbar)
+   ========================================================================== */
+.table-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.25rem;
+}
+
+.search-box {
+  position: relative;
+  flex: 1;
+  min-width: 260px;
+  max-width: 400px;
+}
+
+.search-box svg {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 18px;
+  height: 18px;
+  color: var(--text-muted);
+}
+
+.search-box input {
+  width: 100%;
+  padding: 0.6rem 2.4rem 0.6rem 2rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  background: var(--bg-muted);
+  color: var(--text-primary);
+  outline: none;
+  font-size: 0.88rem;
+  transition: var(--transition);
+}
+
+.search-box input:focus {
+  border-color: var(--border-focus);
+  background: var(--bg-card);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+.clear-search-btn {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+/* ==========================================================================
+   جدول حسابات الصرافين (مطابق للصورة بدقة)
+   ========================================================================== */
+.table-responsive-wrapper {
+  overflow-x: auto;
+  border: 1.5px solid var(--excel-grid-border);
+  border-radius: var(--radius-md);
+  background: var(--bg-card);
+  box-shadow: var(--shadow-sm);
+  -webkit-overflow-scrolling: touch;
+}
+
+.sharaf-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: right;
+  font-size: 0.92rem;
+}
+
+/* ترويسة الجدول العريضة (مطابقة للصورة: شريط خوخي برتقالي بعنوان حسابات الصرافين) */
+.table-title-row .banner-th {
+  background-color: var(--excel-title-bg);
+  color: var(--excel-title-text);
+  font-size: 1.35rem;
+  font-weight: 900;
+  text-align: center;
+  padding: 0.65rem 1rem;
+  letter-spacing: 0.5px;
+  border-bottom: 2px solid var(--excel-grid-border);
+}
+
+/* شريط الأعمدة (مطابق للصورة: خلفية خضراء هادئة + أسهم الفرز) */
+.table-columns-row th {
+  background-color: var(--excel-header-bg);
+  color: var(--excel-header-text);
+  font-weight: 800;
+  font-size: 0.95rem;
+  padding: 0.7rem 0.6rem;
+  border: 1px solid var(--excel-grid-border);
+  white-space: nowrap;
+  user-select: none;
+}
+
+.th-content {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.4rem;
+}
+
+/* رمز سهم التصفية الصغير مثل إكسل تماماً */
+.filter-arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  font-size: 9px;
+  background: #ffffff;
+  border: 1px solid #71717a;
+  border-radius: 2px;
+  color: #18181b;
+  margin-left: 2px;
+  flex-shrink: 0;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+/* خلايا جسم الجدول */
+.sharaf-table td {
+  padding: 0.65rem 0.6rem;
+  border: 1px solid var(--excel-grid-border);
+  vertical-align: middle;
+}
+
+.sharaf-table tbody tr {
+  transition: background-color 0.15s ease;
+}
+
+.sharaf-table tbody tr:nth-child(even) {
+  background-color: rgba(0, 0, 0, 0.015);
+}
+
+body.theme-dark .sharaf-table tbody tr:nth-child(even) {
+  background-color: rgba(255, 255, 255, 0.02);
+}
+
+.sharaf-table tbody tr:hover {
+  background-color: var(--excel-row-hover);
+}
+
+/* تنسيقات الأعمدة الخاصة */
+.col-seq-cell {
+  text-align: center;
+  font-weight: 700;
+  color: var(--text-muted);
+  width: 50px;
+}
+
+.col-date-cell {
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+}
+
+.col-name-cell {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* عمود رقم الحساب مع زر النسخ السريع */
+.col-acc-cell {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: #1e3a8a;
+  white-space: nowrap;
+}
+
+body.theme-dark .col-acc-cell {
+  color: #93c5fd;
+}
+
+.acc-number-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.copy-acc-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 2px 5px;
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  opacity: 0.6;
+  transition: var(--transition);
+}
+
+.copy-acc-btn:hover {
+  opacity: 1;
+  background: var(--bg-hover);
+}
+
+/* عمود المبلغ وعمود المقابل بالبر */
+.col-amount-cell, .col-birr-cell {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  text-align: left;
+  direction: ltr;
+  white-space: nowrap;
+}
+
+.col-amount-cell {
+  color: #047857;
+}
+
+body.theme-dark .col-amount-cell {
+  color: #34d399;
+}
+
+.col-birr-cell {
+  color: #b45309;
+}
+
+body.theme-dark .col-birr-cell {
+  color: #fbbf24;
+}
+
+.col-rate-cell {
+  font-family: var(--font-mono);
+  text-align: center;
+  font-weight: 600;
+}
+
+/* خلية الإجراءات */
+.row-actions-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  justify-content: center;
+}
+
+.action-icon-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  transition: var(--transition);
+}
+
+.action-icon-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.action-icon-btn.delete:hover {
+  color: var(--color-danger);
+  background: #fee2e2;
+}
+
+/* تذييل الإجمالي (Footer) */
+.sharaf-table tfoot .total-row {
+  background-color: var(--excel-total-bg);
+  border-top: 2px solid var(--excel-grid-border);
+  font-weight: 800;
+}
+
+.sharaf-table tfoot td {
+  padding: 0.8rem 0.6rem;
+  border: 1px solid var(--excel-grid-border);
+}
+
+.total-label {
+  font-size: 1rem;
+}
+
+.total-amount, .total-birr {
+  font-family: var(--font-mono);
+  font-size: 1.15rem;
+  font-weight: 900;
+  text-align: left;
+  direction: ltr;
+}
+
+.total-amount { color: #047857; }
+.total-birr { color: #b45309; }
+
+/* الحالة الفارغة */
+.empty-state {
+  text-align: center;
+  padding: 3.5rem 1rem;
+}
+
+.empty-icon {
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+}
+
+.empty-text {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.empty-subtext {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  max-width: 460px;
+  margin: 0.35rem auto 0;
+}
+
+.mt-3 {
+  margin-top: 1rem;
+}
+
+/* ==========================================================================
+   صفحة الإعدادات (Settings View)
+   ========================================================================== */
+.max-width-container {
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+.settings-form-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-top: 1.25rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.form-label {
+  font-size: 0.92rem;
+  color: var(--text-primary);
+}
+
+.form-input, .form-select {
+  width: 100%;
+  padding: 0.65rem 0.85rem;
+  border: 1.5px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--bg-muted);
+  color: var(--text-primary);
+  outline: none;
+  font-size: 0.92rem;
+  transition: var(--transition);
+}
+
+.form-input:focus, .form-select:focus {
+  border-color: var(--border-focus);
+  background: var(--bg-card);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+.input-with-addon {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-addon {
+  position: absolute;
+  left: 12px;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.form-help {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-top: 0.2rem;
+}
+
+.radio-group, .checkbox-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  background: var(--bg-muted);
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+}
+
+.radio-label, .checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.88rem;
+  cursor: pointer;
+  color: var(--text-secondary);
+}
+
+.radio-label input, .checkbox-label input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--color-primary);
+  cursor: pointer;
+}
+
+.settings-actions-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.bg-readonly {
+  background: var(--bg-muted) !important;
+  color: var(--text-secondary);
+  cursor: not-allowed;
+}
+
+/* ==========================================================================
+   دليل الاستخدام (Help Guide)
+   ========================================================================== */
+.help-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.help-step {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  background: var(--bg-muted);
+  border: 1px solid var(--border-color);
+}
+
+.step-num {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.step-details h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+  color: var(--text-primary);
+}
+
+.step-details p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+/* ==========================================================================
+   النوافذ المنبثقة والإشعارات (Modals & Toasts)
+   ========================================================================== */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 1rem;
+}
+
+.modal-backdrop.hidden {
+  display: none;
+}
+
+.modal-dialog {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  width: 100%;
+  max-width: 520px;
+  box-shadow: var(--shadow-xl);
+  overflow: hidden;
+  animation: modalPop 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes modalPop {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.modal-header {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modal-header h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.modal-close-btn {
+  background: transparent;
+  border: none;
+  font-size: 1.2rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0.2rem 0.5rem;
+  border-radius: var(--radius-sm);
+}
+
+.modal-close-btn:hover {
+  background: var(--bg-muted);
+  color: var(--text-primary);
+}
+
+.modal-body {
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.modal-footer {
+  padding: 0.85rem 1.25rem;
+  background: var(--bg-muted);
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+/* حاوية الإشعارات السريعة (Toasts) */
+.toast-container {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  pointer-events: none;
+}
+
+.toast {
+  background: var(--text-primary);
+  color: var(--bg-card);
+  padding: 0.75rem 1.25rem;
+  border-radius: var(--radius-md);
+  font-size: 0.88rem;
+  font-weight: 600;
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  pointer-events: auto;
+  animation: toastSlide 0.3s ease forwards;
+}
+
+@keyframes toastSlide {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.toast.toast-success { background: #065f46; color: #ffffff; }
+.toast.toast-error { background: #991b1b; color: #ffffff; }
+
+/* تذييل الصفحة */
+.app-footer {
+  background: var(--bg-card);
+  border-top: 1px solid var(--border-color);
+  padding: 1.25rem;
+  text-align: center;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  margin-top: auto;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* ==========================================================================
+   التجاوب مع الهواتف الذكية (Mobile Responsiveness)
+   ========================================================================== */
+@media (max-width: 768px) {
+  .header-container {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 0.75rem 1rem;
+  }
+
+  .header-controls {
+    justify-content: space-between;
+    margin-top: 0.5rem;
+  }
+
+  .metrics-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+  }
+
+  .metric-card {
+    padding: 0.85rem;
+    gap: 0.65rem;
+  }
+
+  .metric-icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .metric-icon svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .metric-value {
+    font-size: 1.15rem;
+  }
+
+  .panel-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .panel-actions {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .panel-actions .btn {
+    flex: 1;
+    font-size: 0.8rem;
+  }
+
+  .table-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .search-box {
+    max-width: 100%;
+  }
+
+  .toolbar-actions {
+    justify-content: stretch;
+  }
+
+  .toolbar-actions .btn {
+    flex: 1;
+    font-size: 0.78rem;
+    padding: 0.5rem;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .paste-options-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+
+  .settings-actions-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .settings-actions-bar .btn {
+    width: 100%;
+  }
+}
+
+/* ==========================================================================
+   تنسيقات الطباعة (Print Styles)
+   ========================================================================== */
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  .app-header, .app-nav, .metrics-grid, #tab-paste, #tab-settings, #tab-help,
+  .table-toolbar, .no-print, .app-footer, .toast-container {
+    display: none !important;
+  }
+
+  #tab-table {
+    display: block !important;
+  }
+
+  .panel-card {
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+  }
+
+  .table-responsive-wrapper {
+    border: none !important;
+    overflow: visible !important;
+  }
+
+  .sharaf-table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+  }
+
+  .table-title-row .banner-th {
+    background-color: #f8d7be !important;
+    color: #000000 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .table-columns-row th {
+    background-color: #cbe6cb !important;
+    color: #000000 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .sharaf-table td, .sharaf-table th {
+    border: 1px solid #333333 !important;
+  }
+}
