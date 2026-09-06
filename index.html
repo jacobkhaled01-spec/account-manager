@@ -290,7 +290,25 @@ total=227,620" rows="10" spellcheck="false"></textarea>
               <span>تصدير إكسل منسق (.xlsx)</span>
             </button>
 
-            <!-- نسخ الجدول للحافظة -->
+            <!-- نسخ رسالة البر بالصيغة الأصلية المطلوبة -->
+            <button id="btn-copy-original" class="btn btn-primary" title="نسخ السجلات بالصيغة الأصلية مع المبلغ بالبر تحت رقم الحساب">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+                <rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
+              </svg>
+              <span>📋 نسخ رسالة البر</span>
+            </button>
+
+            <!-- معاينة الرسالة النصية قبل نسخها -->
+            <button id="btn-preview-original" class="btn btn-secondary" title="معاينة وتعديل نص الرسالة قبل النسخ">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+              <span>معاينة الرسالة</span>
+            </button>
+
+            <!-- نسخ الجدول للحافظة كجدول إكسل -->
             <button id="btn-copy-table" class="btn btn-secondary" title="نسخ الجدول لنسخه مباشرة في إكسل">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
@@ -636,6 +654,28 @@ total=227,620" rows="10" spellcheck="false"></textarea>
           <button type="submit" class="btn btn-primary">حفظ السجل</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- ==================== نافذة معاينة ونسخ الرسالة بالبر ==================== -->
+  <div id="preview-message-modal" class="modal-backdrop hidden">
+    <div class="modal-dialog" style="max-width: 680px;">
+      <div class="modal-header">
+        <h3 id="preview-modal-title">📋 معاينة كشف الحوالات (صيغة الرسالة بالبر)</h3>
+        <button class="modal-close-btn" onclick="app.closePreviewModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <p class="form-help" style="margin-bottom: 0.5rem; font-size: 0.88rem; color: var(--color-primary); font-weight: 600;">
+          ✓ تم تجهيز الرسالة: الاسم بدون المبلغ السابق، تحته رقم الحساب، وتحته مباشرة المبلغ بالبر مع birr.
+        </p>
+        <textarea id="preview-message-textarea" class="code-textarea" rows="14" style="min-height: 280px; font-size: 0.95rem; font-family: var(--font-mono);"></textarea>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="app.closePreviewModal()">إغلاق</button>
+        <button type="button" class="btn btn-primary" onclick="app.copyFromPreviewModal()">
+          📋 نسخ النص بالكامل
+        </button>
+      </div>
     </div>
   </div>
 

@@ -242,13 +242,30 @@ class SharafApp {
     this.statTotalBirr = document.getElementById('stat-total-birr');
     this.navCountBadge = document.getElementById('nav-count-badge');
 
+    // أزرار الجدول
+    this.btnExportExcel = document.getElementById('btn-export-excel');
+    this.btnCopyTable = document.getElementById('btn-copy-table');
+    this.btnCopyOriginal = document.getElementById('btn-copy-original');
+    this.btnPreviewOriginal = document.getElementById('btn-preview-original');
+    this.btnPrintTable = document.getElementById('btn-print-table');
+    this.btnAddRow = document.getElementById('btn-add-row');
+    this.btnClearAll = document.getElementById('btn-clear-all');
+
+    // الإحصائيات
+    this.statCount = document.getElementById('stat-count');
+    this.statTotalAmount = document.getElementById('stat-total-amount');
+    this.statTotalBirr = document.getElementById('stat-total-birr');
+    this.navCountBadge = document.getElementById('nav-count-badge');
+
     // تذييل الجدول
     this.footerCount = document.getElementById('footer-count');
     this.footerTotalAmount = document.getElementById('footer-total-amount');
     this.footerTotalBirr = document.getElementById('footer-total-birr');
 
-    // النافذة المنبثقة
+    // النوافذ المنبثقة
     this.rowModal = document.getElementById('row-modal');
+    this.previewModal = document.getElementById('preview-message-modal');
+    this.previewTextarea = document.getElementById('preview-message-textarea');
   }
 
   bindEvents() {
@@ -306,6 +323,12 @@ class SharafApp {
     // أزرار الجدول
     this.btnExportExcel.addEventListener('click', () => this.exportToExcel());
     this.btnCopyTable.addEventListener('click', () => this.copyTableToClipboard());
+    if (this.btnCopyOriginal) {
+      this.btnCopyOriginal.addEventListener('click', () => this.copyOriginalMessage());
+    }
+    if (this.btnPreviewOriginal) {
+      this.btnPreviewOriginal.addEventListener('click', () => this.openPreviewModal());
+    }
     this.btnPrintTable.addEventListener('click', () => window.print());
     this.btnAddRow.addEventListener('click', () => this.openAddRowModal());
     this.btnClearAll.addEventListener('click', () => this.clearAllRecords());
@@ -344,6 +367,12 @@ class SharafApp {
     const parsedRecords = [];
     let pendingRecord = null;
     let textTotal = null;
+    let detectedHeader = '';
+
+    // التقاط السطر الترويسي إن وُجد
+    if (lines.length > 0 && !lines[0].includes('=') && !/^\d+$/.test(lines[0])) {
+      detectedHeader = lines[0];
+    }
 
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
@@ -420,6 +449,7 @@ class SharafApp {
     return {
       records: parsedRecords,
       detectedDate,
+      detectedHeader,
       textTotal,
       calculatedTotalAmount,
       calculatedTotalBirr,
@@ -452,7 +482,8 @@ class SharafApp {
       return;
     }
 
-    // إضافة السجلات الجديدة
+    // حفظ عنوان النص الأصلي وسجلاته
+    this.originalHeaderText = result.detectedHeader || '';
     this.records = result.records;
     this.render();
 
@@ -772,6 +803,86 @@ class SharafApp {
   copyToClipboard(text, msg) {
     navigator.clipboard.writeText(text).then(() => {
       this.showToast(msg || 'تم النسخ', 'success');
+    });
+  }
+
+  // ==================== 7.1 نسخ ومعاينة الرسالة الأصلية بالبر ====================
+  generateCustomBirrMessage() {
+    if (this.records.length === 0) return '';
+
+    const currencyLabel = (this.settings.birrLabel || 'birr').trim();
+    const header = this.originalHeaderText || '';
+
+    const lines = [];
+    if (header) {
+      lines.push(header);
+      lines.push('');
+    }
+
+    this.records.forEach((r, idx) => {
+      // 1. رقم التسلسل واسم المستفيد (بدون المبلغ السابق =المبلغ)
+      lines.push(`${idx + 1},${r.name}`);
+      // 2. رقم الحساب
+      if (r.id) {
+        lines.push(r.id);
+      }
+      // 3. المبلغ بالبر مع اسم العملة بالإنجليزي birr تحت رقم الحساب بالضبط
+      const formattedBirr = this.formatNumber(r.birrEquivalent);
+      lines.push(`${formattedBirr} ${currencyLabel}`);
+      // سطر فارغ بين كل سجل والآخر
+      lines.push('');
+    });
+
+    // الإجمالي بالبر في النهاية
+    const totalBirr = this.records.reduce((sum, r) => sum + (r.birrEquivalent || 0), 0);
+    lines.push(`total=${this.formatNumber(totalBirr)} ${currencyLabel}`);
+
+    return lines.join('\n');
+  }
+
+  copyOriginalMessage() {
+    if (this.records.length === 0) {
+      this.showToast('لا توجد بيانات لنسخها، يرجى إدخال الحسابات أولاً', 'error');
+      return;
+    }
+
+    const message = this.generateCustomBirrMessage();
+    navigator.clipboard.writeText(message).then(() => {
+      this.showToast('تم نسخ رسالة كشف الحوالات بالبر بنجاح!', 'success');
+    }).catch(() => {
+      this.showToast('تعذر النسخ المباشر، يمكنك استخدام زر "معاينة الرسالة"', 'error');
+    });
+  }
+
+  openPreviewModal() {
+    if (this.records.length === 0) {
+      this.showToast('لا توجد بيانات لمعاينتها', 'error');
+      return;
+    }
+
+    const message = this.generateCustomBirrMessage();
+    if (this.previewTextarea) {
+      this.previewTextarea.value = message;
+    }
+    if (this.previewModal) {
+      this.previewModal.classList.remove('hidden');
+    }
+  }
+
+  closePreviewModal() {
+    if (this.previewModal) {
+      this.previewModal.classList.add('hidden');
+    }
+  }
+
+  copyFromPreviewModal() {
+    if (!this.previewTextarea) return;
+    const text = this.previewTextarea.value;
+    navigator.clipboard.writeText(text).then(() => {
+      this.showToast('تم نسخ النص بالكامل بنجاح!', 'success');
+      this.closePreviewModal();
+    }).catch(() => {
+      this.showToast('تعذر النسخ للحافظة', 'error');
     });
   }
 
