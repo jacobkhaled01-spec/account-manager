@@ -184,7 +184,7 @@
 
     <!-- ==================== التبويب الأول: لصق واستيراد البيانات ==================== -->
     <section id="tab-paste" class="tab-pane active">
-      <div class="panel-card">
+      <div class="panel-card mobile-paste-panel">
         <div class="panel-header">
           <div class="panel-title-wrap">
             <h2 class="panel-title">
@@ -192,29 +192,34 @@
                 <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
                 <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
               </svg>
-              منطقة لصق النص الخام واستخراجه تلقائياً
+              <span>منطقة لصق الكشف واستخراجه تلقائياً</span>
             </h2>
             <p class="panel-desc">
-              الصق نص الكشف المالي كما هو، وسيقوم النظام تلقائياً باستخراج التاريخ، الأسماء، المبالغ، وأرقام الحسابات
-              وإدراجها مباشرة في الجدول.
+              الصق نص الكشف المالي كما هو، وسيقوم النظام تلقائياً باستخراج التواريخ، الأسماء، المبالغ، وأرقام الحسابات
+              وحساب المقابل بالبر وإدراجها بالجدول فورياً.
             </p>
           </div>
 
-          <div class="panel-actions">
-            <button id="btn-load-sample" class="btn btn-secondary" title="تحميل النموذج الإثيوبي الدقيق (34 مستفيد)">
-              ✨ تجربة بالبيانات النموذجية
+          <div class="panel-actions mobile-paste-actions">
+            <button id="btn-paste-clipboard" class="btn btn-primary btn-paste-hero" title="لصق المحتوى فوراً من حافظة الجهاز">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 18px; height: 18px;">
+                <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+                <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
+              </svg>
+              <span>📋 لصق فوري من الحافظة</span>
             </button>
-            <button id="btn-paste-clipboard" class="btn btn-secondary" title="لصق المحتوى من حافظة الجهاز">
-              📋 لصق من الحافظة
-            </button>
-            <button id="btn-clear-text" class="btn btn-ghost text-danger" title="مسح النص المدخل">
-              🗑️ مسح
+            <button id="btn-clear-text" class="btn btn-ghost text-danger btn-clear-hero" title="مسح النص المدخل">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 17px; height: 17px;">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+              </svg>
+              <span>مسح النص</span>
             </button>
           </div>
         </div>
 
         <div class="paste-area-wrapper">
-          <textarea id="raw-text-input" class="code-textarea" placeholder="الصق كشف الحسابات هنا... مثال:
+          <textarea id="raw-text-input" class="code-textarea" placeholder="الصق كشف الحسابات هنا كما ورد في الرسالة... مثال:
 ዓዲ ዝሕወሎም ዝርዝር 01/13/18
 1,'Maekelesh Ftwi=7,667
 1000608369582
@@ -222,42 +227,46 @@
 2,kiros berhe=9,584
 1000039884996
 ...
-total=227,620" rows="10" spellcheck="false"></textarea>
+total=227,620" rows="9" spellcheck="false"></textarea>
         </div>
 
-        <!-- خيارات التحليل السريع -->
-        <div class="paste-options-bar">
-          <div class="option-item">
-            <label class="checkbox-label">
+        <!-- كرت خيارات التحليل السريع المتوافق مع الهواتف -->
+        <div class="paste-options-card">
+          <div class="paste-toggle-row">
+            <label class="checkbox-label touch-checkbox-label">
               <input type="checkbox" id="opt-auto-date" checked>
-              <span>كشف التاريخ تلقائياً من رأس النص (مثال: 01/13/18)</span>
+              <span>كشف واستخراج التاريخ تلقائياً من رأس النص (مثال: 01/13/18)</span>
             </label>
           </div>
 
-          <div class="option-item inline-field">
-            <label for="input-custom-date">تاريخ محدد (اختياري):</label>
-            <input type="text" id="input-custom-date" placeholder="مثال: 01/13/18 أو 2026/09/07" class="form-input-sm">
-          </div>
+          <div class="paste-inputs-grid">
+            <div class="mobile-field-item date-field">
+              <label for="input-custom-date" class="mobile-field-label">تاريخ مخصص (اختياري):</label>
+              <input type="text" id="input-custom-date" placeholder="مثال: 01/13/18 أو 2026/09/07" class="form-input-sm">
+            </div>
 
-          <div class="option-item inline-field">
-            <label for="input-batch-currency">العملة:</label>
-            <input type="text" id="input-batch-currency" value="ريال سعودي" class="form-input-sm">
-          </div>
+            <div class="mobile-field-item curr-field">
+              <label for="input-batch-currency" class="mobile-field-label">العملة:</label>
+              <input type="text" id="input-batch-currency" value="ريال سعودي" class="form-input-sm">
+            </div>
 
-          <div class="option-item inline-field">
-            <label for="input-batch-rate">سعر المصارفة:</label>
-            <input type="number" id="input-batch-rate" value="48" step="0.01" class="form-input-sm"
-              style="width: 80px;">
+            <div class="mobile-field-item rate-field">
+              <label for="input-batch-rate" class="mobile-field-label">سعر المصارفة:</label>
+              <div class="input-with-addon-right">
+                <input type="number" id="input-batch-rate" value="48" step="0.01" class="form-input-sm">
+                <span class="addon-tag">بر</span>
+              </div>
+            </div>
           </div>
         </div>
 
         <!-- زر المعالجة الأساسي -->
         <div class="paste-submit-row">
-          <button id="btn-process-text" class="btn btn-primary btn-large">
+          <button id="btn-process-text" class="btn btn-primary btn-large btn-process-hero">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
             </svg>
-            <span>استخراج وتحليل وإدراج تلقائي في الأعمدة</span>
+            <span>⚡ استخراج وتحليل وإدراج تلقائي ⚡</span>
           </button>
 
           <div id="parse-status-message" class="status-msg hidden"></div>
@@ -420,10 +429,7 @@ total=227,620" rows="10" spellcheck="false"></textarea>
                   <div class="empty-content">
                     <div class="empty-icon">📑</div>
                     <p class="empty-text">لا توجد سجلات حالياً في الجدول</p>
-                    <p class="empty-subtext">قم بلصق كشف الحسابات في تبويب "لصق واستيراد البيانات" أو اضغط على "تجربة
-                      بالبيانات النموذجية"</p>
-                    <button class="btn btn-secondary btn-sm mt-3" onclick="app.loadSampleDataAndSwitch()">✨ تجربة
-                      النموذج فوراً</button>
+                    <p class="empty-subtext">قم بلصق كشف الحسابات في تبويب "لصق واستيراد البيانات" ليتم إدراجه تلقائياً</p>
                   </div>
                 </td>
               </tr>
@@ -467,114 +473,135 @@ total=227,620" rows="10" spellcheck="false"></textarea>
 
         <form id="settings-form" class="settings-form-grid" onsubmit="event.preventDefault(); app.saveSettings();">
 
-          <!-- 1. سعر المصارفة الافتراضي -->
-          <div class="form-group">
-            <label for="setting-default-rate" class="form-label">
-              <strong>سعر المصارفة الافتراضي (معامل الضرب):</strong>
-            </label>
-            <div class="input-with-addon">
-              <input type="number" id="setting-default-rate" value="48" step="0.01" min="0.01" required
-                class="form-input">
-              <span class="input-addon">بر لكل 1 وحدة</span>
+          <!-- بطاقة 1: أسعار المصارفة والعملة -->
+          <div class="settings-section-card">
+            <div class="section-title">
+              <span class="section-icon">💱</span>
+              <span class="section-text">أسعار المصارفة والعملة المعتمدة</span>
             </div>
-            <p class="form-help">القيمة الافتراضية لحساب (المقابل بالبر = المبلغ × سعر المصارفة). يمكنك أيضاً تعديلها
-              مباشرة من رأس الصفحة.</p>
-          </div>
+            <div class="section-grid">
+              <div class="form-group">
+                <label for="setting-default-rate" class="form-label">
+                  <strong>سعر المصارفة الافتراضي (معامل الضرب):</strong>
+                </label>
+                <div class="input-with-addon-right">
+                  <input type="number" id="setting-default-rate" value="48" step="0.01" min="0.01" required class="form-input">
+                  <span class="addon-tag">بر لكل 1 وحدة</span>
+                </div>
+                <p class="form-help">يُحسب المقابل بالبر = المبلغ × هذا المعامل.</p>
+              </div>
 
-          <!-- 2. العملة الافتراضية -->
-          <div class="form-group">
-            <label for="setting-default-currency" class="form-label">
-              <strong>العملة الافتراضية:</strong>
-            </label>
-            <div class="input-with-select">
-              <select id="setting-currency-select" class="form-select"
-                onchange="document.getElementById('setting-default-currency').value = this.value">
-                <option value="ريال سعودي">ريال سعودي (SAR)</option>
-                <option value="درهم إماراتي">درهم إماراتي (AED)</option>
-                <option value="دولار أمريكي">دولار أمريكي (USD)</option>
-                <option value="دينار كويتي">دينار كويتي (KWD)</option>
-                <option value="يورو">يورو (EUR)</option>
-                <option value="custom">أخرى (كتابة يدوية)...</option>
-              </select>
-              <input type="text" id="setting-default-currency" value="ريال سعودي" required class="form-input mt-2">
-            </div>
-          </div>
-
-          <!-- 3. اسم الصراف / المنشأة -->
-          <div class="form-group">
-            <label for="setting-shop-name" class="form-label">
-              <strong>كشف الحوالات / المنشأة (للترويسة والطباعة والإكسل):</strong>
-            </label>
-            <input type="text" id="setting-shop-name" value="حسابات الصرافين" class="form-input">
-            <p class="form-help">يظهر هذا الاسم كعنوان رئيسي في ملف الإكسل المصدّر وفي تقارير الطباعة.</p>
-          </div>
-
-          <!-- 4. خيارات التاريخ -->
-          <div class="form-group">
-            <label class="form-label">
-              <strong>آلية تحديد التاريخ للسجلات المستوردة:</strong>
-            </label>
-            <div class="radio-group">
-              <label class="radio-label">
-                <input type="radio" name="date-mode" value="auto" checked>
-                <span>استخراج التاريخ تلقائياً من رأس النص إن وُجد (مثل 01/13/18)، وإلا استخدام تاريخ اليوم</span>
-              </label>
-              <label class="radio-label">
-                <input type="radio" name="date-mode" value="today">
-                <span>استخدام تاريخ اليوم دائماً</span>
-              </label>
+              <div class="form-group">
+                <label for="setting-default-currency" class="form-label">
+                  <strong>العملة الافتراضية:</strong>
+                </label>
+                <select id="setting-currency-select" class="form-select" onchange="document.getElementById('setting-default-currency').value = this.value">
+                  <option value="ريال سعودي">ريال سعودي (SAR)</option>
+                  <option value="درهم إماراتي">درهم إماراتي (AED)</option>
+                  <option value="دولار أمريكي">دولار أمريكي (USD)</option>
+                  <option value="دينار كويتي">دينار كويتي (KWD)</option>
+                  <option value="يورو">يورو (EUR)</option>
+                  <option value="custom">أخرى (كتابة يدوية)...</option>
+                </select>
+                <input type="text" id="setting-default-currency" value="ريال سعودي" required class="form-input mt-2" placeholder="اكتب اسم العملة">
+              </div>
             </div>
           </div>
 
-          <!-- 5. تنسيق الأرقام والإكسل -->
-          <div class="form-group">
-            <label class="form-label">
-              <strong>خيارات تصدير الإكسل والعرض:</strong>
-            </label>
-            <div class="checkbox-group">
-              <label class="checkbox-label">
-                <input type="checkbox" id="setting-excel-colors" checked>
-                <span>تضمين الألوان المتطابقة (شريط العنوان الخوخي + رؤوس الأعمدة الخضراء) في ملف الإكسل</span>
-              </label>
-              <label class="checkbox-label">
-                <input type="checkbox" id="setting-excel-total-row" checked>
-                <span>إضافة صف الإجمالي العام في نهاية ملف الإكسل</span>
-              </label>
-              <label class="checkbox-label">
-                <input type="checkbox" id="setting-thousands-sep" checked>
-                <span>عرض الأرقام والمبالغ مع فواصل الآلاف (مثال: 227,620)</span>
-              </label>
+          <!-- بطاقة 2: قواعد فصل الحوالات ورسائل البر -->
+          <div class="settings-section-card">
+            <div class="section-title">
+              <span class="section-icon">⚖️</span>
+              <span class="section-text">قواعد فصل وتصنيف الحوالات (صغيرة / كبيرة)</span>
+            </div>
+            <div class="section-grid">
+              <div class="form-group">
+                <label for="setting-split-threshold" class="form-label">
+                  <strong>الحد الفاصل للحوالات (بر):</strong>
+                </label>
+                <div class="input-with-addon-right">
+                  <input type="number" id="setting-split-threshold" value="100000" step="1000" class="form-input">
+                  <span class="addon-tag">بر</span>
+                </div>
+                <p class="form-help">الحوالات من 1 إلى هذا المبلغ تصنّف كـ (صغيرة) وما فوقه كـ (كبيرة).</p>
+              </div>
+
+              <div class="form-group">
+                <label for="setting-birr-label" class="form-label">
+                  <strong>رمز عملة البر في الرسالة النصية:</strong>
+                </label>
+                <input type="text" id="setting-birr-label" value="birr" class="form-input">
+                <p class="form-help">الكلمة المكتوبة بجانب المبلغ في رسالة البر (مثال: birr).</p>
+              </div>
             </div>
           </div>
 
-          <!-- 6. الحد الفاصل للحوالات ورمز العملة -->
-          <div class="form-row">
-            <div class="form-group">
-              <label for="setting-split-threshold" class="form-label">
-                <strong>الحد الفاصل للحوالات (بر):</strong>
-              </label>
-              <input type="number" id="setting-split-threshold" value="100000" step="1000" class="form-input">
-              <p class="form-help">الحوالات من 1 إلى هذا الرقم تعتبر صغيرة، وما فوقه يعتبر كبيرة.</p>
+          <!-- بطاقة 3: هوية المنشأة وعنوان الكشف -->
+          <div class="settings-section-card">
+            <div class="section-title">
+              <span class="section-icon">🏢</span>
+              <span class="section-text">هوية المنشأة وعنوان الكشف</span>
             </div>
             <div class="form-group">
-              <label for="setting-birr-label" class="form-label">
-                <strong>اسم عملة البر في الرسالة النصية:</strong>
+              <label for="setting-shop-name" class="form-label">
+                <strong>عنوان كشف الحوالات (للترويسة والطباعة وملف الإكسل):</strong>
               </label>
-              <input type="text" id="setting-birr-label" value="birr" class="form-input">
-              <p class="form-help">الكلمة المكتوبة بجانب المبلغ في الرسالة (مثال: birr أو birrr).</p>
+              <input type="text" id="setting-shop-name" value="حسابات الصرافين" class="form-input">
+              <p class="form-help">يظهر في شريط الترويسة الرئيسي وفي رأس ملفات الإكسل المصدّرة والطباعة.</p>
             </div>
           </div>
 
-          <!-- أزرار الإعدادات -->
+          <!-- بطاقة 4: خيارات التاريخ وتصدير الإكسل -->
+          <div class="settings-section-card">
+            <div class="section-title">
+              <span class="section-icon">📋</span>
+              <span class="section-text">خيارات استيراد التاريخ وتصدير الإكسل</span>
+            </div>
+            <div class="settings-toggles-list">
+              <div class="toggle-card">
+                <span class="toggle-title">آلية تحديد التاريخ للسجلات المستوردة:</span>
+                <div class="radio-group-cards">
+                  <label class="radio-card-item">
+                    <input type="radio" name="date-mode" value="auto" checked>
+                    <span class="radio-label-text">استخراج التاريخ تلقائياً من رأس النص إن وُجد (وإلا استخدام تاريخ اليوم)</span>
+                  </label>
+                  <label class="radio-card-item">
+                    <input type="radio" name="date-mode" value="today">
+                    <span class="radio-label-text">استخدام تاريخ اليوم دائماً</span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="toggle-card">
+                <span class="toggle-title">تخصيص ملف الإكسل وعرض الأرقام:</span>
+                <div class="checkbox-cards-list">
+                  <label class="check-card-item">
+                    <input type="checkbox" id="setting-excel-colors" checked>
+                    <span class="check-label-text">تضمين الألوان المتطابقة (الترويسة الخوخية ورؤوس الأعمدة الخضراء) في الإكسل</span>
+                  </label>
+                  <label class="check-card-item">
+                    <input type="checkbox" id="setting-excel-total-row" checked>
+                    <span class="check-label-text">إضافة صفوف الإجماليات الفرعية والإجمالي الشامل في نهاية الإكسل</span>
+                  </label>
+                  <label class="check-card-item">
+                    <input type="checkbox" id="setting-thousands-sep" checked>
+                    <span class="check-label-text">عرض الأرقام مع فواصل الآلاف لسهولة القراءة (مثال: 227,620)</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- شريط الإجراءات والحفظ بأسفل الإعدادات -->
           <div class="settings-actions-bar">
-            <button type="submit" class="btn btn-primary">
-              💾 حفظ الإعدادات
+            <button type="submit" class="btn btn-primary btn-save-settings">
+              <span>💾 حفظ وتطبيق الإعدادات</span>
             </button>
             <button type="button" class="btn btn-secondary" onclick="app.applyRateToExistingRecords()">
-              🔄 تطبيق سعر المصارفة الحالي على جميع السجلات المسجلة بالجدول
+              <span>🔄 تطبيق سعر المصارفة على السجلات الحالية بالجدول</span>
             </button>
-            <button type="button" class="btn btn-ghost" onclick="app.resetSettingsToDefault()">
-              استعادة الإعدادات الافتراضية
+            <button type="button" class="btn btn-ghost text-muted" onclick="app.resetSettingsToDefault()">
+              <span>استعادة الإعدادات الافتراضية</span>
             </button>
           </div>
 

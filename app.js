@@ -230,7 +230,6 @@ class SharafApp {
 
     this.rawTextInput = document.getElementById('raw-text-input');
     this.btnProcessText = document.getElementById('btn-process-text');
-    this.btnLoadSample = document.getElementById('btn-load-sample');
     this.btnPasteClipboard = document.getElementById('btn-paste-clipboard');
     this.btnClearText = document.getElementById('btn-clear-text');
     this.parseStatusMsg = document.getElementById('parse-status-message');
@@ -271,7 +270,6 @@ class SharafApp {
     });
 
     this.btnProcessText.addEventListener('click', () => this.processRawText());
-    this.btnLoadSample.addEventListener('click', () => this.loadSampleData());
     this.btnPasteClipboard.addEventListener('click', () => this.pasteFromClipboard());
     this.btnClearText.addEventListener('click', () => {
       this.rawTextInput.value = '';
@@ -574,8 +572,7 @@ class SharafApp {
               <div class="empty-content">
                 <div class="empty-icon">📑</div>
                 <p class="empty-text">لا توجد سجلات حالياً في الجدول</p>
-                <p class="empty-subtext">قم بلصق كشف الحسابات في تبويب "لصق واستيراد البيانات" أو اضغط على "تجربة بالبيانات النموذجية"</p>
-                <button class="btn btn-secondary btn-sm mt-3" onclick="app.loadSampleDataAndSwitch()">✨ تجربة النموذج فوراً</button>
+                <p class="empty-subtext">قم بلصق كشف الحسابات في تبويب "لصق واستيراد البيانات" ليتم إدراجه تلقائياً</p>
               </div>
             </td>
           </tr>`;
