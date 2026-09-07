@@ -3,7 +3,10 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5.0">
+  <meta name="theme-color" content="#2563eb">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <title>كشف الحوالات - إدارة كشوف الحسابات وحساب المقابل بالبر</title>
 
   <!-- Google Fonts: Cairo & JetBrains Mono -->
@@ -337,6 +340,13 @@ total=227,620" rows="10" spellcheck="false"></textarea>
               <span>🗑️ تفريغ الجدول</span>
             </button>
           </div>
+        </div>
+
+        <!-- تنبيه وتوجيه التمرير الأفقي للهواتف الذكية -->
+        <div class="mobile-table-hint no-print">
+          <span class="hint-arrow">👉</span>
+          <span>اسحب الجدول أفقياً لمشاهدة باقي الأعمدة والمقابل بالبر</span>
+          <span class="hint-arrow">👈</span>
         </div>
 
         <!-- ==================== جدول حسابات الصرافين (مطابق للصورة) ==================== -->
@@ -708,6 +718,26 @@ total=227,620" rows="10" spellcheck="false"></textarea>
       <p>نظام حسابات © 2026 — مصمم وفق أعلى معايير السرعة، التجاوب، والدقة الحسابية</p>
     </div>
   </footer>
+
+  <!-- شريط الإجراءات السريع العائم للهواتف الذكية (Mobile Floating Quick Actions) -->
+  <aside class="mobile-floating-bar no-print" id="mobile-floating-bar" aria-label="شريط الوصول السريع">
+    <button class="mobile-float-btn primary" onclick="app.copyOriginalMessage()" title="نسخ رسالة البر بالصيغة المعتمدة">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;">
+        <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+        <rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
+      </svg>
+      <span>نسخ البر</span>
+    </button>
+    <button class="mobile-float-btn secondary" onclick="app.openPreviewModal()" title="معاينة وتعديل نص الرسالة">
+      <span>👁️ معاينة</span>
+    </button>
+    <button class="mobile-float-btn excel" onclick="app.exportToExcel()" title="تصدير ملف إكسل منسق">
+      <span>📥 إكسل</span>
+    </button>
+    <button class="mobile-float-btn add" onclick="app.openAddRowModal()" title="إضافة سطر جديد">
+      <span>➕ سطر</span>
+    </button>
+  </aside>
 
   <!-- Main JavaScript Application Logic -->
   <script src="app.js"></script>
