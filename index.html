@@ -163,6 +163,7 @@
           <span class="metric-label">المقابل الإجمالي بالبر (ETB)</span>
           <span class="metric-value" id="stat-total-birr">0</span>
           <span class="metric-hint">المبلغ × سعر المصارفة</span>
+          <span class="metric-cut-cents" id="stat-cut-cents-birr" title="إجمالي السنتات المقطوعة بالبر">✂️ مقطوع: 0 سنت بر</span>
         </div>
       </div>
 
@@ -447,6 +448,14 @@ total=227,620" rows="9" spellcheck="false"></textarea>
                 <td class="total-birr" id="footer-total-birr">0</td>
                 <td class="no-print"></td>
               </tr>
+              <tr class="cut-cents-row" id="footer-cut-cents-row">
+                <td colspan="6" class="total-label cut-cents-label">
+                  ✂️ إجمالي السنتات المقطوعة بالبر (الكسور &lt; 100 سنت) <span class="cut-cents-note" id="footer-cut-cents-desc">(0 سنت)</span>
+                </td>
+                <td class="total-rate-avg">-</td>
+                <td class="total-birr cut-cents-amount" id="footer-cut-cents-val">0.00 بر</td>
+                <td class="no-print"></td>
+              </tr>
             </tfoot>
           </table>
         </div>
@@ -457,17 +466,16 @@ total=227,620" rows="9" spellcheck="false"></textarea>
     <!-- ==================== التبويب الثالث: صفحة الإعدادات ==================== -->
     <section id="tab-settings" class="tab-pane">
       <div class="panel-card max-width-container">
-        <div class="panel-header">
+        <div class="panel-header settings-mobile-header">
           <div class="panel-title-wrap">
             <h2 class="panel-title">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <circle cx="12" cy="12" r="3" />
-                <path
-                  d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
               </svg>
-              الإعدادات العامة للنظام
+              <span>الإعدادات العامة للنظام</span>
             </h2>
-            <p class="panel-desc">تخصيص القيم الافتراضية، سعر المصارفة، العملة، وعناوين ملفات الإكسل المصدّرة.</p>
+            <p class="panel-desc">تخصيص أسعار المصارفة، قواعد فصل الحوالات، العملات، وهوية التقارير وملفات الإكسل.</p>
           </div>
         </div>
 
@@ -484,9 +492,9 @@ total=227,620" rows="9" spellcheck="false"></textarea>
                 <label for="setting-default-rate" class="form-label">
                   <strong>سعر المصارفة الافتراضي (معامل الضرب):</strong>
                 </label>
-                <div class="input-with-addon-right">
+                <div class="input-group-badge">
                   <input type="number" id="setting-default-rate" value="48" step="0.01" min="0.01" required class="form-input">
-                  <span class="addon-tag">بر لكل 1 وحدة</span>
+                  <span class="input-badge-label">بر لكل وحدة</span>
                 </div>
                 <p class="form-help">يُحسب المقابل بالبر = المبلغ × هذا المعامل.</p>
               </div>
@@ -495,15 +503,17 @@ total=227,620" rows="9" spellcheck="false"></textarea>
                 <label for="setting-default-currency" class="form-label">
                   <strong>العملة الافتراضية:</strong>
                 </label>
-                <select id="setting-currency-select" class="form-select" onchange="document.getElementById('setting-default-currency').value = this.value">
-                  <option value="ريال سعودي">ريال سعودي (SAR)</option>
-                  <option value="درهم إماراتي">درهم إماراتي (AED)</option>
-                  <option value="دولار أمريكي">دولار أمريكي (USD)</option>
-                  <option value="دينار كويتي">دينار كويتي (KWD)</option>
-                  <option value="يورو">يورو (EUR)</option>
-                  <option value="custom">أخرى (كتابة يدوية)...</option>
-                </select>
-                <input type="text" id="setting-default-currency" value="ريال سعودي" required class="form-input mt-2" placeholder="اكتب اسم العملة">
+                <div class="currency-picker-wrap">
+                  <select id="setting-currency-select" class="form-select" onchange="document.getElementById('setting-default-currency').value = this.value">
+                    <option value="ريال سعودي">ريال سعودي (SAR)</option>
+                    <option value="درهم إماراتي">درهم إماراتي (AED)</option>
+                    <option value="دولار أمريكي">دولار أمريكي (USD)</option>
+                    <option value="دينار كويتي">دينار كويتي (KWD)</option>
+                    <option value="يورو">يورو (EUR)</option>
+                    <option value="custom">أخرى (كتابة يدوية)...</option>
+                  </select>
+                  <input type="text" id="setting-default-currency" value="ريال سعودي" required class="form-input mt-2" placeholder="اكتب اسم العملة">
+                </div>
               </div>
             </div>
           </div>
@@ -517,20 +527,33 @@ total=227,620" rows="9" spellcheck="false"></textarea>
             <div class="section-grid">
               <div class="form-group">
                 <label for="setting-split-threshold" class="form-label">
-                  <strong>الحد الفاصل للحوالات (بر):</strong>
+                  <strong>الحد الفاصل للحوالات (المقابل بالبر):</strong>
                 </label>
-                <div class="input-with-addon-right">
+                <div class="input-group-badge">
                   <input type="number" id="setting-split-threshold" value="100000" step="1000" class="form-input">
-                  <span class="addon-tag">بر</span>
+                  <span class="input-badge-label">بر</span>
                 </div>
-                <p class="form-help">الحوالات من 1 إلى هذا المبلغ تصنّف كـ (صغيرة) وما فوقه كـ (كبيرة).</p>
+                <div class="quick-preset-chips">
+                  <span class="preset-label">خيارات سريعة:</span>
+                  <button type="button" class="preset-chip" onclick="document.getElementById('setting-split-threshold').value='50000'">50,000</button>
+                  <button type="button" class="preset-chip active" onclick="document.getElementById('setting-split-threshold').value='100000'">100,000</button>
+                  <button type="button" class="preset-chip" onclick="document.getElementById('setting-split-threshold').value='150000'">150,000</button>
+                  <button type="button" class="preset-chip" onclick="document.getElementById('setting-split-threshold').value='200000'">200,000</button>
+                </div>
+                <p class="form-help">الحوالات حتى هذا المبلغ تصنّف كـ (صغيرة) وما زاد عنه كـ (كبيرة).</p>
               </div>
 
               <div class="form-group">
                 <label for="setting-birr-label" class="form-label">
-                  <strong>رمز عملة البر في الرسالة النصية:</strong>
+                  <strong>رمز عملة البر في الرسالة المنسوخة:</strong>
                 </label>
                 <input type="text" id="setting-birr-label" value="birr" class="form-input">
+                <div class="quick-preset-chips">
+                  <span class="preset-label">خيارات سريعة:</span>
+                  <button type="button" class="preset-chip active" onclick="document.getElementById('setting-birr-label').value='birr'">birr</button>
+                  <button type="button" class="preset-chip" onclick="document.getElementById('setting-birr-label').value='بر'">بر</button>
+                  <button type="button" class="preset-chip" onclick="document.getElementById('setting-birr-label').value='ETB'">ETB</button>
+                </div>
                 <p class="form-help">الكلمة المكتوبة بجانب المبلغ في رسالة البر (مثال: birr).</p>
               </div>
             </div>
@@ -547,6 +570,12 @@ total=227,620" rows="9" spellcheck="false"></textarea>
                 <strong>عنوان كشف الحوالات (للترويسة والطباعة وملف الإكسل):</strong>
               </label>
               <input type="text" id="setting-shop-name" value="حسابات الصرافين" class="form-input">
+              <div class="quick-preset-chips">
+                <span class="preset-label">نماذج مقترحة:</span>
+                <button type="button" class="preset-chip active" onclick="document.getElementById('setting-shop-name').value='حسابات الصرافين'">حسابات الصرافين</button>
+                <button type="button" class="preset-chip" onclick="document.getElementById('setting-shop-name').value='كشف الحوالات'">كشف الحوالات</button>
+                <button type="button" class="preset-chip" onclick="document.getElementById('setting-shop-name').value='كشف حساب مالي'">كشف حساب مالي</button>
+              </div>
               <p class="form-help">يظهر في شريط الترويسة الرئيسي وفي رأس ملفات الإكسل المصدّرة والطباعة.</p>
             </div>
           </div>
@@ -559,15 +588,21 @@ total=227,620" rows="9" spellcheck="false"></textarea>
             </div>
             <div class="settings-toggles-list">
               <div class="toggle-card">
-                <span class="toggle-title">آلية تحديد التاريخ للسجلات المستوردة:</span>
+                <span class="toggle-title">آلية تحديد التاريخ للسجلات:</span>
                 <div class="radio-group-cards">
                   <label class="radio-card-item">
                     <input type="radio" name="date-mode" value="auto" checked>
-                    <span class="radio-label-text">استخراج التاريخ تلقائياً من رأس النص إن وُجد (وإلا استخدام تاريخ اليوم)</span>
+                    <div class="card-item-content">
+                      <span class="card-item-title">📅 استخراج التاريخ تلقائياً من النص</span>
+                      <span class="card-item-desc">يتم كشف التاريخ من رأس النص (مثال: 01/13/18)، وإلا تاريخ اليوم.</span>
+                    </div>
                   </label>
                   <label class="radio-card-item">
                     <input type="radio" name="date-mode" value="today">
-                    <span class="radio-label-text">استخدام تاريخ اليوم دائماً</span>
+                    <div class="card-item-content">
+                      <span class="card-item-title">📆 استخدام تاريخ اليوم دائماً</span>
+                      <span class="card-item-desc">تطبيق تاريخ الجهاز الحالي لكافة السجلات متجاهلاً تواريخ النص.</span>
+                    </div>
                   </label>
                 </div>
               </div>
@@ -577,15 +612,24 @@ total=227,620" rows="9" spellcheck="false"></textarea>
                 <div class="checkbox-cards-list">
                   <label class="check-card-item">
                     <input type="checkbox" id="setting-excel-colors" checked>
-                    <span class="check-label-text">تضمين الألوان المتطابقة (الترويسة الخوخية ورؤوس الأعمدة الخضراء) في الإكسل</span>
+                    <div class="card-item-content">
+                      <span class="card-item-title">🎨 تضمين الألوان المتطابقة في ملف الإكسل</span>
+                      <span class="card-item-desc">تلوين الترويسة باللون الخوخي ورؤوس الأعمدة بالأخضر الفاتح.</span>
+                    </div>
                   </label>
                   <label class="check-card-item">
                     <input type="checkbox" id="setting-excel-total-row" checked>
-                    <span class="check-label-text">إضافة صفوف الإجماليات الفرعية والإجمالي الشامل في نهاية الإكسل</span>
+                    <div class="card-item-content">
+                      <span class="card-item-title">📊 إضافة صفوف الإجماليات بملف الإكسل</span>
+                      <span class="card-item-desc">إدراج صف إجمالي الحوالات الصغيرة والكبيرة والإجمالي العام.</span>
+                    </div>
                   </label>
                   <label class="check-card-item">
                     <input type="checkbox" id="setting-thousands-sep" checked>
-                    <span class="check-label-text">عرض الأرقام مع فواصل الآلاف لسهولة القراءة (مثال: 227,620)</span>
+                    <div class="card-item-content">
+                      <span class="card-item-title">🔢 فواصل الآلاف في الأرقام والمبالغ</span>
+                      <span class="card-item-desc">تنسيق الأرقام بفواصل الآلاف لسهولة القراءة (مثال: 227,620).</span>
+                    </div>
                   </label>
                 </div>
               </div>
@@ -595,12 +639,26 @@ total=227,620" rows="9" spellcheck="false"></textarea>
           <!-- شريط الإجراءات والحفظ بأسفل الإعدادات -->
           <div class="settings-actions-bar">
             <button type="submit" class="btn btn-primary btn-save-settings">
-              <span>💾 حفظ وتطبيق الإعدادات</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 19px; height: 19px;">
+                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                <polyline points="7 3 7 8 15 8"></polyline>
+              </svg>
+              <span>حفظ وتطبيق الإعدادات</span>
             </button>
-            <button type="button" class="btn btn-secondary" onclick="app.applyRateToExistingRecords()">
-              <span>🔄 تطبيق سعر المصارفة على السجلات الحالية بالجدول</span>
+            <button type="button" class="btn btn-secondary btn-apply-rate" onclick="app.applyRateToExistingRecords()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 17px; height: 17px;">
+                <polyline points="23 4 23 10 17 10"></polyline>
+                <polyline points="1 20 1 14 7 14"></polyline>
+                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+              </svg>
+              <span>تطبيق سعر المصارفة على السجلات الحالية</span>
             </button>
-            <button type="button" class="btn btn-ghost text-muted" onclick="app.resetSettingsToDefault()">
+            <button type="button" class="btn btn-ghost text-muted btn-reset-settings" onclick="app.resetSettingsToDefault()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;">
+                <polyline points="1 4 1 10 7 10"></polyline>
+                <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+              </svg>
               <span>استعادة الإعدادات الافتراضية</span>
             </button>
           </div>
@@ -746,25 +804,7 @@ total=227,620" rows="9" spellcheck="false"></textarea>
     </div>
   </footer>
 
-  <!-- شريط الإجراءات السريع العائم للهواتف الذكية (Mobile Floating Quick Actions) -->
-  <aside class="mobile-floating-bar no-print" id="mobile-floating-bar" aria-label="شريط الوصول السريع">
-    <button class="mobile-float-btn primary" onclick="app.copyOriginalMessage()" title="نسخ رسالة البر بالصيغة المعتمدة">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;">
-        <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
-        <rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
-      </svg>
-      <span>نسخ البر</span>
-    </button>
-    <button class="mobile-float-btn secondary" onclick="app.openPreviewModal()" title="معاينة وتعديل نص الرسالة">
-      <span>👁️ معاينة</span>
-    </button>
-    <button class="mobile-float-btn excel" onclick="app.exportToExcel()" title="تصدير ملف إكسل منسق">
-      <span>📥 إكسل</span>
-    </button>
-    <button class="mobile-float-btn add" onclick="app.openAddRowModal()" title="إضافة سطر جديد">
-      <span>➕ سطر</span>
-    </button>
-  </aside>
+
 
   <!-- Main JavaScript Application Logic -->
   <script src="app.js"></script>

@@ -1048,6 +1048,81 @@ body.theme-dark .col-birr-cell {
 .total-amount { color: #047857; }
 .total-birr { color: #b45309; }
 
+/* صف السنتات المقطوعة في تذييل الجدول */
+.sharaf-table tfoot .cut-cents-row {
+  background-color: rgba(239, 68, 68, 0.05);
+  font-weight: 700;
+  border-top: 1px dashed var(--excel-grid-border);
+}
+
+body.theme-dark .sharaf-table tfoot .cut-cents-row {
+  background-color: rgba(239, 68, 68, 0.12);
+}
+
+.cut-cents-label {
+  color: #dc2626;
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+body.theme-dark .cut-cents-label {
+  color: #f87171;
+}
+
+.cut-cents-amount {
+  color: #dc2626 !important;
+  font-size: 1.05rem !important;
+}
+
+body.theme-dark .cut-cents-amount {
+  color: #f87171 !important;
+}
+
+.cut-cents-curr {
+  color: #dc2626;
+  font-weight: 700;
+}
+
+.cut-cents-note {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+/* بادج السنتات في بطاقة الإحصائيات العلوية */
+.metric-cut-cents {
+  display: inline-block;
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #dc2626;
+  background: rgba(239, 68, 68, 0.08);
+  padding: 0.15rem 0.45rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+body.theme-dark .metric-cut-cents {
+  color: #fca5a5;
+  background: rgba(239, 68, 68, 0.2);
+}
+
+/* بادج السنتات المقطوعة داخل خلايا الجدول */
+.badge-cut-cents {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #dc2626;
+  direction: ltr;
+  text-align: right;
+  margin-top: 0.15rem;
+  opacity: 0.9;
+}
+
+body.theme-dark .badge-cut-cents {
+  color: #fca5a5;
+}
+
 /* تنسيقات فئات الحوالات (الصغيرة والكبيرة والإجماليات الفرعية) */
 .category-banner-row td {
   background-color: #e0f2fe !important;
@@ -1263,6 +1338,97 @@ body.theme-dark .subtotal-row {
   gap: 1rem;
 }
 
+/* مجموعة إدخال مدمجة تمنع أي تداخل بصري مع الأرقام */
+.input-group-badge {
+  display: flex;
+  align-items: stretch;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--bg-card);
+  transition: var(--transition);
+}
+
+.input-group-badge:focus-within {
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+.input-group-badge input {
+  flex: 1;
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  padding: 0.65rem 0.85rem !important;
+  background: transparent !important;
+  font-size: 16px !important;
+  min-width: 0;
+  color: var(--text-primary);
+}
+
+.input-badge-label {
+  background: var(--bg-muted);
+  border-right: 1px solid var(--border-color);
+  padding: 0.65rem 0.85rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  user-select: none;
+}
+
+/* أزرار خيارات سريعة مسبقة لمسية بالإبهام */
+.quick-preset-chips {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+  margin-top: 0.45rem;
+}
+
+.preset-label {
+  font-size: 0.74rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.preset-chip {
+  background: var(--bg-muted);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 0.25rem 0.55rem;
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: var(--transition);
+  touch-action: manipulation;
+  font-family: var(--font-family);
+}
+
+.preset-chip:hover,
+.preset-chip:active {
+  background: var(--color-primary);
+  color: #ffffff;
+  border-color: var(--color-primary);
+  transform: scale(1.02);
+}
+
+.preset-chip.active {
+  background: rgba(37, 99, 235, 0.12);
+  color: var(--color-primary);
+  border-color: rgba(37, 99, 235, 0.4);
+}
+
+.currency-picker-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
 .settings-toggles-list {
   display: flex;
   flex-direction: column;
@@ -1301,12 +1467,12 @@ body.theme-dark .subtotal-row {
 .radio-card-item,
 .check-card-item {
   display: flex;
-  align-items: center;
-  gap: 0.75rem;
+  align-items: flex-start;
+  gap: 0.85rem;
   background: var(--bg-muted);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
-  padding: 0.75rem 0.95rem;
+  padding: 0.85rem 1rem;
   cursor: pointer;
   transition: var(--transition);
   user-select: none;
@@ -1320,26 +1486,32 @@ body.theme-dark .subtotal-row {
 
 .radio-card-item input[type="radio"],
 .check-card-item input[type="checkbox"] {
-  width: 20px;
-  height: 20px;
-  min-width: 20px;
-  min-height: 20px;
+  width: 22px;
+  height: 22px;
+  min-width: 22px;
+  min-height: 22px;
+  margin-top: 2px;
   accent-color: var(--color-primary);
   cursor: pointer;
 }
 
-.radio-label-text,
-.check-label-text {
-  font-size: 0.88rem;
-  font-weight: 600;
-  color: var(--text-secondary);
-  line-height: 1.45;
+.card-item-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex: 1;
 }
 
-.radio-card-item input:checked ~ .radio-label-text,
-.check-card-item input:checked ~ .check-label-text {
-  color: var(--text-primary);
+.card-item-title {
+  font-size: 0.9rem;
   font-weight: 700;
+  color: var(--text-primary);
+}
+
+.card-item-desc {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  line-height: 1.4;
 }
 
 .radio-label, .checkbox-label {
@@ -1360,23 +1532,61 @@ body.theme-dark .subtotal-row {
 
 .settings-actions-bar {
   display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 0.65rem;
   padding-top: 1.25rem;
   border-top: 1px solid var(--border-color);
 }
 
 .btn-save-settings {
-  font-size: 0.98rem;
-  padding: 0.75rem 1.85rem;
+  width: 100%;
+  min-height: 52px;
+  font-size: 1.02rem;
+  font-weight: 800;
+  padding: 0.85rem 1.5rem;
   box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
   background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  color: #ffffff;
+  border-radius: var(--radius-md);
+  justify-content: center;
 }
 
 .btn-save-settings:hover {
   background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
   transform: translateY(-1px);
+}
+
+.btn-apply-rate {
+  width: 100%;
+  min-height: 48px;
+  font-size: 0.92rem;
+  font-weight: 700;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  border-radius: var(--radius-md);
+  justify-content: center;
+}
+
+.btn-apply-rate:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-focus);
+}
+
+.btn-reset-settings {
+  width: 100%;
+  min-height: 44px;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  border: 1px dashed var(--border-color);
+  border-radius: var(--radius-md);
+  justify-content: center;
+}
+
+.btn-reset-settings:hover {
+  background: rgba(220, 38, 38, 0.06);
+  color: var(--color-danger);
+  border-color: var(--color-danger);
 }
 
 .bg-readonly {
@@ -1579,11 +1789,6 @@ button:active, .btn:active {
   display: none;
 }
 
-/* شريط الإجراءات السريع العائم (مخفي على الشاشات الكبيرة) */
-.mobile-floating-bar {
-  display: none;
-}
-
 @media (max-width: 768px) {
   /* منع تقريب الشاشة التلقائي المزعج على هواتف آيفون Safari */
   input, select, textarea, .form-input, .code-textarea, .form-input-sm {
@@ -1592,7 +1797,7 @@ button:active, .btn:active {
 
   /* هوامش الصفحة الرئيسية على الهاتف */
   .main-content {
-    padding: 0.75rem 0.5rem calc(5.5rem + env(safe-area-inset-bottom, 15px)) 0.5rem !important;
+    padding: 0.75rem 0.5rem calc(1.5rem + env(safe-area-inset-bottom, 10px)) 0.5rem !important;
   }
 
   /* رأس الصفحة على الهاتف */
@@ -1976,12 +2181,23 @@ button:active, .btn:active {
     font-size: 0.84rem;
   }
 
+  .settings-mobile-header {
+    padding-bottom: 0.5rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .settings-mobile-header .panel-desc {
+    font-size: 0.76rem;
+    line-height: 1.4;
+  }
+
   .settings-actions-bar {
     display: flex;
     flex-direction: column;
-    gap: 0.55rem;
+    gap: 0.6rem;
     width: 100%;
     padding-top: 1rem;
+    padding-bottom: 4rem; /* مساحة سفلية كافية تمنع أي تداخل مع حافة الشاشة */
   }
 
   .settings-actions-bar .btn {
@@ -1997,65 +2213,11 @@ button:active, .btn:active {
     font-weight: 700;
   }
 
-  /* شريط الإجراءات السريع العائم بأسفل الهاتف */
-  .mobile-floating-bar {
-    display: flex;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: var(--bg-card-glass);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-    border-top: 1px solid var(--border-color);
-    padding: 0.5rem 0.6rem calc(0.5rem + env(safe-area-inset-bottom, 8px));
-    gap: 0.4rem;
-    z-index: 90;
-    box-shadow: 0 -4px 18px rgba(0, 0, 0, 0.12);
+  /* إخفاء كروت الإحصائيات في صفحة الإعدادات لتوفير المساحة */
+  .metrics-grid.hidden-on-settings {
+    display: none !important;
   }
 
-  .mobile-float-btn {
-    flex: 1;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.3rem;
-    padding: 0.6rem 0.25rem;
-    border-radius: var(--radius-md);
-    font-size: 0.78rem;
-    font-weight: 700;
-    font-family: var(--font-family);
-    border: 1px solid transparent;
-    cursor: pointer;
-    white-space: nowrap;
-    transition: var(--transition);
-    touch-action: manipulation;
-  }
-
-  .mobile-float-btn.primary {
-    flex: 1.4;
-    background: var(--color-primary);
-    color: #ffffff;
-    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.35);
-  }
-
-  .mobile-float-btn.secondary {
-    background: var(--bg-muted);
-    color: var(--text-primary);
-    border-color: var(--border-color);
-  }
-
-  .mobile-float-btn.excel {
-    background: #107c41;
-    color: #ffffff;
-    box-shadow: 0 2px 8px rgba(16, 124, 65, 0.3);
-  }
-
-  .mobile-float-btn.add {
-    background: var(--bg-card);
-    color: var(--color-primary);
-    border-color: var(--color-primary);
-  }
 }
 
 /* تحسينات إضافية للهواتف شديدة الصغر (أقل من 380px) */
@@ -2066,11 +2228,6 @@ button:active, .btn:active {
 
   .metric-value {
     font-size: 1.05rem;
-  }
-
-  .mobile-float-btn {
-    font-size: 0.72rem;
-    padding: 0.5rem 0.2rem;
   }
 }
 
