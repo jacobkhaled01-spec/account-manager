@@ -415,10 +415,10 @@ class SharafApp {
 
         const amount = parseFloat(norm) || 0; // المبلغ للعملة الأصلية بدون استقطاع
 
-        // استقطاع الكسور والسنتات للبر فقط (< 100 سنت)
+        // استقطاع ما دون 100 بر (الآحاد والعشرات والكسور) لتصبح مبالغ الحوالات مئات مقفلة
         const rawBirr = amount * rate;
-        const birrEquivalent = Math.trunc(rawBirr); // استقطاع الأجزاء بعد الفاصلة والتي أقل من 100 سنت للبر فقط
-        const cutCents = Math.round((rawBirr - birrEquivalent) * 100) / 100; // سنتات البر المقطوعة
+        const birrEquivalent = Math.floor(rawBirr / 100) * 100; // مئات مقفلة
+        const cutCents = Math.round((rawBirr - birrEquivalent) * 100) / 100; // المبلغ المقطوع بالبر بدقة
 
         pendingRecord = {
           originalSeq: originalSeq, // الحفاظ على التسلسل/الآيدي الأصلي
@@ -551,7 +551,7 @@ class SharafApp {
     this.records.forEach(record => {
       record.rate = newRate;
       const rawBirr = record.amount * newRate;
-      record.birrEquivalent = Math.trunc(rawBirr); // استقطاع الكسور للبر فقط
+      record.birrEquivalent = Math.floor(rawBirr / 100) * 100; // استقطاع ما دون 100 بر والكسور
       record.cutCents = Math.round((rawBirr - record.birrEquivalent) * 100) / 100;
     });
     this.render();
@@ -569,7 +569,7 @@ class SharafApp {
       const amt = parseFloat(newAmount) || 0;
       this.records[index].amount = amt;
       const rawBirr = amt * this.records[index].rate;
-      this.records[index].birrEquivalent = Math.trunc(rawBirr);
+      this.records[index].birrEquivalent = Math.floor(rawBirr / 100) * 100;
       this.records[index].cutCents = Math.round((rawBirr - this.records[index].birrEquivalent) * 100) / 100;
       this.render();
     }
@@ -748,7 +748,7 @@ class SharafApp {
     const birrLabel = (this.settings.birrLabel || 'birr').trim();
     const statCutBirrEl = document.getElementById('stat-cut-cents-birr');
     if (statCutBirrEl) {
-      statCutBirrEl.textContent = `المقطوع بالبر: ${totalCutCents.toFixed(2)} ${birrLabel}${totalCentsCount > 0 ? ` (${totalCentsCount} سنت)` : ''}`;
+      statCutBirrEl.textContent = `✂️ مقطوع: ${totalCutCents.toFixed(2)} ${birrLabel}${totalCentsCount > 0 ? ` (${this.formatNumber(totalCentsCount)} سنت)` : ''}`;
     }
 
     this.footerCount.textContent = totalCount;
@@ -759,7 +759,7 @@ class SharafApp {
     const footerCutDescEl = document.getElementById('footer-cut-cents-desc');
     if (footerCutValEl) footerCutValEl.textContent = `${totalCutCents.toFixed(2)} بر`;
     if (footerCutDescEl) {
-      footerCutDescEl.textContent = totalCentsCount > 0 ? `(${totalCentsCount} سنت)` : `(0 سنت)`;
+      footerCutDescEl.textContent = totalCentsCount > 0 ? `(${this.formatNumber(totalCentsCount)} سنت)` : `(0 سنت)`;
     }
   }
 
@@ -889,7 +889,7 @@ class SharafApp {
       const birrLabel = (this.settings.birrLabel || 'birr').trim();
       dataRows.push([
         'إجمالي المبلغ المقطوع بالبر',
-        totalCentsCount > 0 ? `الكسور المقتطعة: ${totalCentsCount} سنت` : '0 سنت',
+        totalCentsCount > 0 ? `الكسور المقتطعة: ${this.formatNumber(totalCentsCount)} سنت` : '0 سنت',
         '',
         '',
         '',
@@ -1029,7 +1029,7 @@ class SharafApp {
     const totalCutCents = Math.round(this.records.reduce((sum, r) => sum + (r.cutCents || 0), 0) * 100) / 100;
     const totalCentsCount = Math.round(totalCutCents * 100);
     const birrLabel = (this.settings.birrLabel || 'birr').trim();
-    lines.push(`اجمالي المبلغ المقطوع بالبر=${totalCutCents.toFixed(2)} ${birrLabel}${totalCentsCount > 0 ? ` (${totalCentsCount} سنت)` : ''}`);
+    lines.push(`اجمالي المبلغ المقطوع بالبر=${totalCutCents.toFixed(2)} ${birrLabel}${totalCentsCount > 0 ? ` (${this.formatNumber(totalCentsCount)} سنت)` : ''}`);
     lines.push(`total cut cents=${totalCutCents.toFixed(2)} ${birrLabel}`);
 
     return lines.join('\n');
@@ -1116,9 +1116,10 @@ class SharafApp {
 
   updateModalBirr() {
     const rawAmt = parseFloat(document.getElementById('edit-amount').value) || 0;
-    const amt = Math.trunc(rawAmt);
     const rate = parseFloat(document.getElementById('edit-rate').value) || 0;
-    document.getElementById('edit-birr').value = this.formatNumber(Math.trunc(amt * rate));
+    const rawBirr = rawAmt * rate;
+    const birr = Math.floor(rawBirr / 100) * 100;
+    document.getElementById('edit-birr').value = this.formatNumber(birr);
   }
 
   closeRowModal() {
@@ -1134,7 +1135,7 @@ class SharafApp {
     const currency = document.getElementById('edit-currency').value.trim() || 'ريال سعودي';
     const rate = parseFloat(document.getElementById('edit-rate').value) || 48;
     const rawBirr = amount * rate;
-    const birr = Math.trunc(rawBirr);
+    const birr = Math.floor(rawBirr / 100) * 100;
     const cutCents = Math.round((rawBirr - birr) * 100) / 100;
 
     const existingSeq = index !== -1 ? (this.records[index]?.originalSeq ?? (index + 1)) : (this.records.length + 1);
