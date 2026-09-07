@@ -382,6 +382,10 @@ class SharafApp {
         const leftPart = line.substring(0, eqIndex).trim();
         const rightPart = line.substring(eqIndex + 1).trim();
 
+        // استخراج الرقم التسلسلي / الآيدي الأصلي المذكور في بداية السطر (مثل: 1 أو 2 أو 3 أو 34)
+        const seqMatch = leftPart.match(/^(\d+)[\s\,\'\.\-\_]*/);
+        const originalSeq = seqMatch ? parseInt(seqMatch[1]) : (parsedRecords.length + 1);
+
         let cleanedName = leftPart.replace(/^\d+[\s\,\'\.\-\_]+/, '').trim();
         cleanedName = cleanedName.replace(/^[\'\"\‘\’]+/, '').trim();
 
@@ -390,6 +394,7 @@ class SharafApp {
         const amount = Math.trunc(parseFloat(cleanAmountStr) || 0);
 
         pendingRecord = {
+          originalSeq: originalSeq, // الحفاظ على التسلسل/الآيدي الأصلي
           date: detectedDate,
           name: cleanedName,
           id: '',
@@ -590,9 +595,10 @@ class SharafApp {
 
       const renderRow = (r, idx) => {
         const originalIndex = this.records.indexOf(r);
+        const displaySeq = r.originalSeq !== undefined ? r.originalSeq : (idx + 1);
         return `
           <tr data-index="${originalIndex}">
-            <td class="col-seq-cell">${idx + 1}</td>
+            <td class="col-seq-cell">${displaySeq}</td>
             <td class="col-date-cell">${this.escapeHtml(r.date)}</td>
             <td class="col-name-cell"><strong>${this.escapeHtml(r.name)}</strong></td>
             <td class="col-acc-cell">
@@ -724,6 +730,7 @@ class SharafApp {
     const title = this.settings.shopName || 'كشف الحوالات';
 
     const headers = [
+      'الآيدي (ID)',
       'التاريخ',
       'اسم الحساب',
       'رقم الحساب',
@@ -734,7 +741,7 @@ class SharafApp {
     ];
 
     const dataRows = [];
-    dataRows.push([title, '', '', '', '', '', '']);
+    dataRows.push([title, '', '', '', '', '', '', '']);
     dataRows.push(headers);
 
     const threshold = this.settings.splitThreshold || 100000;
@@ -743,9 +750,10 @@ class SharafApp {
 
     // 1. الحوالات الصغيرة
     if (smallRecords.length > 0) {
-      dataRows.push([`--- الحوالات الصغيرة (من 1 إلى ${this.formatNumber(threshold)} بر) ---`, '', '', '', '', '', '']);
+      dataRows.push([`--- الحوالات الصغيرة (من 1 إلى ${this.formatNumber(threshold)} بر) ---`, '', '', '', '', '', '', '']);
       smallRecords.forEach(r => {
         dataRows.push([
+          r.originalSeq !== undefined ? r.originalSeq : '',
           r.date,
           r.name,
           r.id ? String(r.id) : '',
@@ -761,19 +769,21 @@ class SharafApp {
         'مجموع الحوالات الصغيرة',
         `عدد: ${smallRecords.length}`,
         '',
+        '',
         subAmt,
         smallRecords[0]?.currency || '',
         '',
         subBirr
       ]);
-      dataRows.push(['', '', '', '', '', '', '']); // سطر فاصل
+      dataRows.push(['', '', '', '', '', '', '', '']); // سطر فاصل
     }
 
     // 2. الحوالات الكبيرة
     if (largeRecords.length > 0) {
-      dataRows.push([`--- الحوالات الكبيرة (من ${this.formatNumber(threshold)} بر فأكثر) ---`, '', '', '', '', '', '']);
+      dataRows.push([`--- الحوالات الكبيرة (من ${this.formatNumber(threshold)} بر فأكثر) ---`, '', '', '', '', '', '', '']);
       largeRecords.forEach(r => {
         dataRows.push([
+          r.originalSeq !== undefined ? r.originalSeq : '',
           r.date,
           r.name,
           r.id ? String(r.id) : '',
@@ -789,12 +799,13 @@ class SharafApp {
         'مجموع الحوالات الكبيرة',
         `عدد: ${largeRecords.length}`,
         '',
+        '',
         subAmt,
         largeRecords[0]?.currency || '',
         '',
         subBirr
       ]);
-      dataRows.push(['', '', '', '', '', '', '']); // سطر فاصل
+      dataRows.push(['', '', '', '', '', '', '', '']); // سطر فاصل
     }
 
     // 3. الإجمالي العام
@@ -805,6 +816,7 @@ class SharafApp {
         'الإجمالي العام الشامل',
         `عدد الحسابات الكلي: ${this.records.length}`,
         '',
+        '',
         totalAmount,
         this.records[0]?.currency || '',
         '',
@@ -813,9 +825,10 @@ class SharafApp {
     }
 
     const ws = XLSX.utils.aoa_to_sheet(dataRows);
-    ws['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 6 } }];
+    ws['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 7 } }];
     ws['!views'] = [{ rightToLeft: true }];
     ws['!cols'] = [
+      { wch: 10 },
       { wch: 14 },
       { wch: 28 },
       { wch: 22 },
@@ -839,11 +852,13 @@ class SharafApp {
       return;
     }
 
-    const headers = ['التاريخ', 'اسم الحساب', 'رقم الحساب', 'المبلغ', 'العملة', 'سعر المصارفة', 'المقابل بالبر'];
+    const headers = ['الآيدي (ID)', 'التاريخ', 'اسم الحساب', 'رقم الحساب', 'المبلغ', 'العملة', 'سعر المصارفة', 'المقابل بالبر'];
     let tsv = headers.join('\t') + '\n';
 
-    this.records.forEach(r => {
+    this.records.forEach((r, idx) => {
+      const seq = r.originalSeq !== undefined ? r.originalSeq : (idx + 1);
       tsv += [
+        seq,
         r.date,
         r.name,
         r.id,
@@ -856,7 +871,7 @@ class SharafApp {
 
     const totalAmount = this.records.reduce((sum, r) => sum + r.amount, 0);
     const totalBirr = this.records.reduce((sum, r) => sum + r.birrEquivalent, 0);
-    tsv += `الإجمالي\t${this.records.length} حساب\t\t${totalAmount}\t\t\t${totalBirr}\n`;
+    tsv += `الإجمالي\t\t${this.records.length} حساب\t\t${totalAmount}\t\t\t${totalBirr}\n`;
 
     navigator.clipboard.writeText(tsv).then(() => {
       this.showToast('تم نسخ الجدول للحافظة (يمكنك لصقه مباشرة في إكسل)', 'success');
@@ -894,7 +909,8 @@ class SharafApp {
       lines.push('');
 
       smallRecords.forEach((r, idx) => {
-        lines.push(`${idx + 1},${r.name}`);
+        const seq = r.originalSeq !== undefined ? r.originalSeq : (idx + 1);
+        lines.push(`${seq},${r.name}`);
         if (r.id) lines.push(r.id);
         lines.push(`${this.formatNumber(r.birrEquivalent)} ${currencyLabel}`);
         lines.push('');
@@ -917,7 +933,8 @@ class SharafApp {
       lines.push('');
 
       largeRecords.forEach((r, idx) => {
-        lines.push(`${idx + 1},${r.name}`);
+        const seq = r.originalSeq !== undefined ? r.originalSeq : (idx + 1);
+        lines.push(`${seq},${r.name}`);
         if (r.id) lines.push(r.id);
         lines.push(`${this.formatNumber(r.birrEquivalent)} ${currencyLabel}`);
         lines.push('');
@@ -1035,7 +1052,8 @@ class SharafApp {
     const rate = parseFloat(document.getElementById('edit-rate').value) || 48;
     const birr = Math.trunc(amount * rate);
 
-    const rowData = { date, name, id, amount, currency, rate, birrEquivalent: birr };
+    const existingSeq = index !== -1 ? (this.records[index]?.originalSeq ?? (index + 1)) : (this.records.length + 1);
+    const rowData = { originalSeq: existingSeq, date, name, id, amount, currency, rate, birrEquivalent: birr };
 
     if (index === -1) {
       this.records.push(rowData);
