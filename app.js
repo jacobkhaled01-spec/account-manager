@@ -745,21 +745,22 @@ class SharafApp {
     this.statTotalBirr.textContent = this.formatNumber(totalBirr);
     this.navCountBadge.textContent = totalCount;
 
-    const birrLabel = (this.settings.birrLabel || 'birr').trim();
-
-    const statCutBirrEl = document.getElementById('stat-cut-cents-birr');
-    if (statCutBirrEl) {
-      statCutBirrEl.textContent = `✂️ مقطوع: ${totalCutCents.toFixed(2)} ${birrLabel} (${totalCentsCount} سنت)`;
-    }
-
     this.footerCount.textContent = totalCount;
     this.footerTotalAmount.textContent = `${this.formatNumber(totalAmount)} ${currencyName}`;
     this.footerTotalBirr.textContent = `${this.formatNumber(totalBirr)} بر`;
 
-    const footerCutValEl = document.getElementById('footer-cut-cents-val');
-    const footerCutDescEl = document.getElementById('footer-cut-cents-desc');
-    if (footerCutValEl) footerCutValEl.textContent = `${totalCutCents.toFixed(2)} بر`;
-    if (footerCutDescEl) footerCutDescEl.textContent = `(${totalCentsCount} سنت)`;
+    const footerCutRow = document.getElementById('footer-cut-cents-row');
+    if (footerCutRow) {
+      if (totalCutCents > 0) {
+        footerCutRow.style.display = '';
+        const footerCutValEl = document.getElementById('footer-cut-cents-val');
+        const footerCutDescEl = document.getElementById('footer-cut-cents-desc');
+        if (footerCutValEl) footerCutValEl.textContent = `${totalCutCents.toFixed(2)} بر`;
+        if (footerCutDescEl) footerCutDescEl.textContent = `(${totalCentsCount} سنت)`;
+      } else {
+        footerCutRow.style.display = 'none';
+      }
+    }
   }
 
   sortByColumn(column) {
@@ -1028,8 +1029,10 @@ class SharafApp {
     const totalCutCents = Math.round(this.records.reduce((sum, r) => sum + (r.cutCents || 0), 0) * 100) / 100;
     const totalCentsCount = Math.round(totalCutCents * 100);
     const birrLabel = (this.settings.birrLabel || 'birr').trim();
-    lines.push(`اجمالي السنتات المقطوعه من المبالغ=${totalCutCents.toFixed(2)} ${birrLabel} (${totalCentsCount} سنت)`);
-    lines.push(`total cut cents=${totalCutCents.toFixed(2)} ${birrLabel}`);
+    if (totalCutCents > 0) {
+      lines.push(`اجمالي السنتات المقطوعه من المبالغ=${totalCutCents.toFixed(2)} ${birrLabel} (${totalCentsCount} سنت)`);
+      lines.push(`total cut cents=${totalCutCents.toFixed(2)} ${birrLabel}`);
+    }
 
     return lines.join('\n');
   }

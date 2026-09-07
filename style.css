@@ -1089,24 +1089,6 @@ body.theme-dark .cut-cents-amount {
   font-weight: 600;
 }
 
-/* بادج السنتات في بطاقة الإحصائيات العلوية */
-.metric-cut-cents {
-  display: inline-block;
-  margin-top: 0.25rem;
-  font-size: 0.75rem;
-  font-weight: 700;
-  color: #dc2626;
-  background: rgba(239, 68, 68, 0.08);
-  padding: 0.15rem 0.45rem;
-  border-radius: 9999px;
-  border: 1px solid rgba(239, 68, 68, 0.2);
-}
-
-body.theme-dark .metric-cut-cents {
-  color: #fca5a5;
-  background: rgba(239, 68, 68, 0.2);
-}
-
 /* بادج السنتات المقطوعة داخل خلايا الجدول */
 .badge-cut-cents {
   display: block;
