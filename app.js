@@ -745,21 +745,21 @@ class SharafApp {
     this.statTotalBirr.textContent = this.formatNumber(totalBirr);
     this.navCountBadge.textContent = totalCount;
 
+    const birrLabel = (this.settings.birrLabel || 'birr').trim();
+    const statCutBirrEl = document.getElementById('stat-cut-cents-birr');
+    if (statCutBirrEl) {
+      statCutBirrEl.textContent = `المقطوع بالبر: ${totalCutCents.toFixed(2)} ${birrLabel}${totalCentsCount > 0 ? ` (${totalCentsCount} سنت)` : ''}`;
+    }
+
     this.footerCount.textContent = totalCount;
     this.footerTotalAmount.textContent = `${this.formatNumber(totalAmount)} ${currencyName}`;
     this.footerTotalBirr.textContent = `${this.formatNumber(totalBirr)} بر`;
 
-    const footerCutRow = document.getElementById('footer-cut-cents-row');
-    if (footerCutRow) {
-      if (totalCutCents > 0) {
-        footerCutRow.style.display = '';
-        const footerCutValEl = document.getElementById('footer-cut-cents-val');
-        const footerCutDescEl = document.getElementById('footer-cut-cents-desc');
-        if (footerCutValEl) footerCutValEl.textContent = `${totalCutCents.toFixed(2)} بر`;
-        if (footerCutDescEl) footerCutDescEl.textContent = `(${totalCentsCount} سنت)`;
-      } else {
-        footerCutRow.style.display = 'none';
-      }
+    const footerCutValEl = document.getElementById('footer-cut-cents-val');
+    const footerCutDescEl = document.getElementById('footer-cut-cents-desc');
+    if (footerCutValEl) footerCutValEl.textContent = `${totalCutCents.toFixed(2)} بر`;
+    if (footerCutDescEl) {
+      footerCutDescEl.textContent = totalCentsCount > 0 ? `(${totalCentsCount} سنت)` : `(0 سنت)`;
     }
   }
 
@@ -888,8 +888,8 @@ class SharafApp {
 
       const birrLabel = (this.settings.birrLabel || 'birr').trim();
       dataRows.push([
-        'إجمالي السنتات المقطوعة بالبر',
-        `الكسور المقتطعة: ${totalCentsCount} سنت`,
+        'إجمالي المبلغ المقطوع بالبر',
+        totalCentsCount > 0 ? `الكسور المقتطعة: ${totalCentsCount} سنت` : '0 سنت',
         '',
         '',
         '',
@@ -1025,14 +1025,12 @@ class SharafApp {
     const totalBirr = this.records.reduce((sum, r) => sum + (r.birrEquivalent || 0), 0);
     lines.push(`total=${this.formatNumber(totalBirr)} ${currencyLabel}`);
 
-    // 5. إجمالي السنتات المقطوعة من المبالغ (الكسور والأجزاء أقل من 100 سنت)
+    // 5. إجمالي المبلغ المقطوع بالبر (الكسور والأجزاء أقل من 100 سنت)
     const totalCutCents = Math.round(this.records.reduce((sum, r) => sum + (r.cutCents || 0), 0) * 100) / 100;
     const totalCentsCount = Math.round(totalCutCents * 100);
     const birrLabel = (this.settings.birrLabel || 'birr').trim();
-    if (totalCutCents > 0) {
-      lines.push(`اجمالي السنتات المقطوعه من المبالغ=${totalCutCents.toFixed(2)} ${birrLabel} (${totalCentsCount} سنت)`);
-      lines.push(`total cut cents=${totalCutCents.toFixed(2)} ${birrLabel}`);
-    }
+    lines.push(`اجمالي المبلغ المقطوع بالبر=${totalCutCents.toFixed(2)} ${birrLabel}${totalCentsCount > 0 ? ` (${totalCentsCount} سنت)` : ''}`);
+    lines.push(`total cut cents=${totalCutCents.toFixed(2)} ${birrLabel}`);
 
     return lines.join('\n');
   }

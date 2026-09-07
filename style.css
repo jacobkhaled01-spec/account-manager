@@ -1089,6 +1089,26 @@ body.theme-dark .cut-cents-amount {
   font-weight: 600;
 }
 
+/* بادج إجمالي المبلغ المقطوع بالبر في بطاقة الإحصائيات العلوية */
+.metric-cut-cents {
+  display: inline-block;
+  margin-top: 0.35rem;
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: #b45309;
+  background: rgba(245, 158, 11, 0.12);
+  padding: 0.2rem 0.55rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  width: fit-content;
+}
+
+body.theme-dark .metric-cut-cents {
+  color: #fde68a;
+  background: rgba(245, 158, 11, 0.2);
+  border-color: rgba(245, 158, 11, 0.4);
+}
+
 /* بادج السنتات المقطوعة داخل خلايا الجدول */
 .badge-cut-cents {
   display: block;
