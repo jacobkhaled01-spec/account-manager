@@ -1,6 +1,6 @@
 /**
- * نظام حسابات الصرافين - المنطق البرمجي الكامل
- * Accounts & Exchange Engine - Parsing, Live Calculations, Excel Export
+ * نظام كشف الحوالات وحسابات الصرافين - المنطق البرمجي الكامل
+ * Currency Bureau Accounts Engine - Decimal Truncation, Small/Large Splitting, Real-time Calculations
  */
 
 // نموذج البيانات الافتراضي المأخوذ من طلب المستخدم الدقيق (34 مستفيد)
@@ -115,6 +115,7 @@ class SharafApp {
     this.searchQuery = '';
     this.sortColumn = null;
     this.sortAsc = true;
+    this.originalHeaderText = '';
 
     this.initElements();
     this.bindEvents();
@@ -127,11 +128,13 @@ class SharafApp {
     const defaultSettings = {
       defaultRate: 48,
       defaultCurrency: 'ريال سعودي',
-      shopName: 'حسابات الصرافين',
+      shopName: 'كشف الحوالات',
       dateMode: 'auto',
       excelColors: true,
       excelTotalRow: true,
       thousandsSep: true,
+      splitThreshold: 100000,
+      birrLabel: 'birr',
       theme: 'light'
     };
 
@@ -147,8 +150,10 @@ class SharafApp {
   saveSettings() {
     const rateVal = parseFloat(document.getElementById('setting-default-rate').value) || 48;
     const currVal = document.getElementById('setting-default-currency').value.trim() || 'ريال سعودي';
-    const shopVal = document.getElementById('setting-shop-name').value.trim() || 'حسابات الصرافين';
-    
+    const shopVal = document.getElementById('setting-shop-name').value.trim() || 'كشف الحوالات';
+    const splitVal = parseFloat(document.getElementById('setting-split-threshold')?.value) || 100000;
+    const birrLbl = document.getElementById('setting-birr-label')?.value.trim() || 'birr';
+
     const dateRadios = document.getElementsByName('date-mode');
     let dateMode = 'auto';
     for (let r of dateRadios) {
@@ -159,12 +164,15 @@ class SharafApp {
     this.settings.defaultCurrency = currVal;
     this.settings.shopName = shopVal;
     this.settings.dateMode = dateMode;
+    this.settings.splitThreshold = splitVal;
+    this.settings.birrLabel = birrLbl;
     this.settings.excelColors = document.getElementById('setting-excel-colors').checked;
     this.settings.excelTotalRow = document.getElementById('setting-excel-total-row').checked;
     this.settings.thousandsSep = document.getElementById('setting-thousands-sep').checked;
 
     localStorage.setItem('sharaf_settings', JSON.stringify(this.settings));
     this.applySettingsToUI();
+    this.render();
     this.showToast('تم حفظ الإعدادات بنجاح', 'success');
   }
 
@@ -173,6 +181,7 @@ class SharafApp {
     localStorage.removeItem('sharaf_settings');
     this.settings = this.loadSettings();
     this.applySettingsToUI();
+    this.render();
     this.showToast('تمت استعادة الإعدادات الافتراضية', 'success');
   }
 
@@ -194,6 +203,11 @@ class SharafApp {
     document.getElementById('setting-excel-total-row').checked = this.settings.excelTotalRow;
     document.getElementById('setting-thousands-sep').checked = this.settings.thousandsSep;
 
+    const splitInput = document.getElementById('setting-split-threshold');
+    if (splitInput) splitInput.value = this.settings.splitThreshold || 100000;
+    const birrInput = document.getElementById('setting-birr-label');
+    if (birrInput) birrInput.value = this.settings.birrLabel || 'birr';
+
     const dateRadios = document.getElementsByName('date-mode');
     for (let r of dateRadios) {
       if (r.value === this.settings.dateMode) r.checked = true;
@@ -211,11 +225,9 @@ class SharafApp {
 
   // ==================== 2. ربط العناصر والأحداث ====================
   initElements() {
-    // التبويبات
     this.navTabs = document.querySelectorAll('.nav-tab');
     this.tabPanes = document.querySelectorAll('.tab-pane');
 
-    // منطقة اللصق
     this.rawTextInput = document.getElementById('raw-text-input');
     this.btnProcessText = document.getElementById('btn-process-text');
     this.btnLoadSample = document.getElementById('btn-load-sample');
@@ -223,26 +235,11 @@ class SharafApp {
     this.btnClearText = document.getElementById('btn-clear-text');
     this.parseStatusMsg = document.getElementById('parse-status-message');
 
-    // الجدول والبحث
     this.tableSearchInput = document.getElementById('table-search-input');
     this.btnClearSearch = document.getElementById('btn-clear-search');
     this.tableBody = document.getElementById('table-body');
     this.headerRateInput = document.getElementById('header-rate-input');
 
-    // أزرار الجدول
-    this.btnExportExcel = document.getElementById('btn-export-excel');
-    this.btnCopyTable = document.getElementById('btn-copy-table');
-    this.btnPrintTable = document.getElementById('btn-print-table');
-    this.btnAddRow = document.getElementById('btn-add-row');
-    this.btnClearAll = document.getElementById('btn-clear-all');
-
-    // الإحصائيات
-    this.statCount = document.getElementById('stat-count');
-    this.statTotalAmount = document.getElementById('stat-total-amount');
-    this.statTotalBirr = document.getElementById('stat-total-birr');
-    this.navCountBadge = document.getElementById('nav-count-badge');
-
-    // أزرار الجدول
     this.btnExportExcel = document.getElementById('btn-export-excel');
     this.btnCopyTable = document.getElementById('btn-copy-table');
     this.btnCopyOriginal = document.getElementById('btn-copy-original');
@@ -251,25 +248,21 @@ class SharafApp {
     this.btnAddRow = document.getElementById('btn-add-row');
     this.btnClearAll = document.getElementById('btn-clear-all');
 
-    // الإحصائيات
     this.statCount = document.getElementById('stat-count');
     this.statTotalAmount = document.getElementById('stat-total-amount');
     this.statTotalBirr = document.getElementById('stat-total-birr');
     this.navCountBadge = document.getElementById('nav-count-badge');
 
-    // تذييل الجدول
     this.footerCount = document.getElementById('footer-count');
     this.footerTotalAmount = document.getElementById('footer-total-amount');
     this.footerTotalBirr = document.getElementById('footer-total-birr');
 
-    // النوافذ المنبثقة
     this.rowModal = document.getElementById('row-modal');
     this.previewModal = document.getElementById('preview-message-modal');
     this.previewTextarea = document.getElementById('preview-message-textarea');
   }
 
   bindEvents() {
-    // التنقل بين التبويبات
     this.navTabs.forEach(tab => {
       tab.addEventListener('click', () => {
         const tabId = tab.getAttribute('data-tab');
@@ -277,7 +270,6 @@ class SharafApp {
       });
     });
 
-    // أزرار منطقة اللصق
     this.btnProcessText.addEventListener('click', () => this.processRawText());
     this.btnLoadSample.addEventListener('click', () => this.loadSampleData());
     this.btnPasteClipboard.addEventListener('click', () => this.pasteFromClipboard());
@@ -286,7 +278,6 @@ class SharafApp {
       this.rawTextInput.focus();
     });
 
-    // تحديث سعر المصارفة الفوري من الهيدر
     this.headerRateInput.addEventListener('input', (e) => {
       const newRate = parseFloat(e.target.value);
       if (!isNaN(newRate) && newRate > 0) {
@@ -297,7 +288,6 @@ class SharafApp {
       }
     });
 
-    // البحث في الجدول
     this.tableSearchInput.addEventListener('input', (e) => {
       this.searchQuery = e.target.value.trim().toLowerCase();
       this.btnClearSearch.classList.toggle('hidden', this.searchQuery === '');
@@ -312,7 +302,6 @@ class SharafApp {
       this.tableSearchInput.focus();
     });
 
-    // فرز الأعمدة
     document.querySelectorAll('.table-columns-row th[data-sort]').forEach(th => {
       th.addEventListener('click', () => {
         const col = th.getAttribute('data-sort');
@@ -320,7 +309,6 @@ class SharafApp {
       });
     });
 
-    // أزرار الجدول
     this.btnExportExcel.addEventListener('click', () => this.exportToExcel());
     this.btnCopyTable.addEventListener('click', () => this.copyTableToClipboard());
     if (this.btnCopyOriginal) {
@@ -333,7 +321,6 @@ class SharafApp {
     this.btnAddRow.addEventListener('click', () => this.openAddRowModal());
     this.btnClearAll.addEventListener('click', () => this.clearAllRecords());
 
-    // تبديل المظهر
     document.getElementById('btn-theme-toggle').addEventListener('click', () => this.toggleTheme());
     document.getElementById('btn-open-settings').addEventListener('click', () => this.switchTab('tab-settings'));
   }
@@ -350,7 +337,6 @@ class SharafApp {
     const autoDate = options.autoDate !== undefined ? options.autoDate : true;
     let customDate = options.customDate || '';
 
-    // كشف التاريخ من النص (مثل 01/13/18 أو 2026-09-07)
     let detectedDate = customDate;
     if (!detectedDate && autoDate) {
       const dateMatch = text.match(/\b(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2,4})\b/);
@@ -360,7 +346,7 @@ class SharafApp {
     }
     if (!detectedDate) {
       const today = new Date();
-      detectedDate = today.toLocaleDateString('en-CA'); // YYYY-MM-DD
+      detectedDate = today.toLocaleDateString('en-CA');
     }
 
     const lines = text.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
@@ -369,7 +355,6 @@ class SharafApp {
     let textTotal = null;
     let detectedHeader = '';
 
-    // التقاط السطر الترويسي إن وُجد
     if (lines.length > 0 && !lines[0].includes('=') && !/^\d+$/.test(lines[0])) {
       detectedHeader = lines[0];
     }
@@ -377,19 +362,16 @@ class SharafApp {
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
 
-      // تجاهل أسطر الفواصل مثل **** أو ---- أو ====
       if (/^[\*\-\=\_\#\.]+$/.test(line)) {
         continue;
       }
 
-      // التحقق من سطر المجموع النهائي مثل: total=227,620 أو المجموع: 227,620
       const totalMatch = line.match(/(?:total|المجموع|الإجمالي)\s*[:=]\s*([\d,]+(?:\.\d+)?)/i);
       if (totalMatch) {
-        textTotal = parseFloat(totalMatch[1].replace(/,/g, ''));
+        textTotal = Math.trunc(parseFloat(totalMatch[1].replace(/,/g, '')));
         continue;
       }
 
-      // التحقق من سطر الاسم والمبلغ الذي يحتوي على علامة =
       if (line.includes('=')) {
         if (pendingRecord) {
           parsedRecords.push(pendingRecord);
@@ -400,29 +382,26 @@ class SharafApp {
         const leftPart = line.substring(0, eqIndex).trim();
         const rightPart = line.substring(eqIndex + 1).trim();
 
-        // تنظيف الاسم: إزالة رقم التسلسل والرموز من البداية (مثل: 1,' أو 4' أو 19, أو 33')
         let cleanedName = leftPart.replace(/^\d+[\s\,\'\.\-\_]+/, '').trim();
         cleanedName = cleanedName.replace(/^[\'\"\‘\’]+/, '').trim();
 
-        // تنظيف المبلغ: إزالة الفواصل
+        // استقطاع أي رقم بعد الفاصلة العشرية
         const cleanAmountStr = rightPart.replace(/,/g, '').trim();
-        const amount = parseFloat(cleanAmountStr) || 0;
+        const amount = Math.trunc(parseFloat(cleanAmountStr) || 0);
 
         pendingRecord = {
           date: detectedDate,
           name: cleanedName,
-          id: '', // سيتم البحث عن رقم الحساب في السطر التالي
+          id: '',
           amount: amount,
           currency: currency,
           rate: rate,
-          birrEquivalent: Math.round(amount * rate * 100) / 100
+          birrEquivalent: Math.trunc(amount * rate) // استقطاع الكسور
         };
         continue;
       }
 
-      // إذا كان لدينا سجل ينتظر رقم الحساب
       if (pendingRecord) {
-        // رقم الحساب عادة أرقام أو أرقام مع مسافات أو شرطات
         const accountMatch = line.match(/^[\d\s\-]{6,}$/);
         if (accountMatch) {
           pendingRecord.id = line.replace(/[\s\-]/g, '');
@@ -430,7 +409,6 @@ class SharafApp {
           pendingRecord = null;
           continue;
         } else if (!line.includes('=') && !/^(ዓዲ|ዝሕወሎም|total)/i.test(line)) {
-          // في حال كان رقم الحساب يحتوي على حروف أو نص
           pendingRecord.id = line;
           parsedRecords.push(pendingRecord);
           pendingRecord = null;
@@ -482,15 +460,13 @@ class SharafApp {
       return;
     }
 
-    // حفظ عنوان النص الأصلي وسجلاته
     this.originalHeaderText = result.detectedHeader || '';
     this.records = result.records;
     this.render();
 
-    // إشعار الحالة
     let msg = `تم استخراج ${result.count} سجلاً بنجاح! الإجمالي: ${this.formatNumber(result.calculatedTotalAmount)} ${batchCurr}`;
     if (result.textTotal !== null) {
-      if (Math.abs(result.textTotal - result.calculatedTotalAmount) < 0.01) {
+      if (Math.abs(result.textTotal - result.calculatedTotalAmount) === 0) {
         msg += ` (مطابق لمجموع النص: ${this.formatNumber(result.textTotal)} ✓)`;
       } else {
         msg += ` (تنبيه: مجموع النص المدون هو ${this.formatNumber(result.textTotal)})`;
@@ -503,7 +479,6 @@ class SharafApp {
 
     this.showToast(`تم استيراد ${result.count} حساب بنجاح`, 'success');
 
-    // الانتقال التلقائي لجدول الحسابات لمعاينة النتائج
     setTimeout(() => {
       this.switchTab('tab-table');
     }, 600);
@@ -537,7 +512,7 @@ class SharafApp {
   recalculateAllRecordsRate(newRate) {
     this.records.forEach(record => {
       record.rate = newRate;
-      record.birrEquivalent = Math.round(record.amount * newRate * 100) / 100;
+      record.birrEquivalent = Math.trunc(record.amount * newRate); // استقطاع الكسور
     });
     this.render();
     this.showToast(`تم تحديث الأسعار بالمعامل: ${newRate}`, 'success');
@@ -551,15 +526,15 @@ class SharafApp {
 
   updateRecordAmount(index, newAmount) {
     if (this.records[index]) {
-      this.records[index].amount = newAmount;
-      this.records[index].birrEquivalent = Math.round(newAmount * this.records[index].rate * 100) / 100;
+      const amt = Math.trunc(newAmount);
+      this.records[index].amount = amt;
+      this.records[index].birrEquivalent = Math.trunc(amt * this.records[index].rate);
       this.render();
     }
   }
 
-  // ==================== 5. العرض والرندرة (Rendering) ====================
+  // ==================== 5. العرض والرندرة مع فصل الصغير والكبير ====================
   render() {
-    // تصفية السجلات حسب البحث
     let filtered = this.records.filter(r => {
       if (!this.searchQuery) return true;
       const q = this.searchQuery;
@@ -572,7 +547,6 @@ class SharafApp {
       );
     });
 
-    // الفرز
     if (this.sortColumn) {
       filtered.sort((a, b) => {
         let valA = a[this.sortColumn];
@@ -587,7 +561,6 @@ class SharafApp {
       });
     }
 
-    // بناء صفوف الجدول
     if (filtered.length === 0) {
       if (this.records.length === 0) {
         this.tableBody.innerHTML = `
@@ -610,10 +583,14 @@ class SharafApp {
           </tr>`;
       }
     } else {
-      let html = '';
-      filtered.forEach((r, idx) => {
+      // فصل السجلات إلى فئتين: الصغيرة (1 إلى 100,000 بر) والكبيرة (100,000 فأكثر)
+      const threshold = this.settings.splitThreshold || 100000;
+      const smallRecords = filtered.filter(r => (r.birrEquivalent || 0) <= threshold);
+      const largeRecords = filtered.filter(r => (r.birrEquivalent || 0) > threshold);
+
+      const renderRow = (r, idx) => {
         const originalIndex = this.records.indexOf(r);
-        html += `
+        return `
           <tr data-index="${originalIndex}">
             <td class="col-seq-cell">${idx + 1}</td>
             <td class="col-date-cell">${this.escapeHtml(r.date)}</td>
@@ -633,29 +610,92 @@ class SharafApp {
               <button class="action-icon-btn delete" onclick="app.deleteRow(${originalIndex})" title="حذف">🗑️</button>
             </td>
           </tr>`;
-      });
+      };
+
+      let html = '';
+
+      // 1. قسم الحوالات الصغيرة في الأعلى
+      if (smallRecords.length > 0) {
+        const subAmt = smallRecords.reduce((s, r) => s + (r.amount || 0), 0);
+        const subBirr = smallRecords.reduce((s, r) => s + (r.birrEquivalent || 0), 0);
+
+        html += `
+          <tr class="category-banner-row">
+            <td colspan="9">
+              📌 الحوالات الصغيرة (من 1 إلى ${this.formatNumber(threshold)} بر) — [${smallRecords.length} حساب]
+            </td>
+          </tr>`;
+
+        smallRecords.forEach((r, idx) => {
+          html += renderRow(r, idx);
+        });
+
+        html += `
+          <tr class="subtotal-row">
+            <td colspan="4" class="subtotal-label">
+              <strong>مجموع الحوالات الصغيرة (${smallRecords.length} حساب)</strong>
+            </td>
+            <td class="col-amount-cell">${this.formatNumber(subAmt)}</td>
+            <td class="col-curr-cell">${smallRecords[0]?.currency || ''}</td>
+            <td class="col-rate-cell">-</td>
+            <td class="col-birr-cell">${this.formatNumber(subBirr)} بر</td>
+            <td class="no-print"></td>
+          </tr>`;
+      }
+
+      // 2. فاصل بارز بين الفئتين
+      if (smallRecords.length > 0 && largeRecords.length > 0) {
+        html += `
+          <tr class="category-divider-row">
+            <td colspan="9"><span class="divider-badge">⚡ الحوالات الكبيرة في الأسفل ⚡</span></td>
+          </tr>`;
+      }
+
+      // 3. قسم الحوالات الكبيرة في الأسفل
+      if (largeRecords.length > 0) {
+        const subAmt = largeRecords.reduce((s, r) => s + (r.amount || 0), 0);
+        const subBirr = largeRecords.reduce((s, r) => s + (r.birrEquivalent || 0), 0);
+
+        html += `
+          <tr class="category-banner-row large-banner">
+            <td colspan="9">
+              ⭐ الحوالات الكبيرة (من ${this.formatNumber(threshold)} بر فأكثر) — [${largeRecords.length} حساب]
+            </td>
+          </tr>`;
+
+        largeRecords.forEach((r, idx) => {
+          html += renderRow(r, idx);
+        });
+
+        html += `
+          <tr class="subtotal-row">
+            <td colspan="4" class="subtotal-label">
+              <strong>مجموع الحوالات الكبيرة (${largeRecords.length} حساب)</strong>
+            </td>
+            <td class="col-amount-cell">${this.formatNumber(subAmt)}</td>
+            <td class="col-curr-cell">${largeRecords[0]?.currency || ''}</td>
+            <td class="col-rate-cell">-</td>
+            <td class="col-birr-cell">${this.formatNumber(subBirr)} بر</td>
+            <td class="no-print"></td>
+          </tr>`;
+      }
+
       this.tableBody.innerHTML = html;
     }
 
-    // حساب الإجماليات
+    // حساب الإجماليات العامة
     const totalCount = this.records.length;
     const totalAmount = this.records.reduce((sum, r) => sum + (r.amount || 0), 0);
     const totalBirr = this.records.reduce((sum, r) => sum + (r.birrEquivalent || 0), 0);
 
-    // تحديث كروت الإحصائيات
     this.statCount.textContent = totalCount;
     this.statTotalAmount.textContent = this.formatNumber(totalAmount);
     this.statTotalBirr.textContent = this.formatNumber(totalBirr);
     this.navCountBadge.textContent = totalCount;
 
-    // تحديث تذييل الجدول
     this.footerCount.textContent = totalCount;
-    this.footerTotalAmount.textContent = this.formatNumber(totalAmount);
-    this.footerTotalBirr.textContent = this.formatNumber(totalBirr);
-    if (this.records.length > 0) {
-      this.footerTotalAmount.textContent = `${this.formatNumber(totalAmount)} ${this.records[0].currency || ''}`;
-      this.footerTotalBirr.textContent = `${this.formatNumber(totalBirr)} بر`;
-    }
+    this.footerTotalAmount.textContent = `${this.formatNumber(totalAmount)} ${this.records[0]?.currency || ''}`;
+    this.footerTotalBirr.textContent = `${this.formatNumber(totalBirr)} بر`;
   }
 
   sortByColumn(column) {
@@ -668,7 +708,7 @@ class SharafApp {
     this.render();
   }
 
-  // ==================== 6. تصدير إكسل منسق (Formatted Excel Export) ====================
+  // ==================== 6. تصدير إكسل منسق مع التقسيم ====================
   exportToExcel() {
     if (this.records.length === 0) {
       this.showToast('لا توجد بيانات لتصديرها إلى إكسل', 'error');
@@ -680,13 +720,9 @@ class SharafApp {
       return;
     }
 
-    // تجهيز مصنف الإكسل
     const wb = XLSX.utils.book_new();
+    const title = this.settings.shopName || 'كشف الحوالات';
 
-    // 1. ترويسة العنوان الرئيسي (مطابقة للصورة: شريط خوخي عريض بعنوان "حسابات الصرافين")
-    const title = this.settings.shopName || 'حسابات الصرافين';
-
-    // 2. رؤوس الأعمدة السبعة المطابقة تماماً للصورة
     const headers = [
       'التاريخ',
       'اسم الحساب',
@@ -697,34 +733,77 @@ class SharafApp {
       'المقابل بالبر'
     ];
 
-    // بناء صفوف البيانات
     const dataRows = [];
-    
-    // سطر الترويسة الرئيسية
     dataRows.push([title, '', '', '', '', '', '']);
-    // سطر رؤوس الأعمدة
     dataRows.push(headers);
 
-    // إضافة السجلات
-    this.records.forEach(r => {
-      dataRows.push([
-        r.date,
-        r.name,
-        r.id ? String(r.id) : '', // حفظ كرقم نصي لمنع تقريب إكسل للأرقام الطويلة
-        r.amount,
-        r.currency,
-        r.rate,
-        r.birrEquivalent
-      ]);
-    });
+    const threshold = this.settings.splitThreshold || 100000;
+    const smallRecords = this.records.filter(r => (r.birrEquivalent || 0) <= threshold);
+    const largeRecords = this.records.filter(r => (r.birrEquivalent || 0) > threshold);
 
-    // سطر الإجمالي العام في النهاية
+    // 1. الحوالات الصغيرة
+    if (smallRecords.length > 0) {
+      dataRows.push([`--- الحوالات الصغيرة (من 1 إلى ${this.formatNumber(threshold)} بر) ---`, '', '', '', '', '', '']);
+      smallRecords.forEach(r => {
+        dataRows.push([
+          r.date,
+          r.name,
+          r.id ? String(r.id) : '',
+          r.amount,
+          r.currency,
+          r.rate,
+          r.birrEquivalent
+        ]);
+      });
+      const subAmt = smallRecords.reduce((s, r) => s + r.amount, 0);
+      const subBirr = smallRecords.reduce((s, r) => s + r.birrEquivalent, 0);
+      dataRows.push([
+        'مجموع الحوالات الصغيرة',
+        `عدد: ${smallRecords.length}`,
+        '',
+        subAmt,
+        smallRecords[0]?.currency || '',
+        '',
+        subBirr
+      ]);
+      dataRows.push(['', '', '', '', '', '', '']); // سطر فاصل
+    }
+
+    // 2. الحوالات الكبيرة
+    if (largeRecords.length > 0) {
+      dataRows.push([`--- الحوالات الكبيرة (من ${this.formatNumber(threshold)} بر فأكثر) ---`, '', '', '', '', '', '']);
+      largeRecords.forEach(r => {
+        dataRows.push([
+          r.date,
+          r.name,
+          r.id ? String(r.id) : '',
+          r.amount,
+          r.currency,
+          r.rate,
+          r.birrEquivalent
+        ]);
+      });
+      const subAmt = largeRecords.reduce((s, r) => s + r.amount, 0);
+      const subBirr = largeRecords.reduce((s, r) => s + r.birrEquivalent, 0);
+      dataRows.push([
+        'مجموع الحوالات الكبيرة',
+        `عدد: ${largeRecords.length}`,
+        '',
+        subAmt,
+        largeRecords[0]?.currency || '',
+        '',
+        subBirr
+      ]);
+      dataRows.push(['', '', '', '', '', '', '']); // سطر فاصل
+    }
+
+    // 3. الإجمالي العام
     if (this.settings.excelTotalRow) {
       const totalAmount = this.records.reduce((sum, r) => sum + r.amount, 0);
       const totalBirr = this.records.reduce((sum, r) => sum + r.birrEquivalent, 0);
       dataRows.push([
-        'الإجمالي العام',
-        `عدد الحسابات: ${this.records.length}`,
+        'الإجمالي العام الشامل',
+        `عدد الحسابات الكلي: ${this.records.length}`,
         '',
         totalAmount,
         this.records[0]?.currency || '',
@@ -733,36 +812,22 @@ class SharafApp {
       ]);
     }
 
-    // إنشاء ورقة العمل
     const ws = XLSX.utils.aoa_to_sheet(dataRows);
-
-    // دمج خلايا العنوان الرئيسي (A1:G1)
-    ws['!merges'] = [
-      { s: { r: 0, c: 0 }, e: { r: 0, c: 6 } }
-    ];
-
-    // ضبط اتجاه الورقة من اليمين إلى اليسار (RTL) لتطابق اللغة العربية
+    ws['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 6 } }];
     ws['!views'] = [{ rightToLeft: true }];
-
-    // ضبط عروض الأعمدة لتكون منسقة ومريحة للقراءة
     ws['!cols'] = [
-      { wch: 14 }, // التاريخ
-      { wch: 28 }, // اسم الحساب
-      { wch: 22 }, // رقم الحساب
-      { wch: 16 }, // المبلغ
-      { wch: 14 }, // العملة
-      { wch: 14 }, // سعر المصارفة
-      { wch: 18 }  // المقابل بالبر
+      { wch: 14 },
+      { wch: 28 },
+      { wch: 22 },
+      { wch: 16 },
+      { wch: 14 },
+      { wch: 14 },
+      { wch: 18 }
     ];
 
-    // إضافة الورقة إلى المصنف
-    XLSX.utils.book_append_sheet(wb, ws, 'حسابات الصرافين');
-
-    // إنشاء اسم ملف ذكي مع التاريخ والوقت
+    XLSX.utils.book_append_sheet(wb, ws, 'كشف الحوالات');
     const todayStr = new Date().toISOString().split('T')[0];
     const fileName = `${title.replace(/\s+/g, '_')}_${todayStr}.xlsx`;
-
-    // تصدير وتنزيل الملف
     XLSX.writeFile(wb, fileName);
     this.showToast(`تم تصدير ملف الإكسل: ${fileName}`, 'success');
   }
@@ -811,7 +876,11 @@ class SharafApp {
     if (this.records.length === 0) return '';
 
     const currencyLabel = (this.settings.birrLabel || 'birr').trim();
+    const threshold = this.settings.splitThreshold || 100000;
     const header = this.originalHeaderText || '';
+
+    const smallRecords = this.records.filter(r => (r.birrEquivalent || 0) <= threshold);
+    const largeRecords = this.records.filter(r => (r.birrEquivalent || 0) > threshold);
 
     const lines = [];
     if (header) {
@@ -819,21 +888,48 @@ class SharafApp {
       lines.push('');
     }
 
-    this.records.forEach((r, idx) => {
-      // 1. رقم التسلسل واسم المستفيد (بدون المبلغ السابق =المبلغ)
-      lines.push(`${idx + 1},${r.name}`);
-      // 2. رقم الحساب
-      if (r.id) {
-        lines.push(r.id);
-      }
-      // 3. المبلغ بالبر مع اسم العملة بالإنجليزي birr تحت رقم الحساب بالضبط
-      const formattedBirr = this.formatNumber(r.birrEquivalent);
-      lines.push(`${formattedBirr} ${currencyLabel}`);
-      // سطر فارغ بين كل سجل والآخر
+    // 1. الحوالات الصغيرة في الأعلى
+    if (smallRecords.length > 0) {
+      lines.push(`--- الحوالات الصغيرة (1 إلى ${this.formatNumber(threshold)} بر) ---`);
       lines.push('');
-    });
 
-    // الإجمالي بالبر في النهاية
+      smallRecords.forEach((r, idx) => {
+        lines.push(`${idx + 1},${r.name}`);
+        if (r.id) lines.push(r.id);
+        lines.push(`${this.formatNumber(r.birrEquivalent)} ${currencyLabel}`);
+        lines.push('');
+      });
+
+      const subSmallBirr = smallRecords.reduce((s, r) => s + (r.birrEquivalent || 0), 0);
+      lines.push(`total small=${this.formatNumber(subSmallBirr)} ${currencyLabel}`);
+      lines.push('');
+    }
+
+    // 2. فاصل بارز بين الجزأين
+    if (smallRecords.length > 0 && largeRecords.length > 0) {
+      lines.push('----------------------------------------');
+      lines.push('');
+    }
+
+    // 3. الحوالات الكبيرة في الأسفل
+    if (largeRecords.length > 0) {
+      lines.push(`--- الحوالات الكبيرة (${this.formatNumber(threshold)} بر فأكثر) ---`);
+      lines.push('');
+
+      largeRecords.forEach((r, idx) => {
+        lines.push(`${idx + 1},${r.name}`);
+        if (r.id) lines.push(r.id);
+        lines.push(`${this.formatNumber(r.birrEquivalent)} ${currencyLabel}`);
+        lines.push('');
+      });
+
+      const subLargeBirr = largeRecords.reduce((s, r) => s + (r.birrEquivalent || 0), 0);
+      lines.push(`total large=${this.formatNumber(subLargeBirr)} ${currencyLabel}`);
+      lines.push('');
+    }
+
+    // 4. فاصل وإجمالي عام بعد فاصل
+    lines.push('========================================');
     const totalBirr = this.records.reduce((sum, r) => sum + (r.birrEquivalent || 0), 0);
     lines.push(`total=${this.formatNumber(totalBirr)} ${currencyLabel}`);
 
@@ -920,9 +1016,9 @@ class SharafApp {
   }
 
   updateModalBirr() {
-    const amt = parseFloat(document.getElementById('edit-amount').value) || 0;
+    const amt = Math.trunc(parseFloat(document.getElementById('edit-amount').value) || 0);
     const rate = parseFloat(document.getElementById('edit-rate').value) || 0;
-    document.getElementById('edit-birr').value = this.formatNumber(amt * rate);
+    document.getElementById('edit-birr').value = this.formatNumber(Math.trunc(amt * rate));
   }
 
   closeRowModal() {
@@ -934,10 +1030,10 @@ class SharafApp {
     const date = document.getElementById('edit-date').value.trim();
     const name = document.getElementById('edit-name').value.trim();
     const id = document.getElementById('edit-acc-id').value.trim();
-    const amount = parseFloat(document.getElementById('edit-amount').value) || 0;
+    const amount = Math.trunc(parseFloat(document.getElementById('edit-amount').value) || 0);
     const currency = document.getElementById('edit-currency').value.trim() || 'ريال سعودي';
     const rate = parseFloat(document.getElementById('edit-rate').value) || 48;
-    const birr = Math.round(amount * rate * 100) / 100;
+    const birr = Math.trunc(amount * rate);
 
     const rowData = { date, name, id, amount, currency, rate, birrEquivalent: birr };
 
@@ -975,9 +1071,11 @@ class SharafApp {
   // ==================== 9. أدوات مساعدة ====================
   formatNumber(val) {
     if (val === null || val === undefined || isNaN(val)) return '0';
-    if (!this.settings.thousandsSep) return val.toString();
-    return Number(val).toLocaleString('en-US', {
-      maximumFractionDigits: 2,
+    // استقطاع أي رقم بعد الفاصلة العشرية (Truncate Decimals)
+    const intVal = Math.trunc(Number(val));
+    if (!this.settings.thousandsSep) return intVal.toString();
+    return intVal.toLocaleString('en-US', {
+      maximumFractionDigits: 0,
       minimumFractionDigits: 0
     });
   }

@@ -956,6 +956,73 @@ body.theme-dark .col-birr-cell {
 .total-amount { color: #047857; }
 .total-birr { color: #b45309; }
 
+/* تنسيقات فئات الحوالات (الصغيرة والكبيرة والإجماليات الفرعية) */
+.category-banner-row td {
+  background-color: #e0f2fe !important;
+  color: #0369a1 !important;
+  font-weight: 800;
+  font-size: 0.96rem;
+  padding: 0.65rem 0.85rem !important;
+  border-top: 2px solid var(--excel-grid-border) !important;
+  border-bottom: 2px solid var(--excel-grid-border) !important;
+}
+
+body.theme-dark .category-banner-row td {
+  background-color: #0c4a6e !important;
+  color: #bae6fd !important;
+}
+
+.category-banner-row.large-banner td {
+  background-color: #fef3c7 !important;
+  color: #92400e !important;
+}
+
+body.theme-dark .category-banner-row.large-banner td {
+  background-color: #78350f !important;
+  color: #fde68a !important;
+}
+
+.subtotal-row {
+  background-color: #f8fafc !important;
+  font-weight: 800;
+  border-top: 1.5px solid var(--excel-grid-border) !important;
+  border-bottom: 1.5px solid var(--excel-grid-border) !important;
+}
+
+body.theme-dark .subtotal-row {
+  background-color: #1e293b !important;
+}
+
+.subtotal-row td {
+  padding: 0.7rem 0.6rem !important;
+}
+
+.subtotal-label {
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.category-divider-row td {
+  background: var(--bg-muted) !important;
+  padding: 0.6rem !important;
+  border-left: 1px solid var(--excel-grid-border);
+  border-right: 1px solid var(--excel-grid-border);
+  border-top: 2px dashed #94a3b8 !important;
+  border-bottom: 2px dashed #94a3b8 !important;
+  text-align: center;
+}
+
+.divider-badge {
+  display: inline-block;
+  background: var(--bg-card);
+  padding: 0.2rem 1rem;
+  border-radius: 9999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  border: 1px solid var(--border-color);
+}
+
 /* الحالة الفارغة */
 .empty-state {
   text-align: center;

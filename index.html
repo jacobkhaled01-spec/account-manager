@@ -535,6 +535,24 @@ total=227,620" rows="10" spellcheck="false"></textarea>
             </div>
           </div>
 
+          <!-- 6. الحد الفاصل للحوالات ورمز العملة -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="setting-split-threshold" class="form-label">
+                <strong>الحد الفاصل للحوالات (بر):</strong>
+              </label>
+              <input type="number" id="setting-split-threshold" value="100000" step="1000" class="form-input">
+              <p class="form-help">الحوالات من 1 إلى هذا الرقم تعتبر صغيرة، وما فوقه يعتبر كبيرة.</p>
+            </div>
+            <div class="form-group">
+              <label for="setting-birr-label" class="form-label">
+                <strong>اسم عملة البر في الرسالة النصية:</strong>
+              </label>
+              <input type="text" id="setting-birr-label" value="birr" class="form-input">
+              <p class="form-help">الكلمة المكتوبة بجانب المبلغ في الرسالة (مثال: birr أو birrr).</p>
+            </div>
+          </div>
+
           <!-- أزرار الإعدادات -->
           <div class="settings-actions-bar">
             <button type="submit" class="btn btn-primary">
