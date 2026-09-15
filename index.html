@@ -59,6 +59,12 @@
           </div>
         </div>
 
+        <!-- مؤشر الحفظ التلقائي الذكي -->
+        <div id="autosave-status" class="autosave-badge" title="الحفظ التلقائي نشط لجميع الكشوفات">
+          <span class="autosave-dot"></span>
+          <span class="autosave-text">محفوظ تلقائياً</span>
+        </div>
+
         <!-- أزرار الإجراءات العلوية -->
         <button id="btn-theme-toggle" class="icon-btn" title="تبديل الوضع الليلي / الفاتح" aria-label="تبديل المظهر">
           <span class="theme-icon light-icon">☀️</span>
@@ -101,6 +107,15 @@
           </svg>
           <span>كشف الحوالات الصادرة</span>
           <span class="badge-count badge-outgoing" id="nav-outgoing-badge">0</span>
+        </button>
+
+        <button class="nav-tab" data-tab="tab-history">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10" />
+            <polyline points="12 6 12 12 16 14" />
+          </svg>
+          <span>السجل التاريخي</span>
+          <span class="badge-count badge-history" id="nav-history-badge">0</span>
         </button>
 
         <button class="nav-tab" data-tab="tab-settings">
@@ -261,6 +276,21 @@ total=227,620" rows="9" spellcheck="false"></textarea>
             </div>
           </div>
 
+          <!-- وضع الاستيراد: إضافة متتابعة أو استبدال -->
+          <div class="paste-mode-selector-row">
+            <span class="target-title">وضع الاستيراد:</span>
+            <div class="target-radio-options">
+              <label class="radio-chip">
+                <input type="radio" name="import-mode" value="append" checked>
+                <span>➕ إضافة متتابعة (تراكمي بدون حذف السابق)</span>
+              </label>
+              <label class="radio-chip">
+                <input type="radio" name="import-mode" value="replace">
+                <span>🔄 استبدال الكشف الحالي</span>
+              </label>
+            </div>
+          </div>
+
           <!-- نماذج سريعة للتجربة الفورية -->
           <div class="quick-sample-templates-row">
             <span class="samples-title">نماذج سريعة:</span>
@@ -396,6 +426,19 @@ total=227,620" rows="9" spellcheck="false"></textarea>
           <span class="hint-arrow">👉</span>
           <span>اسحب الجدول أفقياً لمشاهدة باقي الأعمدة والمقابل بالبر</span>
           <span class="hint-arrow">👈</span>
+        </div>
+
+        <!-- شريط فرز العملات للحوالات الواردة -->
+        <div class="currency-filter-bar" id="incoming-currency-filter-bar">
+          <div class="filter-bar-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;">
+              <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+            </svg>
+            <span>فرز حسب العملة:</span>
+          </div>
+          <div class="filter-chips-container" id="incoming-curr-chips">
+            <button type="button" class="curr-chip active" data-curr="ALL">جميع العملات (0)</button>
+          </div>
         </div>
 
         <!-- ==================== جدول حسابات الصرافين (مطابق للصورة) ==================== -->
@@ -598,6 +641,19 @@ total=227,620" rows="9" spellcheck="false"></textarea>
           </div>
         </div>
 
+        <!-- شريط فرز العملات للحوالات الصادرة -->
+        <div class="currency-filter-bar" id="outgoing-currency-filter-bar">
+          <div class="filter-bar-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;">
+              <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+            </svg>
+            <span>فرز حسب العملة:</span>
+          </div>
+          <div class="filter-chips-container" id="outgoing-curr-chips">
+            <button type="button" class="curr-chip active" data-curr="ALL">جميع العملات (0)</button>
+          </div>
+        </div>
+
         <!-- جدول الحوالات الصادرة -->
         <div class="table-responsive">
           <table class="data-table outgoing-table" id="outgoing-main-table">
@@ -632,6 +688,40 @@ total=227,620" rows="9" spellcheck="false"></textarea>
           </table>
         </div>
 
+      </div>
+    </section>
+
+    <!-- ==================== التبويب: السجل التاريخي للعمليات ==================== -->
+    <section id="tab-history" class="tab-pane">
+      <div class="panel-card max-width-container">
+        <div class="panel-header">
+          <div class="panel-title-wrap">
+            <h2 class="panel-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10" />
+                <polyline points="12 6 12 12 16 14" />
+              </svg>
+              <span>السجل التاريخي للعمليات والتدقيق المالي</span>
+            </h2>
+            <p class="panel-desc">سجل زمني آلي وغير قابل للضياع لجميع عمليات الاستيراد، التعديل، والحذف مع حفظ تلقائي دائم.</p>
+          </div>
+          <div class="panel-actions">
+            <button id="btn-clear-history" class="btn btn-ghost text-danger" title="مسح سجل التدقيق">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 17px; height: 17px;">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+              </svg>
+              <span>مسح السجل التاريخي</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- قائمة أحداث السجل -->
+        <div class="history-timeline-wrapper">
+          <div id="history-timeline-list" class="history-timeline-list">
+            <!-- يتم تعبئة عناصر السجل ديناميكياً -->
+          </div>
+        </div>
       </div>
     </section>
 

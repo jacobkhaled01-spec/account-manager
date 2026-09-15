@@ -140,8 +140,11 @@ TEAME TESFAY HAGOS=4975 SAR
 
 class SharafApp {
   constructor() {
-    this.records = [];
+    this.records = this.loadIncomingRecords();
     this.outgoingRecords = this.loadOutgoingRecords();
+    this.auditLog = this.loadAuditLog();
+    this.incomingCurrFilter = 'ALL';
+    this.outgoingCurrFilter = 'ALL';
     this.settings = this.loadSettings();
     this.searchQuery = '';
     this.outgoingSearchQuery = '';
@@ -155,9 +158,134 @@ class SharafApp {
     this.switchTab('tab-paste');
     this.render();
     this.renderOutgoing();
+    this.renderAuditLog();
   }
 
-  // ==================== 1. الإعدادات والتهيئة ====================
+  // ==================== 1. التخزين، الإعدادات والحفظ التلقائي ====================
+  loadIncomingRecords() {
+    try {
+      const saved = localStorage.getItem('sharaf_incoming_records');
+      return saved ? JSON.parse(saved) : [];
+    } catch (e) {
+      console.warn('Could not load incoming records from localStorage:', e);
+      return [];
+    }
+  }
+
+  saveIncomingRecords() {
+    try {
+      localStorage.setItem('sharaf_incoming_records', JSON.stringify(this.records));
+      this.triggerAutoSaveIndicator();
+    } catch (e) {
+      console.warn('Could not save incoming records to localStorage:', e);
+    }
+  }
+
+  loadAuditLog() {
+    try {
+      const saved = localStorage.getItem('sharaf_audit_log');
+      return saved ? JSON.parse(saved) : [];
+    } catch (e) {
+      console.warn('Could not load audit log from localStorage:', e);
+      return [];
+    }
+  }
+
+  saveAuditLog() {
+    try {
+      localStorage.setItem('sharaf_audit_log', JSON.stringify(this.auditLog));
+    } catch (e) {
+      console.warn('Could not save audit log to localStorage:', e);
+    }
+  }
+
+  addAuditLog(entry) {
+    const item = {
+      id: Date.now(),
+      timestamp: new Date().toISOString(),
+      timeFormatted: new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+      dateFormatted: new Date().toLocaleDateString('ar-EG', { year: 'numeric', month: 'short', day: 'numeric' }),
+      type: entry.type || 'import',
+      title: entry.title || 'عملية مالية',
+      description: entry.description || '',
+      tags: entry.tags || []
+    };
+    this.auditLog.unshift(item);
+    if (this.auditLog.length > 200) {
+      this.auditLog = this.auditLog.slice(0, 200);
+    }
+    this.saveAuditLog();
+    this.renderAuditLog();
+  }
+
+  renderAuditLog() {
+    const listEl = document.getElementById('history-timeline-list');
+    const badgeEl = document.getElementById('nav-history-badge');
+    if (badgeEl) badgeEl.textContent = this.auditLog.length;
+    if (!listEl) return;
+
+    if (this.auditLog.length === 0) {
+      listEl.innerHTML = `
+        <div class="history-empty-state">
+          <div class="history-empty-icon">📜</div>
+          <p>لا توجد عمليات مسجلة حتى الآن. أي استيراد أو تعديل أو إضافة سيتم توثيقه هنا تلقائياً.</p>
+        </div>`;
+      return;
+    }
+
+    const typeIcons = {
+      import: '📥',
+      edit: '✏️',
+      delete: '🗑️',
+      clear: '⚠️'
+    };
+
+    listEl.innerHTML = this.auditLog.map(item => `
+      <div class="history-item type-${item.type}">
+        <div class="history-icon-box">
+          <span>${typeIcons[item.type] || '📌'}</span>
+        </div>
+        <div class="history-card">
+          <div class="history-card-header">
+            <span class="history-card-title">${this.escapeHtml(item.title)}</span>
+            <span class="history-card-time">${item.dateFormatted} - ${item.timeFormatted}</span>
+          </div>
+          <div class="history-card-desc">${this.escapeHtml(item.description)}</div>
+          ${item.tags && item.tags.length > 0 ? `
+            <div class="history-card-tags">
+              ${item.tags.map(t => `<span class="history-tag">${this.escapeHtml(t)}</span>`).join('')}
+            </div>` : ''}
+        </div>
+      </div>
+    `).join('');
+  }
+
+  clearAuditLog() {
+    if (this.auditLog.length === 0) return;
+    if (!confirm('تحذير: هل أنت متأكد من رغبتك في مسح السجل التاريخي بالكامل؟')) return;
+    this.auditLog = [];
+    this.saveAuditLog();
+    this.renderAuditLog();
+    this.showToast('تم مسح السجل التاريخي', 'info');
+  }
+
+  triggerAutoSaveIndicator() {
+    const badge = document.getElementById('autosave-status');
+    if (badge) {
+      badge.classList.remove('saved-pulse');
+      void badge.offsetWidth;
+      badge.classList.add('saved-pulse');
+    }
+  }
+
+  getImportMode() {
+    const radios = document.getElementsByName('import-mode');
+    for (let r of radios) {
+      if (r.checked) return r.value;
+    }
+    return 'append';
+  }
+
   loadSettings() {
     const defaultSettings = {
       defaultRate: 48,
@@ -407,16 +535,20 @@ class SharafApp {
 
     document.getElementById('btn-theme-toggle').addEventListener('click', () => this.toggleTheme());
     document.getElementById('btn-open-settings').addEventListener('click', () => this.switchTab('tab-settings'));
+    const btnClearHist = document.getElementById('btn-clear-history');
+    if (btnClearHist) {
+      btnClearHist.addEventListener('click', () => this.clearAuditLog());
+    }
   }
 
   switchTab(tabId) {
     this.navTabs.forEach(t => t.classList.toggle('active', t.getAttribute('data-tab') === tabId));
     this.tabPanes.forEach(p => p.classList.toggle('active', p.id === tabId));
 
-    // إخفاء كروت الإحصائيات العلوية في صفحة الإعدادات أو الحوالات الصادرة لتوفير مساحة شاشة الهاتف
+    // إخفاء كروت الإحصائيات العلوية في صفحة الإعدادات أو الحوالات الصادرة أو السجل لتوفير مساحة شاشة الهاتف
     const metricsGrid = document.querySelector('.metrics-grid');
     if (metricsGrid) {
-      if (tabId === 'tab-settings' || tabId === 'tab-help' || tabId === 'tab-outgoing') {
+      if (tabId === 'tab-settings' || tabId === 'tab-help' || tabId === 'tab-outgoing' || tabId === 'tab-history') {
         metricsGrid.classList.add('hidden-on-settings');
       } else {
         metricsGrid.classList.remove('hidden-on-settings');
@@ -751,6 +883,70 @@ class SharafApp {
     return records;
   }
 
+  // ==================== 4. خوارزمية تقسيم النصوص المختلطة ====================
+  splitMixedText(rawText) {
+    const rawBlocks = rawText.split(/(?:\r?\n)(?:[-=_*~]{3,}|_{3,}|={3,})(?:\r?\n)/);
+    const incomingBlocks = [];
+    const outgoingBlocks = [];
+
+    for (let block of rawBlocks) {
+      const trimmed = block.trim();
+      if (!trimmed) continue;
+
+      const hasOutgoingSigns = /ارسال\s*حوال[ةه]|حوال[ةه]\s*صادرة|خصم\s*[\d,]+|(?:المستلم[\s\S]*?المرسل)|(?:المرسل[\s\S]*?المستلم)/i.test(trimmed);
+      const hasIncomingSigns = /\b\d+[\,\'\.\-\_].+=\s*[\d,]+|ዓዲ|total\s*=\s*[\d,]+/i.test(trimmed);
+
+      if (hasOutgoingSigns && !hasIncomingSigns) {
+        outgoingBlocks.push(trimmed);
+      } else if (hasIncomingSigns && !hasOutgoingSigns) {
+        incomingBlocks.push(trimmed);
+      } else if (hasOutgoingSigns && hasIncomingSigns) {
+        const lines = trimmed.split('\n');
+        let curLines = [];
+        let curType = null;
+
+        const flush = () => {
+          if (curLines.length === 0) return;
+          const txt = curLines.join('\n').trim();
+          if (txt) {
+            if (curType === 'outgoing') outgoingBlocks.push(txt);
+            else incomingBlocks.push(txt);
+          }
+          curLines = [];
+        };
+
+        for (let line of lines) {
+          const lTrim = line.trim();
+          if (/^\*?\(\s*ارسال\s*حوال[ةه]\s*\)\*?/i.test(lTrim) || /^(\*)?المستلم(\*)?\s*$/i.test(lTrim)) {
+            flush();
+            curType = 'outgoing';
+            curLines.push(line);
+          } else if (/^\d+[\,\'\.\-\_].+=[\d,]+/i.test(lTrim) || /^ዓዲ/i.test(lTrim)) {
+            flush();
+            curType = 'incoming';
+            curLines.push(line);
+          } else {
+            curLines.push(line);
+          }
+        }
+        flush();
+      } else {
+        if (trimmed.includes('=')) {
+          incomingBlocks.push(trimmed);
+        } else {
+          outgoingBlocks.push(trimmed);
+        }
+      }
+    }
+
+    return {
+      incomingText: incomingBlocks.join('\n\n'),
+      outgoingText: outgoingBlocks.join('\n\n-----------------\n\n'),
+      hasIncoming: incomingBlocks.length > 0,
+      hasOutgoing: outgoingBlocks.length > 0
+    };
+  }
+
   processRawText() {
     const rawText = this.rawTextInput.value.trim();
     if (!rawText) {
@@ -769,12 +965,86 @@ class SharafApp {
       }
     }
 
+    const importMode = this.getImportMode();
+    const autoDate = document.getElementById('opt-auto-date')?.checked ?? true;
+    const customDate = document.getElementById('input-custom-date')?.value.trim() || '';
+    const batchCurr = document.getElementById('input-batch-currency')?.value.trim() || this.settings.defaultCurrency;
+    const batchRate = parseFloat(document.getElementById('input-batch-rate')?.value) || this.settings.defaultRate;
+
+    // 1. الاكتشاف المختلط الذكي إذا كان الخيار تلقائي
+    if (targetType === 'auto') {
+      const split = this.splitMixedText(rawText);
+      if (split.hasIncoming && split.hasOutgoing) {
+        const outRecords = this.parseOutgoingText(split.outgoingText);
+        const inResult = this.parseFinancialText(split.incomingText, {
+          rate: batchRate,
+          currency: batchCurr,
+          autoDate: autoDate,
+          customDate: customDate
+        });
+
+        if (outRecords.length > 0 || inResult.count > 0) {
+          if (inResult.count > 0) {
+            if (importMode === 'append') {
+              const startSeq = this.records.length;
+              const newRows = inResult.records.map((r, i) => ({
+                ...r,
+                originalSeq: startSeq + i + 1
+              }));
+              this.records = [...this.records, ...newRows];
+            } else {
+              this.records = inResult.records;
+            }
+            this.saveIncomingRecords();
+            this.render();
+          }
+
+          if (outRecords.length > 0) {
+            if (importMode === 'append') {
+              this.outgoingRecords = [...this.outgoingRecords, ...outRecords];
+            } else {
+              this.outgoingRecords = outRecords;
+            }
+            this.saveOutgoingRecords();
+            this.renderOutgoing();
+          }
+
+          const tags = [];
+          if (inResult.count > 0) tags.push(`واردة: ${inResult.count}`);
+          if (outRecords.length > 0) tags.push(`صادرة: ${outRecords.length}`);
+          tags.push(importMode === 'append' ? 'إضافة للكشف' : 'استبدال الكشف');
+
+          this.addAuditLog({
+            type: 'import',
+            title: 'استيراد كشف مختلط (واردة + صادرة)',
+            description: `تم تلقائياً فرز واستيراد ${inResult.count} حوالة واردة و ${outRecords.length} حوالة صادرة.`,
+            tags
+          });
+
+          this.parseStatusMsg.textContent = `تم كشف وتوزيع: ${inResult.count} حوالة واردة + ${outRecords.length} حوالة صادرة بنجاح ✓ (${importMode === 'append' ? 'إضافة متتابعة' : 'استبدال'})`;
+          this.parseStatusMsg.className = 'status-msg success';
+          this.parseStatusMsg.classList.remove('hidden');
+
+          this.showToast(`تم استيراد ${inResult.count} واردة و ${outRecords.length} صادرة بنجاح`, 'success');
+
+          setTimeout(() => {
+            if (inResult.count >= outRecords.length) {
+              this.switchTab('tab-table');
+            } else {
+              this.switchTab('tab-outgoing');
+            }
+          }, 600);
+          return;
+        }
+      }
+    }
+
+    // 2. معالجة الحوالات الصادرة إذا تطابق النمط أو تم تحديدها صراحة
     const isOutgoing = targetType === 'outgoing' || (targetType === 'auto' && (
       /ارسال\s*حوال[ةه]|حوال[ةه]\s*صادرة|خصم\s*[\d,]+/i.test(rawText) ||
       (/المستلم/i.test(rawText) && /المرسل/i.test(rawText))
     ));
 
-    // معالجة الحوالات الصادرة إذا تطابق النمط
     if (isOutgoing) {
       const outRecords = this.parseOutgoingText(rawText);
       if (outRecords.length === 0) {
@@ -782,11 +1052,22 @@ class SharafApp {
         return;
       }
 
-      this.outgoingRecords = outRecords;
+      if (importMode === 'append') {
+        this.outgoingRecords = [...this.outgoingRecords, ...outRecords];
+      } else {
+        this.outgoingRecords = outRecords;
+      }
       this.saveOutgoingRecords();
       this.renderOutgoing();
 
-      this.parseStatusMsg.textContent = `تم استخراج ${outRecords.length} حوالة صادرة بنجاح وتم توجيهك إلى كشف الحوالات الصادرة ✓`;
+      this.addAuditLog({
+        type: 'import',
+        title: 'استيراد حوالات صادرة',
+        description: `تم استيراد ${outRecords.length} حوالة صادرة (${importMode === 'append' ? 'إضافة للكشف' : 'استبدال الكشف'}).`,
+        tags: [`صادرة: ${outRecords.length}`, importMode === 'append' ? 'إضافة متتابعة' : 'استبدال']
+      });
+
+      this.parseStatusMsg.textContent = `تم استخراج ${outRecords.length} حوالة صادرة بنجاح وتم توجيهك إلى كشف الحوالات الصادرة ✓ (${importMode === 'append' ? 'إضافة متتابعة' : 'استبدال'})`;
       this.parseStatusMsg.className = 'status-msg success';
       this.parseStatusMsg.classList.remove('hidden');
 
@@ -797,12 +1078,7 @@ class SharafApp {
       return;
     }
 
-    // معالجة الحوالات الواردة الافتراضية
-    const autoDate = document.getElementById('opt-auto-date').checked;
-    const customDate = document.getElementById('input-custom-date').value.trim();
-    const batchCurr = document.getElementById('input-batch-currency').value.trim() || this.settings.defaultCurrency;
-    const batchRate = parseFloat(document.getElementById('input-batch-rate').value) || this.settings.defaultRate;
-
+    // 3. معالجة الحوالات الواردة
     const result = this.parseFinancialText(rawText, {
       rate: batchRate,
       currency: batchCurr,
@@ -816,8 +1092,27 @@ class SharafApp {
     }
 
     this.originalHeaderText = result.detectedHeader || '';
-    this.records = result.records;
+
+    if (importMode === 'append') {
+      const startSeq = this.records.length;
+      const newRows = result.records.map((r, i) => ({
+        ...r,
+        originalSeq: startSeq + i + 1
+      }));
+      this.records = [...this.records, ...newRows];
+    } else {
+      this.records = result.records;
+    }
+
+    this.saveIncomingRecords();
     this.render();
+
+    this.addAuditLog({
+      type: 'import',
+      title: 'استيراد حوالات واردة',
+      description: `تم استيراد ${result.count} حساب وارد بإجمالي ${this.formatNumber(result.calculatedTotalAmount)} ${batchCurr} (${importMode === 'append' ? 'إضافة للكشف' : 'استبدال الكشف'}).`,
+      tags: [`واردة: ${result.count}`, `${this.formatNumber(result.calculatedTotalAmount)} ${batchCurr}`, importMode === 'append' ? 'إضافة متتابعة' : 'استبدال']
+    });
 
     let msg = `تم استخراج ${result.count} سجلاً بنجاح! الإجمالي: ${this.formatNumber(result.calculatedTotalAmount)} ${batchCurr}`;
     if (result.calculatedTotalCutCents > 0) {
@@ -904,19 +1199,55 @@ class SharafApp {
     }
   }
 
+  setIncomingCurrFilter(curr) {
+    this.incomingCurrFilter = curr;
+    this.render();
+  }
+
+  buildIncomingCurrFilterBar() {
+    const container = document.getElementById('incoming-curr-chips');
+    if (!container) return;
+
+    const currCounts = {};
+    this.records.forEach(r => {
+      const c = (r.currency || this.settings.defaultCurrency || 'ريال سعودي').trim();
+      currCounts[c] = (currCounts[c] || 0) + 1;
+    });
+
+    const currencies = Object.keys(currCounts);
+    let html = `<button type="button" class="curr-chip ${this.incomingCurrFilter === 'ALL' ? 'active' : ''}" onclick="app.setIncomingCurrFilter('ALL')">
+      <span>جميع العملات (${this.records.length})</span>
+    </button>`;
+
+    currencies.forEach(curr => {
+      const isActive = this.incomingCurrFilter === curr;
+      html += `<button type="button" class="curr-chip ${isActive ? 'active' : ''}" onclick="app.setIncomingCurrFilter('${this.escapeHtml(curr)}')">
+        <span>${this.escapeHtml(curr)} (${currCounts[curr]})</span>
+      </button>`;
+    });
+
+    container.innerHTML = html;
+  }
+
   // ==================== 5. العرض والرندرة مع فصل الصغير والكبير ====================
   render() {
-    let filtered = this.records.filter(r => {
-      if (!this.searchQuery) return true;
+    this.buildIncomingCurrFilterBar();
+
+    let filtered = this.records;
+    if (this.incomingCurrFilter && this.incomingCurrFilter !== 'ALL') {
+      filtered = filtered.filter(r => (r.currency || this.settings.defaultCurrency || 'ريال سعودي').trim() === this.incomingCurrFilter);
+    }
+
+    if (this.searchQuery) {
       const q = this.searchQuery;
-      return (
+      filtered = filtered.filter(r => (
         r.name.toLowerCase().includes(q) ||
         r.id.toLowerCase().includes(q) ||
         r.amount.toString().includes(q) ||
         r.date.includes(q) ||
         r.currency.toLowerCase().includes(q)
-      );
-    });
+      ));
+    }
 
     if (this.sortColumn) {
       filtered.sort((a, b) => {
@@ -1061,15 +1392,17 @@ class SharafApp {
       this.tableBody.innerHTML = html;
     }
 
-    // حساب الإجماليات العامة
+    // حساب الإجماليات
     const totalCount = this.records.length;
-    const totalAmount = this.records.reduce((sum, r) => sum + (r.amount || 0), 0);
-    const totalBirr = this.records.reduce((sum, r) => sum + (r.birrEquivalent || 0), 0);
-    const totalCutCents = Math.round(this.records.reduce((sum, r) => sum + (r.cutCents || 0), 0) * 100) / 100;
+    const isFiltered = this.incomingCurrFilter && this.incomingCurrFilter !== 'ALL';
+    const recordsForTotals = isFiltered ? filtered : this.records;
+    const totalAmount = recordsForTotals.reduce((sum, r) => sum + (r.amount || 0), 0);
+    const totalBirr = recordsForTotals.reduce((sum, r) => sum + (r.birrEquivalent || 0), 0);
+    const totalCutCents = Math.round(recordsForTotals.reduce((sum, r) => sum + (r.cutCents || 0), 0) * 100) / 100;
     const totalCentsCount = Math.round(totalCutCents * 100);
-    const currencyName = this.records[0]?.currency || this.settings.defaultCurrency || 'ريال سعودي';
+    const currencyName = isFiltered ? this.incomingCurrFilter : (this.records[0]?.currency || this.settings.defaultCurrency || 'ريال سعودي');
 
-    this.statCount.textContent = totalCount;
+    this.statCount.textContent = isFiltered ? `${filtered.length} / ${totalCount}` : totalCount;
     this.statTotalAmount.textContent = this.formatNumber(totalAmount);
     this.statTotalBirr.textContent = this.formatNumber(totalBirr);
     this.navCountBadge.textContent = totalCount;
@@ -1080,7 +1413,7 @@ class SharafApp {
       statCutBirrEl.textContent = `✂️ مقطوع: ${totalCutCents.toFixed(2)} ${birrLabel}${totalCentsCount > 0 ? ` (${this.formatNumber(totalCentsCount)} سنت)` : ''}`;
     }
 
-    this.footerCount.textContent = totalCount;
+    this.footerCount.textContent = isFiltered ? `${filtered.length} (من ${totalCount})` : totalCount;
     this.footerTotalAmount.textContent = `${this.formatNumber(totalAmount)} ${currencyName}`;
     this.footerTotalBirr.textContent = `${this.formatNumber(totalBirr)} بر`;
 
@@ -1292,14 +1625,18 @@ class SharafApp {
 
   // ==================== 7.1 نسخ ومعاينة الرسالة الأصلية بالبر ====================
   generateCustomBirrMessage() {
-    if (this.records.length === 0) return '';
+    let recordsToUse = this.records;
+    if (this.incomingCurrFilter && this.incomingCurrFilter !== 'ALL') {
+      recordsToUse = recordsToUse.filter(r => (r.currency || this.settings.defaultCurrency || 'ريال سعودي').trim() === this.incomingCurrFilter);
+    }
+    if (recordsToUse.length === 0) return '';
 
     const currencyLabel = (this.settings.birrLabel || 'birr').trim();
     const threshold = this.settings.splitThreshold || 100000;
     const header = this.originalHeaderText || '';
 
-    const smallRecords = this.records.filter(r => (r.birrEquivalent || 0) <= threshold);
-    const largeRecords = this.records.filter(r => (r.birrEquivalent || 0) > threshold);
+    const smallRecords = recordsToUse.filter(r => (r.birrEquivalent || 0) <= threshold);
+    const largeRecords = recordsToUse.filter(r => (r.birrEquivalent || 0) > threshold);
 
     const lines = [];
     if (header) {
@@ -1351,11 +1688,11 @@ class SharafApp {
 
     // 4. فاصل وإجمالي عام بعد فاصل
     lines.push('========================================');
-    const totalBirr = this.records.reduce((sum, r) => sum + (r.birrEquivalent || 0), 0);
+    const totalBirr = recordsToUse.reduce((sum, r) => sum + (r.birrEquivalent || 0), 0);
     lines.push(`total=${this.formatNumber(totalBirr)} ${currencyLabel}`);
 
     // 5. إجمالي المبلغ المقطوع بالبر (الكسور والأجزاء أقل من 100 سنت)
-    const totalCutCents = Math.round(this.records.reduce((sum, r) => sum + (r.cutCents || 0), 0) * 100) / 100;
+    const totalCutCents = Math.round(recordsToUse.reduce((sum, r) => sum + (r.cutCents || 0), 0) * 100) / 100;
     const totalCentsCount = Math.round(totalCutCents * 100);
     const birrLabel = (this.settings.birrLabel || 'birr').trim();
     lines.push(`اجمالي المبلغ المقطوع بالبر=${totalCutCents.toFixed(2)} ${birrLabel}${totalCentsCount > 0 ? ` (${this.formatNumber(totalCentsCount)} سنت)` : ''}`);
@@ -1482,12 +1819,25 @@ class SharafApp {
 
     if (index === -1) {
       this.records.push(rowData);
+      this.addAuditLog({
+        type: 'edit',
+        title: 'إضافة حساب يدوي (وارد)',
+        description: `تمت إضافة المستفيد: ${name} بمبلغ ${this.formatNumber(amount)} ${currency}.`,
+        tags: [name, `${this.formatNumber(amount)} ${currency}`]
+      });
       this.showToast('تمت إضافة السجل بنجاح', 'success');
     } else {
       this.records[index] = rowData;
+      this.addAuditLog({
+        type: 'edit',
+        title: 'تعديل حساب (وارد)',
+        description: `تم تعديل بيانات المستفيد: ${name} (المبلغ: ${this.formatNumber(amount)} ${currency}).`,
+        tags: [name, `${this.formatNumber(amount)} ${currency}`]
+      });
       this.showToast('تم تعديل السجل بنجاح', 'success');
     }
 
+    this.saveIncomingRecords();
     this.closeRowModal();
     this.render();
   }
@@ -1497,6 +1847,13 @@ class SharafApp {
     if (!r) return;
     if (confirm(`هل أنت متأكد من حذف حساب: "${r.name}"؟`)) {
       this.records.splice(index, 1);
+      this.saveIncomingRecords();
+      this.addAuditLog({
+        type: 'delete',
+        title: 'حذف حساب (وارد)',
+        description: `تم حذف المستفيد: ${r.name} بمبلغ ${this.formatNumber(r.amount)} ${r.currency}.`,
+        tags: [r.name]
+      });
       this.render();
       this.showToast('تم حذف السجل', 'success');
     }
@@ -1505,7 +1862,15 @@ class SharafApp {
   clearAllRecords() {
     if (this.records.length === 0) return;
     if (confirm('تحذير: هل أنت متأكد من مسح جميع السجلات من الجدول؟')) {
+      const prevCount = this.records.length;
       this.records = [];
+      this.saveIncomingRecords();
+      this.addAuditLog({
+        type: 'clear',
+        title: 'تفريغ جدول الوارد بالكامل',
+        description: `تم مسح جميع الحسابات الواردة (${prevCount} حساب).`,
+        tags: [`${prevCount} حساب`]
+      });
       this.render();
       this.showToast('تم تفريغ الجدول بالكامل', 'success');
     }
@@ -1567,10 +1932,46 @@ class SharafApp {
     }
   }
 
+  setOutgoingCurrFilter(curr) {
+    this.outgoingCurrFilter = curr;
+    this.renderOutgoing();
+  }
+
+  buildOutgoingCurrFilterBar() {
+    const container = document.getElementById('outgoing-curr-chips');
+    if (!container) return;
+
+    const currCounts = {};
+    this.outgoingRecords.forEach(r => {
+      const c = (r.currency || 'سعودي').trim();
+      currCounts[c] = (currCounts[c] || 0) + 1;
+    });
+
+    const currencies = Object.keys(currCounts);
+    let html = `<button type="button" class="curr-chip ${this.outgoingCurrFilter === 'ALL' ? 'active' : ''}" onclick="app.setOutgoingCurrFilter('ALL')">
+      <span>جميع العملات (${this.outgoingRecords.length})</span>
+    </button>`;
+
+    currencies.forEach(curr => {
+      const isActive = this.outgoingCurrFilter === curr;
+      html += `<button type="button" class="curr-chip ${isActive ? 'active' : ''}" onclick="app.setOutgoingCurrFilter('${this.escapeHtml(curr)}')">
+        <span>${this.escapeHtml(curr)} (${currCounts[curr]})</span>
+      </button>`;
+    });
+
+    container.innerHTML = html;
+  }
+
   renderOutgoing() {
     if (!this.outgoingTableBody) return;
 
+    this.buildOutgoingCurrFilterBar();
+
     let filtered = this.outgoingRecords;
+    if (this.outgoingCurrFilter && this.outgoingCurrFilter !== 'ALL') {
+      filtered = filtered.filter(r => (r.currency || 'سعودي').trim() === this.outgoingCurrFilter);
+    }
+
     if (this.outgoingSearchQuery) {
       const q = this.outgoingSearchQuery;
       filtered = filtered.filter(r =>
@@ -1588,7 +1989,7 @@ class SharafApp {
         <tr>
           <td colspan="11" class="empty-state-cell" style="padding: 2.5rem 1rem; text-align: center;">
             <div style="font-size: 2.2rem; margin-bottom: 0.5rem;">📤</div>
-            <h4 style="margin: 0 0 0.5rem; font-size: 1.05rem; color: var(--text-primary);">لا توجد حوالات صادرة مدخلة حالياً</h4>
+            <h4 style="margin: 0 0 0.5rem; font-size: 1.05rem; color: var(--text-primary);">لا توجد حوالات صادرة مطابقة حالياً</h4>
             <p style="color: var(--text-secondary); font-size: 0.88rem; max-width: 480px; margin: 0 auto 1rem;">
               يمكنك لصق نصوص الحوالات الصادرة في تبويب "لصق واستيراد البيانات" أو إضافة حوالة يدوياً.
             </p>
@@ -1600,6 +2001,7 @@ class SharafApp {
     } else {
       let html = '';
       filtered.forEach((r, idx) => {
+        const originalIndex = this.outgoingRecords.indexOf(r);
         let currClass = 'badge-curr-sar';
         if (/دولار\s*ازرق/i.test(r.currency)) currClass = 'badge-curr-blue-usd';
         else if (/دولار/i.test(r.currency) || (r.currency && r.currency.includes('$'))) currClass = 'badge-curr-usd';
@@ -1619,8 +2021,8 @@ class SharafApp {
             <td class="cell-commission">${this.escapeHtml(r.commission || '-')}</td>
             <td style="font-size: 0.85rem; color: var(--text-secondary);">${this.escapeHtml(r.notes || '-')}</td>
             <td class="no-print" style="white-space: nowrap; text-align: center;">
-              <button class="action-btn edit-btn" onclick="app.openOutgoingModal(${idx})" title="تعديل">✏️</button>
-              <button class="action-btn delete-btn" onclick="app.deleteOutgoingRow(${idx})" title="حذف">🗑️</button>
+              <button class="action-btn edit-btn" onclick="app.openOutgoingModal(${originalIndex})" title="تعديل">✏️</button>
+              <button class="action-btn delete-btn" onclick="app.deleteOutgoingRow(${originalIndex})" title="حذف">🗑️</button>
             </td>
           </tr>`;
       });
@@ -1629,21 +2031,28 @@ class SharafApp {
 
     // الإحصائيات والتذييل
     const totalCount = this.outgoingRecords.length;
+    const isFiltered = this.outgoingCurrFilter && this.outgoingCurrFilter !== 'ALL';
+    const recordsForTotals = isFiltered ? filtered : this.outgoingRecords;
+
     if (this.navOutgoingBadge) {
       this.navOutgoingBadge.textContent = totalCount;
     }
 
     const statCountEl = document.getElementById('outgoing-stat-count');
-    if (statCountEl) statCountEl.textContent = `${totalCount} حوالة`;
+    if (statCountEl) {
+      statCountEl.textContent = isFiltered ? `${filtered.length} / ${totalCount} حوالة` : `${totalCount} حوالة`;
+    }
 
     const footerCountEl = document.getElementById('outgoing-footer-count');
-    if (footerCountEl) footerCountEl.textContent = totalCount;
+    if (footerCountEl) {
+      footerCountEl.textContent = isFiltered ? `${filtered.length} (من ${totalCount})` : totalCount;
+    }
 
     const currMap = {};
     const networksSet = new Set();
     let commissionsCount = 0;
 
-    this.outgoingRecords.forEach(r => {
+    recordsForTotals.forEach(r => {
       const c = r.currency || 'غير محدد';
       currMap[c] = (currMap[c] || 0) + (r.amount || 0);
       if (r.network && r.network !== '-') networksSet.add(r.network);
@@ -1657,14 +2066,15 @@ class SharafApp {
       statAmountsEl.style.fontSize = parts.length > 2 ? '0.95rem' : '1.35rem';
     }
 
-    // تذييل الجدول: صف لكل عملة بشكل منضبط
+    // تذييل الجدول: مطابق تماماً للأعمدة الـ 11
     const footerEl = document.getElementById('outgoing-table-foot');
     if (footerEl) {
       const currEntries = Object.entries(currMap);
       if (currEntries.length === 0) {
         footerEl.innerHTML = `<tr class="total-row">
           <td colspan="6" class="total-label"><strong>إجمالي الحوالات الصادرة (<span id="outgoing-footer-count">${totalCount}</span> حوالة)</strong></td>
-          <td colspan="2" class="total-amount">-</td>
+          <td class="total-amount">-</td>
+          <td class="total-amount">-</td>
           <td class="total-amount">-</td>
           <td colspan="2" class="no-print"></td>
         </tr>`;
@@ -1674,10 +2084,11 @@ class SharafApp {
           if (i === 0) {
             footerHtml += `<tr class="total-row">
               <td colspan="6" class="total-label" rowspan="${currEntries.length}">
-                <strong>إجمالي الحوالات الصادرة (${totalCount} حوالة)</strong>
+                <strong>إجمالي الحوالات الصادرة (${isFiltered ? `${filtered.length} (من ${totalCount})` : `${totalCount} حوالة`})</strong>
               </td>
               <td class="total-amount" style="font-family:var(--font-mono);font-weight:800;font-size:1rem;">${this.formatNumber(amt)}</td>
               <td class="total-amount" style="font-weight:700;">${this.escapeHtml(curr)}</td>
+              <td class="total-amount" rowspan="${currEntries.length}" style="color:#d97706;font-weight:700;">${commissionsCount} بعمولة</td>
               <td colspan="2" class="no-print" rowspan="${currEntries.length}"></td>
             </tr>`;
           } else {
@@ -1716,11 +2127,10 @@ class SharafApp {
       document.getElementById('outgoing-edit-ref').value = '';
       document.getElementById('outgoing-edit-network').value = '';
       document.getElementById('outgoing-edit-amount').value = '';
-      document.getElementById('outgoing-edit-currency').value = 'ريال سعودي';
+      document.getElementById('outgoing-edit-currency').value = this.outgoingCurrFilter !== 'ALL' ? this.outgoingCurrFilter : 'ريال سعودي';
       document.getElementById('outgoing-edit-commission').value = '';
       document.getElementById('outgoing-edit-notes').value = '';
     } else {
-      if (titleEl) titleEl.textContent = 'تعديل حوالة صادرة';
       const r = this.outgoingRecords[index];
       if (!r) return;
       document.getElementById('outgoing-edit-date').value = r.date || '';
@@ -1776,9 +2186,21 @@ class SharafApp {
 
     if (index === -1) {
       this.outgoingRecords.push(record);
+      this.addAuditLog({
+        type: 'edit',
+        title: 'إضافة حوالة صادرة يدوية',
+        description: `تمت إضافة حوالة صادرة للمستلم: ${recipient} بمبلغ ${this.formatNumber(amount)} ${currency}.`,
+        tags: [recipient, `${this.formatNumber(amount)} ${currency}`]
+      });
       this.showToast('تمت إضافة الحوالة الصادرة بنجاح', 'success');
     } else {
       this.outgoingRecords[index] = record;
+      this.addAuditLog({
+        type: 'edit',
+        title: 'تعديل حوالة صادرة',
+        description: `تم تعديل حوالة المستلم: ${recipient} (المبلغ: ${this.formatNumber(amount)} ${currency}).`,
+        tags: [recipient, `${this.formatNumber(amount)} ${currency}`]
+      });
       this.showToast('تم تعديل الحوالة الصادرة بنجاح', 'success');
     }
 
@@ -1793,6 +2215,12 @@ class SharafApp {
     if (confirm(`هل أنت متأكد من حذف حوالة: "${r.recipient}"؟`)) {
       this.outgoingRecords.splice(index, 1);
       this.saveOutgoingRecords();
+      this.addAuditLog({
+        type: 'delete',
+        title: 'حذف حوالة صادرة',
+        description: `تم حذف حوالة المستلم: ${r.recipient} بمبلغ ${this.formatNumber(r.amount)} ${r.currency}.`,
+        tags: [r.recipient]
+      });
       this.renderOutgoing();
       this.showToast('تم حذف الحوالة الصادرة', 'success');
     }
@@ -1801,24 +2229,39 @@ class SharafApp {
   clearAllOutgoing() {
     if (this.outgoingRecords.length === 0) return;
     if (confirm('تحذير: هل أنت متأكد من مسح جميع الحوالات الصادرة من الكشف؟')) {
+      const prevCount = this.outgoingRecords.length;
       this.outgoingRecords = [];
       this.saveOutgoingRecords();
+      this.addAuditLog({
+        type: 'clear',
+        title: 'تفريغ كشف الحوالات الصادرة بالكامل',
+        description: `تم مسح جميع الحوالات الصادرة (${prevCount} حوالة).`,
+        tags: [`${prevCount} حوالة`]
+      });
       this.renderOutgoing();
       this.showToast('تم تفريغ كشف الحوالات الصادرة بالكامل', 'success');
     }
   }
 
   generateOutgoingMessage() {
-    if (this.outgoingRecords.length === 0) return '';
+    let recordsToUse = this.outgoingRecords;
+    if (this.outgoingCurrFilter && this.outgoingCurrFilter !== 'ALL') {
+      recordsToUse = recordsToUse.filter(r => (r.currency || 'سعودي').trim() === this.outgoingCurrFilter);
+    }
+    if (recordsToUse.length === 0) return '';
+
     const today = new Date().toLocaleDateString('ar-EG');
     const lines = [];
     lines.push(`📤 *كشف الحوالات الصادرة*`);
     lines.push(`📅 التاريخ: ${today}`);
-    lines.push(`🔢 إجمالي الحوالات: ${this.outgoingRecords.length}`);
+    lines.push(`🔢 إجمالي الحوالات: ${recordsToUse.length}`);
+    if (this.outgoingCurrFilter && this.outgoingCurrFilter !== 'ALL') {
+      lines.push(`💱 العملة المحددة: ${this.outgoingCurrFilter}`);
+    }
     lines.push('----------------------------------------');
     lines.push('');
 
-    this.outgoingRecords.forEach((r, idx) => {
+    recordsToUse.forEach((r, idx) => {
       lines.push(`*${idx + 1}) المستلم:* ${r.recipient}`);
       if (r.sender && r.sender !== '-') {
         lines.push(`*المرسل:* ${r.sender}`);
@@ -1839,7 +2282,7 @@ class SharafApp {
     lines.push('========================================');
     lines.push('💰 *إجمالي المبالغ الصادرة حسب العملات:*');
     const currMap = {};
-    this.outgoingRecords.forEach(r => {
+    recordsToUse.forEach(r => {
       const c = r.currency || 'غير محدد';
       currMap[c] = (currMap[c] || 0) + (r.amount || 0);
     });
