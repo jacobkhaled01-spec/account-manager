@@ -1657,10 +1657,38 @@ class SharafApp {
       statAmountsEl.style.fontSize = parts.length > 2 ? '0.95rem' : '1.35rem';
     }
 
-    const footerAmountsEl = document.getElementById('outgoing-footer-amounts');
-    if (footerAmountsEl) {
-      const parts = Object.entries(currMap).map(([c, amt]) => `${this.formatNumber(amt)} ${c}`);
-      footerAmountsEl.textContent = parts.length > 0 ? parts.join(' • ') : '-';
+    // تذييل الجدول: صف لكل عملة بشكل منضبط
+    const footerEl = document.getElementById('outgoing-table-foot');
+    if (footerEl) {
+      const currEntries = Object.entries(currMap);
+      if (currEntries.length === 0) {
+        footerEl.innerHTML = `<tr class="total-row">
+          <td colspan="6" class="total-label"><strong>إجمالي الحوالات الصادرة (<span id="outgoing-footer-count">${totalCount}</span> حوالة)</strong></td>
+          <td colspan="2" class="total-amount">-</td>
+          <td class="total-amount">-</td>
+          <td colspan="2" class="no-print"></td>
+        </tr>`;
+      } else {
+        let footerHtml = '';
+        currEntries.forEach(([curr, amt], i) => {
+          if (i === 0) {
+            footerHtml += `<tr class="total-row">
+              <td colspan="6" class="total-label" rowspan="${currEntries.length}">
+                <strong>إجمالي الحوالات الصادرة (${totalCount} حوالة)</strong>
+              </td>
+              <td class="total-amount" style="font-family:var(--font-mono);font-weight:800;font-size:1rem;">${this.formatNumber(amt)}</td>
+              <td class="total-amount" style="font-weight:700;">${this.escapeHtml(curr)}</td>
+              <td colspan="2" class="no-print" rowspan="${currEntries.length}"></td>
+            </tr>`;
+          } else {
+            footerHtml += `<tr class="total-row">
+              <td class="total-amount" style="font-family:var(--font-mono);font-weight:800;font-size:1rem;">${this.formatNumber(amt)}</td>
+              <td class="total-amount" style="font-weight:700;">${this.escapeHtml(curr)}</td>
+            </tr>`;
+          }
+        });
+        footerEl.innerHTML = footerHtml;
+      }
     }
 
     const statCommsEl = document.getElementById('outgoing-stat-commissions');
