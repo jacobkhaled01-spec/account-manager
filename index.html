@@ -90,8 +90,17 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M3 3h18v18H3zM3 9h18M3 15h18M9 3v18M15 3v18" />
           </svg>
-          <span>جدول الحسابات</span>
+          <span>كشف الحوالات الواردة</span>
           <span class="badge-count" id="nav-count-badge">0</span>
+        </button>
+
+        <button class="nav-tab" data-tab="tab-outgoing">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="22" y1="2" x2="11" y2="13"></line>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+          </svg>
+          <span>كشف الحوالات الصادرة</span>
+          <span class="badge-count badge-outgoing" id="nav-outgoing-badge">0</span>
         </button>
 
         <button class="nav-tab" data-tab="tab-settings">
@@ -233,6 +242,36 @@ total=227,620" rows="9" spellcheck="false"></textarea>
 
         <!-- كرت خيارات التحليل السريع المتوافق مع الهواتف -->
         <div class="paste-options-card">
+          <!-- محدد نوع الكشف: تلقائي / وارد / صادر -->
+          <div class="paste-target-selector-row">
+            <span class="target-title">نوع الكشف المستهدف:</span>
+            <div class="target-radio-options">
+              <label class="radio-chip">
+                <input type="radio" name="parse-target-type" value="auto" checked>
+                <span>🤖 كشف تلقائي ذكي</span>
+              </label>
+              <label class="radio-chip">
+                <input type="radio" name="parse-target-type" value="incoming">
+                <span>📥 حوالات واردة</span>
+              </label>
+              <label class="radio-chip">
+                <input type="radio" name="parse-target-type" value="outgoing">
+                <span>📤 حوالات صادرة</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- نماذج سريعة للتجربة الفورية -->
+          <div class="quick-sample-templates-row">
+            <span class="samples-title">نماذج سريعة:</span>
+            <button type="button" class="btn-sample-chip" onclick="app.loadSampleDataAndSwitch()">
+              📥 النموذج الإثيوبي (وارد)
+            </button>
+            <button type="button" class="btn-sample-chip" onclick="app.loadOutgoingSampleAndSwitch()">
+              📤 قوالب الصادر (الأكوع/مريسي/المحيط)
+            </button>
+          </div>
+
           <div class="paste-toggle-row">
             <label class="checkbox-label touch-checkbox-label">
               <input type="checkbox" id="opt-auto-date" checked>
@@ -463,7 +502,140 @@ total=227,620" rows="9" spellcheck="false"></textarea>
       </div>
     </section>
 
-    <!-- ==================== التبويب الثالث: صفحة الإعدادات ==================== -->
+    <!-- ==================== التبويب الثالث: كشف الحوالات الصادرة ==================== -->
+    <section id="tab-outgoing" class="tab-pane">
+      <div class="panel-card panel-outgoing">
+        
+        <!-- إحصائيات سريعة خاصة بالحوالات الصادرة -->
+        <div class="outgoing-summary-bar">
+          <div class="outgoing-stat-card">
+            <span class="stat-num" id="outgoing-stat-count">0</span>
+            <span class="stat-lbl">إجمالي الحوالات الصادرة</span>
+          </div>
+          <div class="outgoing-stat-card">
+            <span class="stat-num" id="outgoing-stat-amounts">0</span>
+            <span class="stat-lbl">إجمالي المبالغ الصادرة</span>
+          </div>
+          <div class="outgoing-stat-card">
+            <span class="stat-num" id="outgoing-stat-commissions">0</span>
+            <span class="stat-lbl">إجمالي العمولات المقتطعة</span>
+          </div>
+          <div class="outgoing-stat-card">
+            <span class="stat-num" id="outgoing-stat-networks">0</span>
+            <span class="stat-lbl">الشبكات والإدارات</span>
+          </div>
+        </div>
+
+        <!-- شريط أدوات جدول الحوالات الصادرة -->
+        <div class="table-toolbar">
+          <div class="search-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <input type="text" id="outgoing-search-input" placeholder="بحث بالمستلم، بالمرسل، برقم الحوالة، أو بالشبكة...">
+            <button id="btn-clear-outgoing-search" class="clear-search-btn hidden">✕</button>
+          </div>
+
+          <div class="toolbar-actions">
+            <!-- تصدير إكسل منسق -->
+            <button id="btn-outgoing-export-excel" class="btn btn-excel">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                <polyline points="14 2 14 8 20 8" />
+                <line x1="16" y1="13" x2="8" y2="13" />
+                <line x1="16" y1="17" x2="8" y2="17" />
+                <polyline points="10 9 9 9 8 9" />
+              </svg>
+              <span>تصدير إكسل (.xlsx)</span>
+            </button>
+
+            <!-- نسخ رسالة الحوالات الصادرة للواتساب -->
+            <button id="btn-outgoing-copy-msg" class="btn btn-primary" title="نسخ كشف الحوالات الصادرة كرسالة منسقة للواتساب">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+                <rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
+              </svg>
+              <span>📋 نسخ رسالة الصادر</span>
+            </button>
+
+            <!-- معاينة الرسالة -->
+            <button id="btn-outgoing-preview-msg" class="btn btn-secondary" title="معاينة رسالة كشف الحوالات الصادرة">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+              <span>معاينة الرسالة</span>
+            </button>
+
+            <!-- طباعة الكشف -->
+            <button id="btn-outgoing-print" class="btn btn-secondary">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 6 2 18 2 18 9" />
+                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+                <rect x="6" y="14" width="12" height="8" />
+              </svg>
+              <span>طباعة</span>
+            </button>
+
+            <!-- إضافة حوالة صادرة يدوياً -->
+            <button id="btn-outgoing-add-row" class="btn btn-secondary">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+              </svg>
+              <span>إضافة حوالة</span>
+            </button>
+
+            <!-- مسح الكشف -->
+            <button id="btn-outgoing-clear-all" class="btn btn-danger-ghost">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="3 6 5 6 21 6" />
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+              </svg>
+              <span>تفريغ الكشف</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- جدول الحوالات الصادرة -->
+        <div class="table-responsive">
+          <table class="data-table outgoing-table" id="outgoing-main-table">
+            <thead>
+              <tr>
+                <th style="width: 50px;">#</th>
+                <th style="width: 105px;">التاريخ</th>
+                <th style="min-width: 160px;">اسم المستلم</th>
+                <th style="min-width: 160px;">اسم المرسل</th>
+                <th style="min-width: 130px;">رقم الحوالة / المرجع</th>
+                <th style="min-width: 140px;">اسم الشبكة (عبر)</th>
+                <th style="min-width: 110px;">المبلغ</th>
+                <th style="width: 90px;">العملة</th>
+                <th style="min-width: 110px;">العمولة</th>
+                <th style="min-width: 120px;">ملاحظات</th>
+                <th class="no-print" style="width: 90px;">إجراءات</th>
+              </tr>
+            </thead>
+            <tbody id="outgoing-table-body">
+              <!-- يتم إدراج السجلات برمجياً -->
+            </tbody>
+            <tfoot id="outgoing-table-foot">
+              <tr class="total-row">
+                <td colspan="6" class="total-label">
+                  <strong>إجمالي الحوالات الصادرة (<span id="outgoing-footer-count">0</span> حوالة)</strong>
+                </td>
+                <td colspan="2" class="total-amount" id="outgoing-footer-amounts">-</td>
+                <td class="total-amount" id="outgoing-footer-commissions">-</td>
+                <td colspan="2" class="no-print"></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==================== التبويب الرابع: صفحة الإعدادات ==================== -->
     <section id="tab-settings" class="tab-pane">
       <div class="panel-card max-width-container">
         <div class="panel-header settings-mobile-header">
@@ -788,6 +960,89 @@ total=227,620" rows="9" spellcheck="false"></textarea>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" onclick="app.closePreviewModal()">إغلاق</button>
         <button type="button" class="btn btn-primary" onclick="app.copyFromPreviewModal()">
+          📋 نسخ النص بالكامل
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== نافذة إضافة / تعديل حوالة صادرة ==================== -->
+  <div id="modal-outgoing-row" class="modal-backdrop hidden">
+    <div class="modal-dialog" style="max-width: 600px;">
+      <div class="modal-header">
+        <h3 id="outgoing-modal-title">تعديل حوالة صادرة</h3>
+        <button class="modal-close-btn" onclick="app.closeOutgoingModal()">✕</button>
+      </div>
+      <form id="outgoing-row-form" onsubmit="event.preventDefault(); app.saveOutgoingModal();">
+        <input type="hidden" id="outgoing-edit-index">
+        <div class="modal-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="outgoing-edit-date" class="form-label">التاريخ:</label>
+              <input type="text" id="outgoing-edit-date" required class="form-input">
+            </div>
+            <div class="form-group">
+              <label for="outgoing-edit-network" class="form-label">اسم الشبكة (عبر):</label>
+              <input type="text" id="outgoing-edit-network" placeholder="مثال: مريسي، الادارة الاكوع، المحيط" class="form-input">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="outgoing-edit-recipient" class="form-label">اسم المستلم:</label>
+            <input type="text" id="outgoing-edit-recipient" required class="form-input" placeholder="الاسم الرباعي للمستلم">
+          </div>
+          <div class="form-group">
+            <label for="outgoing-edit-sender" class="form-label">اسم المرسل:</label>
+            <input type="text" id="outgoing-edit-sender" class="form-input" placeholder="اسم مرسل الحوالة">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="outgoing-edit-ref" class="form-label">رقم الحوالة / المرجع:</label>
+              <input type="text" id="outgoing-edit-ref" class="form-input" placeholder="مثال: 400688572189">
+            </div>
+            <div class="form-group">
+              <label for="outgoing-edit-amount" class="form-label">المبلغ:</label>
+              <input type="number" id="outgoing-edit-amount" step="any" required class="form-input">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="outgoing-edit-currency" class="form-label">العملة:</label>
+              <input type="text" id="outgoing-edit-currency" value="ريال سعودي" required class="form-input" placeholder="دولار ازرق، سعودي، دولار...">
+            </div>
+            <div class="form-group">
+              <label for="outgoing-edit-commission" class="form-label">العمولة:</label>
+              <input type="text" id="outgoing-edit-commission" class="form-input" placeholder="مثال: 15 دولار ازرق">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="outgoing-edit-notes" class="form-label">ملاحظات إضافية:</label>
+            <input type="text" id="outgoing-edit-notes" class="form-input" placeholder="أي تفاصيل أو ملاحظات أخرى">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="app.closeOutgoingModal()">إلغاء</button>
+          <button type="submit" class="btn btn-primary">حفظ الحوالة الصادرة</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== نافذة معاينة ونسخ كشف الحوالات الصادرة ==================== -->
+  <div id="preview-outgoing-modal" class="modal-backdrop hidden">
+    <div class="modal-dialog" style="max-width: 680px;">
+      <div class="modal-header">
+        <h3>📋 معاينة كشف الحوالات الصادرة (نسخة الواتساب)</h3>
+        <button class="modal-close-btn" onclick="app.closeOutgoingPreviewModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <p class="form-help" style="margin-bottom: 0.5rem; font-size: 0.88rem; color: var(--color-primary); font-weight: 600;">
+          ✓ رسالة كشف الحوالات الصادرة منسقة وجاهزة بالكامل للمشاركة الفورية.
+        </p>
+        <textarea id="preview-outgoing-textarea" class="code-textarea" rows="14" style="min-height: 280px; font-size: 0.95rem; font-family: var(--font-mono);"></textarea>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="app.closeOutgoingPreviewModal()">إغلاق</button>
+        <button type="button" class="btn btn-primary" onclick="app.copyFromOutgoingPreviewModal()">
           📋 نسخ النص بالكامل
         </button>
       </div>

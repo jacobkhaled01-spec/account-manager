@@ -2285,3 +2285,184 @@ button:active, .btn:active {
     border: 1px solid #333333 !important;
   }
 }
+
+/* ==========================================================================
+   كشف الحوالات الصادرة (Outgoing Transfers Statement)
+   ========================================================================== */
+
+/* بادج تبويب الصادر */
+.badge-outgoing {
+  background: linear-gradient(135deg, #f97316, #ea580c) !important;
+  color: #ffffff !important;
+}
+
+/* محدد نوع الكشف في صفحة اللصق */
+.paste-target-selector-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem 1rem;
+  background: var(--bg-muted);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  margin-bottom: 0.85rem;
+}
+
+.target-title, .samples-title {
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: var(--text-primary);
+}
+
+.target-radio-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.radio-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.85rem;
+  border-radius: 9999px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  font-size: 0.84rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.radio-chip input[type="radio"] {
+  accent-color: var(--color-primary);
+  cursor: pointer;
+}
+
+.radio-chip:has(input:checked) {
+  background: rgba(37, 99, 235, 0.1);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+/* أزرار النماذج السريعة */
+.quick-sample-templates-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.85rem;
+}
+
+.btn-sample-chip {
+  background: var(--bg-muted);
+  border: 1px dashed var(--border-color);
+  color: var(--text-secondary);
+  padding: 0.4rem 0.85rem;
+  border-radius: var(--radius-md);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-sample-chip:hover {
+  background: rgba(37, 99, 235, 0.08);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+/* شريط إحصائيات الحوالات الصادرة */
+.outgoing-summary-bar {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.85rem;
+  margin-bottom: 1.25rem;
+}
+
+.outgoing-stat-card {
+  background: var(--bg-muted);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 1rem 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  border-right: 4px solid #ea580c;
+}
+
+.outgoing-stat-card .stat-num {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+}
+
+.outgoing-stat-card .stat-lbl {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+/* جدول الحوالات الصادرة */
+.outgoing-table th {
+  background-color: #f1f5f9;
+  color: var(--text-primary);
+  font-size: 0.86rem;
+}
+
+.theme-dark .outgoing-table th {
+  background-color: #1e293b;
+}
+
+.badge-network {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border-radius: 9999px;
+  background: rgba(234, 88, 12, 0.12);
+  color: #ea580c;
+  font-weight: 700;
+  font-size: 0.82rem;
+  border: 1px solid rgba(234, 88, 12, 0.25);
+}
+
+.badge-curr-tag {
+  display: inline-block;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-weight: 700;
+  font-size: 0.8rem;
+}
+
+.badge-curr-blue-usd {
+  background: rgba(2, 132, 199, 0.15);
+  color: #0284c7;
+  border: 1px solid rgba(2, 132, 199, 0.3);
+}
+
+.badge-curr-sar {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.badge-curr-usd {
+  background: rgba(99, 102, 241, 0.15);
+  color: #6366f1;
+  border: 1px solid rgba(99, 102, 241, 0.3);
+}
+
+.cell-ref-code {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 0.88rem;
+  letter-spacing: 0.5px;
+}
+
+.cell-commission {
+  color: #d97706;
+  font-weight: 600;
+  font-size: 0.85rem;
+}

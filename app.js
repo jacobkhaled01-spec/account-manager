@@ -108,11 +108,43 @@ const SAMPLE_RAW_TEXT = `ዓዲ ዝሕወሎም ዝርዝር 01/13/18
 1000738510465
 total=227,620`;
 
+// نموذج قوالب الحوالات الصادرة (الأكوع / مريسي / المحيط)
+const SAMPLE_OUTGOING_TEXT = `المستلم 
+حاميم شريف علي ثابت
+المرسل 
+نصير هشام محمد عبدالوهاب
+8000$
+
+مريسي
+
+-----------------
+*(ارسال حوالة)* 
+خصم 15,000 *دولار ازرق* عموله 15 دولار ازرق 
+حوالة صادرة عبر : الادارة الاكوع 
+رقم الحوالة : 400688572189 
+*المستلم*: صبري محمد مصلح مجلي المولد 
+المرسل: صبري محمد مصلح مجلي المولد
+
+------------
+*(ارسال حوالة)* 
+خصم 8,000 *سعودي* عموله 8 سعودي 
+حوالة صادرة عبر : الادارة شبكة المحيط 
+رقم الحوالة : 3413498736 
+*المستلم*: حاميم شريف علي ثابت 
+المرسل: نصير هشام محمد عبدالوهاب
+
+----------------
+TEAME TESFAY HAGOS=4975 SAR
+
+1000181711713`;
+
 class SharafApp {
   constructor() {
     this.records = [];
+    this.outgoingRecords = this.loadOutgoingRecords();
     this.settings = this.loadSettings();
     this.searchQuery = '';
+    this.outgoingSearchQuery = '';
     this.sortColumn = null;
     this.sortAsc = true;
     this.originalHeaderText = '';
@@ -122,6 +154,7 @@ class SharafApp {
     this.applySettingsToUI();
     this.switchTab('tab-paste');
     this.render();
+    this.renderOutgoing();
   }
 
   // ==================== 1. الإعدادات والتهيئة ====================
@@ -260,6 +293,20 @@ class SharafApp {
     this.rowModal = document.getElementById('row-modal');
     this.previewModal = document.getElementById('preview-message-modal');
     this.previewTextarea = document.getElementById('preview-message-textarea');
+
+    // عناصر كشف الحوالات الصادرة
+    this.navOutgoingBadge = document.getElementById('nav-outgoing-badge');
+    this.outgoingTableBody = document.getElementById('outgoing-table-body');
+    this.outgoingSearchInput = document.getElementById('outgoing-search-input');
+    this.btnClearOutgoingSearch = document.getElementById('btn-clear-outgoing-search');
+    this.btnOutgoingExportExcel = document.getElementById('btn-outgoing-export-excel');
+    this.btnOutgoingCopyMsg = document.getElementById('btn-outgoing-copy-msg');
+    this.btnOutgoingPreviewMsg = document.getElementById('btn-outgoing-preview-msg');
+    this.btnOutgoingPrint = document.getElementById('btn-outgoing-print');
+    this.btnOutgoingAddRow = document.getElementById('btn-outgoing-add-row');
+    this.btnOutgoingClearAll = document.getElementById('btn-outgoing-clear-all');
+    this.outgoingModal = document.getElementById('modal-outgoing-row');
+    this.outgoingPreviewModal = document.getElementById('preview-outgoing-modal');
   }
 
   bindEvents() {
@@ -320,6 +367,44 @@ class SharafApp {
     this.btnAddRow.addEventListener('click', () => this.openAddRowModal());
     this.btnClearAll.addEventListener('click', () => this.clearAllRecords());
 
+    // أحداث كشف الحوالات الصادرة
+    if (this.btnOutgoingExportExcel) {
+      this.btnOutgoingExportExcel.addEventListener('click', () => this.exportOutgoingExcel());
+    }
+    if (this.btnOutgoingCopyMsg) {
+      this.btnOutgoingCopyMsg.addEventListener('click', () => this.copyOutgoingMessage());
+    }
+    if (this.btnOutgoingPreviewMsg) {
+      this.btnOutgoingPreviewMsg.addEventListener('click', () => this.previewOutgoingMessage());
+    }
+    if (this.btnOutgoingPrint) {
+      this.btnOutgoingPrint.addEventListener('click', () => this.printOutgoingTable());
+    }
+    if (this.btnOutgoingAddRow) {
+      this.btnOutgoingAddRow.addEventListener('click', () => this.openOutgoingModal(-1));
+    }
+    if (this.btnOutgoingClearAll) {
+      this.btnOutgoingClearAll.addEventListener('click', () => this.clearAllOutgoing());
+    }
+    if (this.outgoingSearchInput) {
+      this.outgoingSearchInput.addEventListener('input', (e) => {
+        this.outgoingSearchQuery = e.target.value.trim().toLowerCase();
+        if (this.btnClearOutgoingSearch) {
+          this.btnClearOutgoingSearch.classList.toggle('hidden', !this.outgoingSearchQuery);
+        }
+        this.renderOutgoing();
+      });
+    }
+    if (this.btnClearOutgoingSearch) {
+      this.btnClearOutgoingSearch.addEventListener('click', () => {
+        this.outgoingSearchInput.value = '';
+        this.outgoingSearchQuery = '';
+        this.btnClearOutgoingSearch.classList.add('hidden');
+        this.renderOutgoing();
+        this.outgoingSearchInput.focus();
+      });
+    }
+
     document.getElementById('btn-theme-toggle').addEventListener('click', () => this.toggleTheme());
     document.getElementById('btn-open-settings').addEventListener('click', () => this.switchTab('tab-settings'));
   }
@@ -328,10 +413,10 @@ class SharafApp {
     this.navTabs.forEach(t => t.classList.toggle('active', t.getAttribute('data-tab') === tabId));
     this.tabPanes.forEach(p => p.classList.toggle('active', p.id === tabId));
 
-    // إخفاء كروت الإحصائيات العلوية في صفحة الإعدادات لتوفير مساحة شاشة الهاتف
+    // إخفاء كروت الإحصائيات العلوية في صفحة الإعدادات أو الحوالات الصادرة لتوفير مساحة شاشة الهاتف
     const metricsGrid = document.querySelector('.metrics-grid');
     if (metricsGrid) {
-      if (tabId === 'tab-settings' || tabId === 'tab-help') {
+      if (tabId === 'tab-settings' || tabId === 'tab-help' || tabId === 'tab-outgoing') {
         metricsGrid.classList.add('hidden-on-settings');
       } else {
         metricsGrid.classList.remove('hidden-on-settings');
@@ -403,6 +488,20 @@ class SharafApp {
         let cleanedName = leftPart.replace(/^\d+[\s\,\'\.\-\_]+/, '').trim();
         cleanedName = cleanedName.replace(/^[\'\"\‘\’]+/, '').trim();
 
+        // استخراج العملة الصريحة إذا ذكرت بالسطر (مثل =4975 SAR أو 8000 سعودي)
+        let rowCurrency = currency;
+        const currMatch = rightPart.match(/[A-Za-z\u0600-\u06FF\$]{2,}/);
+        if (currMatch) {
+          const rawCurr = currMatch[0].trim();
+          if (/^sar$/i.test(rawCurr) || /سعودي/i.test(rawCurr)) {
+            rowCurrency = 'ريال سعودي';
+          } else if (/^usd$/i.test(rawCurr) || /دولار/i.test(rawCurr) || rawCurr === '$') {
+            rowCurrency = 'دولار أمريكي';
+          } else {
+            rowCurrency = rawCurr;
+          }
+        }
+
         // تطبيع المبلغ واستقطاع الكسور / السنتات بعد الفاصلة العشرية وأي أجزاء أقل من 100 سنت
         let norm = rightPart.trim();
         if (/,\d{1,2}$/.test(norm)) {
@@ -426,7 +525,7 @@ class SharafApp {
           name: cleanedName,
           id: '',
           amount: amount,
-          currency: currency,
+          currency: rowCurrency,
           rate: rate,
           birrEquivalent: birrEquivalent,
           cutCents: cutCents
@@ -470,6 +569,188 @@ class SharafApp {
     };
   }
 
+  // ==================== 3.1 خوارزمية تحليل الحوالات الصادرة ====================
+  parseOutgoingText(text) {
+    const records = [];
+    const normalized = text.replace(/\r\n/g, '\n');
+    const rawBlocks = normalized.split(/(?=(?:\*\(ارسال حوالة\)\*|\(ارسال حوالة\)|ارسال حوالة|^المستلم\b|^[^\n\=]{2,}\=[\d,]+|(?:\n\s*[-_=*]{3,}\s*\n)))/m);
+
+    for (let rawBlock of rawBlocks) {
+      let block = rawBlock.trim();
+      if (!block) continue;
+      block = block.replace(/^[-_=*]{3,}\s*/, '').trim();
+      if (!block) continue;
+
+      // قالب 2 و 3: إشعار إرسال حوالة عبر شبكة صرافة (الأكوع، المحيط، إلخ)
+      if (/ارسال\s*حوال[ةه]|حوال[ةه]\s*صادرة/i.test(block) || /خصم\s*[\d,]+/.test(block)) {
+        let amount = 0;
+        let currency = 'ريال سعودي';
+        let commission = '';
+        let network = '';
+        let transferNo = '';
+        let recipient = '';
+        let sender = '';
+
+        // المبلغ والعملة والعمولة
+        const discountMatch = block.match(/خصم\s*([\d,]+(?:\.\d+)?)\s*\*?([^\*\n\r]+?)\*?\s*عمول[ةه]\s*([\d,]+(?:\.\d+)?\s*[^\n\r]*)/i);
+        if (discountMatch) {
+          amount = parseFloat(discountMatch[1].replace(/,/g, '')) || 0;
+          currency = discountMatch[2].replace(/\*/g, '').trim();
+          commission = discountMatch[3].trim();
+        } else {
+          const amtMatch = block.match(/خصم\s*([\d,]+(?:\.\d+)?)\s*\*?([^\*\n\r]+?)\*?(?:\s|$)/i);
+          if (amtMatch) {
+            amount = parseFloat(amtMatch[1].replace(/,/g, '')) || 0;
+            currency = amtMatch[2].replace(/\*/g, '').trim();
+          }
+          const commMatch = block.match(/عمول[ةه]\s*([\d,]+(?:\.\d+)?\s*[^\n\r]*)/i);
+          if (commMatch) commission = commMatch[1].trim();
+        }
+
+        // اسم الشبكة / عبر
+        const netMatch = block.match(/(?:حوال[ةه]\s*صادرة\s*)?عبر\s*(?:الادارة|الإدارة|شبكة)?\s*:\s*([^\n\r]+)/i);
+        if (netMatch) {
+          network = netMatch[1].trim();
+        }
+
+        // رقم الحوالة / المرجع
+        const refMatch = block.match(/(?:رقم\s*الحوال[ةه]|رقم\s*الاشعار|رقم\s*العملي[ةه]|المرجع)\s*:\s*([^\n\r]+)/i);
+        if (refMatch) {
+          transferNo = refMatch[1].trim();
+        }
+
+        // المستلم
+        const recMatch = block.match(/\*?المستلم\*?\s*:\s*([^\n\r]+)/i);
+        if (recMatch) {
+          recipient = recMatch[1].replace(/\*/g, '').trim();
+        }
+
+        // المرسل
+        const sndMatch = block.match(/\*?المرسل\*?\s*:\s*([^\n\r]+)/i);
+        if (sndMatch) {
+          sender = sndMatch[1].replace(/\*/g, '').trim();
+        }
+
+        if (recipient || sender || amount > 0) {
+          records.push({
+            type: 'outgoing',
+            recipient,
+            sender,
+            amount,
+            currency,
+            commission: commission || '-',
+            network: network || '-',
+            transferNo: transferNo || '-',
+            date: new Date().toLocaleDateString('en-CA'),
+            notes: ''
+          });
+          continue;
+        }
+      }
+
+      // قالب 1: كتلة (المستلم \n اسم \n المرسل \n اسم \n مبلغ$ \n شبكة)
+      if (/المستلم/i.test(block) && /المرسل/i.test(block)) {
+        const lines = block.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0 && !/^[-_=*]{3,}$/.test(l));
+        let recipient = '';
+        let sender = '';
+        let amount = 0;
+        let currency = '';
+        let network = '';
+
+        for (let i = 0; i < lines.length; i++) {
+          const line = lines[i];
+
+          if (/^المستلم\s*[:\-]?$/i.test(line) && i + 1 < lines.length) {
+            recipient = lines[i + 1];
+            i++;
+            continue;
+          } else if (/^المستلم\s*[:\-]\s*(.+)/i.test(line)) {
+            recipient = line.match(/^المستلم\s*[:\-]\s*(.+)/i)[1].trim();
+            continue;
+          }
+
+          if (/^المرسل\s*[:\-]?$/i.test(line) && i + 1 < lines.length) {
+            sender = lines[i + 1];
+            i++;
+            continue;
+          } else if (/^المرسل\s*[:\-]\s*(.+)/i.test(line)) {
+            sender = line.match(/^المرسل\s*[:\-]\s*(.+)/i)[1].trim();
+            continue;
+          }
+
+          const amtMatch = line.match(/^([\d,]+(?:\.\d+)?)\s*(\$|USD|SAR|EUR|AED|دولار|سعودي|درهم|ريال)?$/i);
+          if (amtMatch) {
+            amount = parseFloat(amtMatch[1].replace(/,/g, '')) || 0;
+            const currSymbol = (amtMatch[2] || '').trim();
+            if (currSymbol === '$' || /^usd$/i.test(currSymbol) || /دولار/i.test(currSymbol)) {
+              currency = 'دولار ($)';
+            } else if (/^sar$/i.test(currSymbol) || /سعودي/i.test(currSymbol)) {
+              currency = 'سعودي (SAR)';
+            } else {
+              currency = currSymbol || 'ريال سعودي';
+            }
+            continue;
+          }
+
+          if (!line.includes('=') && !/^(المستلم|المرسل|total|\d+)/i.test(line)) {
+            network = line;
+          }
+        }
+
+        if (recipient || sender || amount > 0) {
+          records.push({
+            type: 'outgoing',
+            recipient,
+            sender,
+            amount,
+            currency: currency || 'ريال سعودي',
+            commission: '-',
+            network: network || '-',
+            transferNo: '-',
+            date: new Date().toLocaleDateString('en-CA'),
+            notes: ''
+          });
+          continue;
+        }
+      }
+
+      // قالب 4: حوالة بالصيغة (Name=Amount Currency \n AccountNo)
+      if (block.includes('=')) {
+        const lines = block.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0 && !/^[-_=*]{3,}$/.test(l));
+        for (let i = 0; i < lines.length; i++) {
+          const line = lines[i];
+          if (line.includes('=')) {
+            const parts = line.split('=');
+            const name = parts[0].replace(/^\d+[\s\,\'\.\-\_]+/, '').trim();
+            const rightPart = parts[1].trim();
+            const amtMatch = rightPart.match(/^([\d,]+(?:\.\d+)?)\s*([A-Za-z\u0600-\u06FF\$]+)?/);
+            const amount = amtMatch ? parseFloat(amtMatch[1].replace(/,/g, '')) : 0;
+            const curr = amtMatch && amtMatch[2] ? amtMatch[2].trim() : 'SAR';
+            let accNo = '';
+            if (i + 1 < lines.length && /^[\d\s\-]{6,}$/.test(lines[i + 1])) {
+              accNo = lines[i + 1].replace(/[\s\-]/g, '');
+              i++;
+            }
+            records.push({
+              type: 'outgoing',
+              recipient: name,
+              sender: '-',
+              amount,
+              currency: curr,
+              commission: '-',
+              network: '-',
+              transferNo: accNo,
+              date: new Date().toLocaleDateString('en-CA'),
+              notes: ''
+            });
+          }
+        }
+      }
+    }
+
+    return records;
+  }
+
   processRawText() {
     const rawText = this.rawTextInput.value.trim();
     if (!rawText) {
@@ -478,6 +759,45 @@ class SharafApp {
       return;
     }
 
+    // فحص خيار نوع الكشف المحدد (تلقائي ذكي / واردة / صادرة)
+    const targetRadios = document.getElementsByName('parse-target-type');
+    let targetType = 'auto';
+    for (let r of targetRadios) {
+      if (r.checked) {
+        targetType = r.value;
+        break;
+      }
+    }
+
+    const isOutgoing = targetType === 'outgoing' || (targetType === 'auto' && (
+      /ارسال\s*حوال[ةه]|حوال[ةه]\s*صادرة|خصم\s*[\d,]+/i.test(rawText) ||
+      (/المستلم/i.test(rawText) && /المرسل/i.test(rawText))
+    ));
+
+    // معالجة الحوالات الصادرة إذا تطابق النمط
+    if (isOutgoing) {
+      const outRecords = this.parseOutgoingText(rawText);
+      if (outRecords.length === 0) {
+        this.showToast('تعذر العثور على حوالات صادرة مطابقة في النص المدخل', 'error');
+        return;
+      }
+
+      this.outgoingRecords = outRecords;
+      this.saveOutgoingRecords();
+      this.renderOutgoing();
+
+      this.parseStatusMsg.textContent = `تم استخراج ${outRecords.length} حوالة صادرة بنجاح وتم توجيهك إلى كشف الحوالات الصادرة ✓`;
+      this.parseStatusMsg.className = 'status-msg success';
+      this.parseStatusMsg.classList.remove('hidden');
+
+      this.showToast(`تم استيراد ${outRecords.length} حوالة صادرة بنجاح`, 'success');
+      setTimeout(() => {
+        this.switchTab('tab-outgoing');
+      }, 600);
+      return;
+    }
+
+    // معالجة الحوالات الواردة الافتراضية
     const autoDate = document.getElementById('opt-auto-date').checked;
     const customDate = document.getElementById('input-custom-date').value.trim();
     const batchCurr = document.getElementById('input-batch-currency').value.trim() || this.settings.defaultCurrency;
@@ -529,6 +849,15 @@ class SharafApp {
 
   loadSampleDataAndSwitch() {
     this.loadSampleData();
+    const incomingRadio = document.querySelector('input[name="parse-target-type"][value="incoming"]');
+    if (incomingRadio) incomingRadio.checked = true;
+    this.processRawText();
+  }
+
+  loadOutgoingSampleAndSwitch() {
+    this.rawTextInput.value = SAMPLE_OUTGOING_TEXT;
+    const outgoingRadio = document.querySelector('input[name="parse-target-type"][value="outgoing"]');
+    if (outgoingRadio) outgoingRadio.checked = true;
     this.processRawText();
   }
 
@@ -1216,7 +1545,415 @@ class SharafApp {
       toast.style.transform = 'translateY(10px)';
       toast.style.transition = 'all 0.3s ease';
       setTimeout(() => toast.remove(), 300);
-    }, 3200);
+    }, 3000);
+  }
+
+  // ==================== 10. إدارة كشف الحوالات الصادرة ====================
+  loadOutgoingRecords() {
+    try {
+      const saved = localStorage.getItem('sharaf_outgoing_records');
+      return saved ? JSON.parse(saved) : [];
+    } catch (e) {
+      console.warn('Could not load outgoing records from localStorage:', e);
+      return [];
+    }
+  }
+
+  saveOutgoingRecords() {
+    try {
+      localStorage.setItem('sharaf_outgoing_records', JSON.stringify(this.outgoingRecords));
+    } catch (e) {
+      console.warn('Could not save outgoing records to localStorage:', e);
+    }
+  }
+
+  renderOutgoing() {
+    if (!this.outgoingTableBody) return;
+
+    let filtered = this.outgoingRecords;
+    if (this.outgoingSearchQuery) {
+      const q = this.outgoingSearchQuery;
+      filtered = filtered.filter(r =>
+        (r.recipient && r.recipient.toLowerCase().includes(q)) ||
+        (r.sender && r.sender.toLowerCase().includes(q)) ||
+        (r.transferNo && r.transferNo.toLowerCase().includes(q)) ||
+        (r.network && r.network.toLowerCase().includes(q)) ||
+        (r.notes && r.notes.toLowerCase().includes(q)) ||
+        (String(r.amount).includes(q))
+      );
+    }
+
+    if (filtered.length === 0) {
+      this.outgoingTableBody.innerHTML = `
+        <tr>
+          <td colspan="11" class="empty-state-cell" style="padding: 2.5rem 1rem; text-align: center;">
+            <div style="font-size: 2.2rem; margin-bottom: 0.5rem;">📤</div>
+            <h4 style="margin: 0 0 0.5rem; font-size: 1.05rem; color: var(--text-primary);">لا توجد حوالات صادرة مدخلة حالياً</h4>
+            <p style="color: var(--text-secondary); font-size: 0.88rem; max-width: 480px; margin: 0 auto 1rem;">
+              يمكنك لصق نصوص الحوالات الصادرة في تبويب "لصق واستيراد البيانات" أو إضافة حوالة يدوياً.
+            </p>
+            <button type="button" class="btn btn-primary btn-sm" onclick="app.loadOutgoingSampleAndSwitch()">
+              ✨ تجربة نماذج الصادر الجاهزة
+            </button>
+          </td>
+        </tr>`;
+    } else {
+      let html = '';
+      filtered.forEach((r, idx) => {
+        let currClass = 'badge-curr-sar';
+        if (/دولار\s*ازرق/i.test(r.currency)) currClass = 'badge-curr-blue-usd';
+        else if (/دولار/i.test(r.currency) || (r.currency && r.currency.includes('$'))) currClass = 'badge-curr-usd';
+
+        html += `
+          <tr>
+            <td style="font-weight: 700; color: var(--text-secondary); text-align: center;">${idx + 1}</td>
+            <td style="font-size: 0.85rem; white-space: nowrap;">${this.escapeHtml(r.date || '-')}</td>
+            <td style="font-weight: 700; color: var(--text-primary);">${this.escapeHtml(r.recipient || '-')}</td>
+            <td style="color: var(--text-secondary);">${this.escapeHtml(r.sender || '-')}</td>
+            <td class="cell-ref-code">${this.escapeHtml(r.transferNo || '-')}</td>
+            <td><span class="badge-network">${this.escapeHtml(r.network || '-')}</span></td>
+            <td style="font-weight: 800; font-family: var(--font-mono); color: var(--color-primary); font-size: 1rem;">
+              ${this.formatNumber(r.amount)}
+            </td>
+            <td><span class="badge-curr-tag ${currClass}">${this.escapeHtml(r.currency || '-')}</span></td>
+            <td class="cell-commission">${this.escapeHtml(r.commission || '-')}</td>
+            <td style="font-size: 0.85rem; color: var(--text-secondary);">${this.escapeHtml(r.notes || '-')}</td>
+            <td class="no-print" style="white-space: nowrap; text-align: center;">
+              <button class="action-btn edit-btn" onclick="app.openOutgoingModal(${idx})" title="تعديل">✏️</button>
+              <button class="action-btn delete-btn" onclick="app.deleteOutgoingRow(${idx})" title="حذف">🗑️</button>
+            </td>
+          </tr>`;
+      });
+      this.outgoingTableBody.innerHTML = html;
+    }
+
+    // الإحصائيات والتذييل
+    const totalCount = this.outgoingRecords.length;
+    if (this.navOutgoingBadge) {
+      this.navOutgoingBadge.textContent = totalCount;
+    }
+
+    const statCountEl = document.getElementById('outgoing-stat-count');
+    if (statCountEl) statCountEl.textContent = `${totalCount} حوالة`;
+
+    const footerCountEl = document.getElementById('outgoing-footer-count');
+    if (footerCountEl) footerCountEl.textContent = totalCount;
+
+    const currMap = {};
+    const networksSet = new Set();
+    let commissionsCount = 0;
+
+    this.outgoingRecords.forEach(r => {
+      const c = r.currency || 'غير محدد';
+      currMap[c] = (currMap[c] || 0) + (r.amount || 0);
+      if (r.network && r.network !== '-') networksSet.add(r.network);
+      if (r.commission && r.commission !== '-') commissionsCount++;
+    });
+
+    const statAmountsEl = document.getElementById('outgoing-stat-amounts');
+    if (statAmountsEl) {
+      const parts = Object.entries(currMap).map(([c, amt]) => `${this.formatNumber(amt)} ${c}`);
+      statAmountsEl.textContent = parts.length > 0 ? parts.join(' • ') : '0';
+      statAmountsEl.style.fontSize = parts.length > 2 ? '0.95rem' : '1.35rem';
+    }
+
+    const footerAmountsEl = document.getElementById('outgoing-footer-amounts');
+    if (footerAmountsEl) {
+      const parts = Object.entries(currMap).map(([c, amt]) => `${this.formatNumber(amt)} ${c}`);
+      footerAmountsEl.textContent = parts.length > 0 ? parts.join(' • ') : '-';
+    }
+
+    const statCommsEl = document.getElementById('outgoing-stat-commissions');
+    if (statCommsEl) {
+      statCommsEl.textContent = `${commissionsCount} حوالة بعمولة`;
+    }
+
+    const statNetsEl = document.getElementById('outgoing-stat-networks');
+    if (statNetsEl) {
+      statNetsEl.textContent = `${networksSet.size} شبكة`;
+    }
+  }
+
+  openOutgoingModal(index = -1) {
+    const editIndexEl = document.getElementById('outgoing-edit-index');
+    if (!editIndexEl) return;
+    editIndexEl.value = index;
+    const titleEl = document.getElementById('outgoing-modal-title');
+
+    if (index === -1) {
+      if (titleEl) titleEl.textContent = 'إضافة حوالة صادرة جديدة';
+      document.getElementById('outgoing-edit-date').value = new Date().toLocaleDateString('en-CA');
+      document.getElementById('outgoing-edit-recipient').value = '';
+      document.getElementById('outgoing-edit-sender').value = '';
+      document.getElementById('outgoing-edit-ref').value = '';
+      document.getElementById('outgoing-edit-network').value = '';
+      document.getElementById('outgoing-edit-amount').value = '';
+      document.getElementById('outgoing-edit-currency').value = 'ريال سعودي';
+      document.getElementById('outgoing-edit-commission').value = '';
+      document.getElementById('outgoing-edit-notes').value = '';
+    } else {
+      if (titleEl) titleEl.textContent = 'تعديل حوالة صادرة';
+      const r = this.outgoingRecords[index];
+      if (!r) return;
+      document.getElementById('outgoing-edit-date').value = r.date || '';
+      document.getElementById('outgoing-edit-recipient').value = r.recipient || '';
+      document.getElementById('outgoing-edit-sender').value = r.sender !== '-' ? r.sender : '';
+      document.getElementById('outgoing-edit-ref').value = r.transferNo !== '-' ? r.transferNo : '';
+      document.getElementById('outgoing-edit-network').value = r.network !== '-' ? r.network : '';
+      document.getElementById('outgoing-edit-amount').value = r.amount || '';
+      document.getElementById('outgoing-edit-currency').value = r.currency || 'ريال سعودي';
+      document.getElementById('outgoing-edit-commission').value = r.commission !== '-' ? r.commission : '';
+      document.getElementById('outgoing-edit-notes').value = r.notes || '';
+    }
+
+    if (this.outgoingModal) {
+      this.outgoingModal.classList.remove('hidden');
+    }
+  }
+
+  closeOutgoingModal() {
+    if (this.outgoingModal) {
+      this.outgoingModal.classList.add('hidden');
+    }
+  }
+
+  saveOutgoingModal() {
+    const index = parseInt(document.getElementById('outgoing-edit-index').value);
+    const date = document.getElementById('outgoing-edit-date').value.trim();
+    const recipient = document.getElementById('outgoing-edit-recipient').value.trim();
+    const sender = document.getElementById('outgoing-edit-sender').value.trim() || '-';
+    const transferNo = document.getElementById('outgoing-edit-ref').value.trim() || '-';
+    const network = document.getElementById('outgoing-edit-network').value.trim() || '-';
+    const amount = parseFloat(document.getElementById('outgoing-edit-amount').value) || 0;
+    const currency = document.getElementById('outgoing-edit-currency').value.trim() || 'ريال سعودي';
+    const commission = document.getElementById('outgoing-edit-commission').value.trim() || '-';
+    const notes = document.getElementById('outgoing-edit-notes').value.trim();
+
+    if (!recipient) {
+      this.showToast('يرجى إدخال اسم المستلم', 'error');
+      return;
+    }
+
+    const record = {
+      date,
+      recipient,
+      sender,
+      transferNo,
+      network,
+      amount,
+      currency,
+      commission,
+      notes
+    };
+
+    if (index === -1) {
+      this.outgoingRecords.push(record);
+      this.showToast('تمت إضافة الحوالة الصادرة بنجاح', 'success');
+    } else {
+      this.outgoingRecords[index] = record;
+      this.showToast('تم تعديل الحوالة الصادرة بنجاح', 'success');
+    }
+
+    this.saveOutgoingRecords();
+    this.closeOutgoingModal();
+    this.renderOutgoing();
+  }
+
+  deleteOutgoingRow(index) {
+    const r = this.outgoingRecords[index];
+    if (!r) return;
+    if (confirm(`هل أنت متأكد من حذف حوالة: "${r.recipient}"؟`)) {
+      this.outgoingRecords.splice(index, 1);
+      this.saveOutgoingRecords();
+      this.renderOutgoing();
+      this.showToast('تم حذف الحوالة الصادرة', 'success');
+    }
+  }
+
+  clearAllOutgoing() {
+    if (this.outgoingRecords.length === 0) return;
+    if (confirm('تحذير: هل أنت متأكد من مسح جميع الحوالات الصادرة من الكشف؟')) {
+      this.outgoingRecords = [];
+      this.saveOutgoingRecords();
+      this.renderOutgoing();
+      this.showToast('تم تفريغ كشف الحوالات الصادرة بالكامل', 'success');
+    }
+  }
+
+  generateOutgoingMessage() {
+    if (this.outgoingRecords.length === 0) return '';
+    const today = new Date().toLocaleDateString('ar-EG');
+    const lines = [];
+    lines.push(`📤 *كشف الحوالات الصادرة*`);
+    lines.push(`📅 التاريخ: ${today}`);
+    lines.push(`🔢 إجمالي الحوالات: ${this.outgoingRecords.length}`);
+    lines.push('----------------------------------------');
+    lines.push('');
+
+    this.outgoingRecords.forEach((r, idx) => {
+      lines.push(`*${idx + 1}) المستلم:* ${r.recipient}`);
+      if (r.sender && r.sender !== '-') {
+        lines.push(`*المرسل:* ${r.sender}`);
+      }
+      lines.push(`*المبلغ:* ${this.formatNumber(r.amount)} ${r.currency}${r.commission && r.commission !== '-' ? ` (عمولة: ${r.commission})` : ''}`);
+      if (r.transferNo && r.transferNo !== '-') {
+        lines.push(`*رقم الحوالة:* ${r.transferNo}`);
+      }
+      if (r.network && r.network !== '-') {
+        lines.push(`*الشبكة (عبر):* ${r.network}`);
+      }
+      if (r.notes) {
+        lines.push(`*ملاحظة:* ${r.notes}`);
+      }
+      lines.push('');
+    });
+
+    lines.push('========================================');
+    lines.push('💰 *إجمالي المبالغ الصادرة حسب العملات:*');
+    const currMap = {};
+    this.outgoingRecords.forEach(r => {
+      const c = r.currency || 'غير محدد';
+      currMap[c] = (currMap[c] || 0) + (r.amount || 0);
+    });
+    for (const [curr, amt] of Object.entries(currMap)) {
+      lines.push(`• ${this.formatNumber(amt)} ${curr}`);
+    }
+
+    return lines.join('\n');
+  }
+
+  previewOutgoingMessage() {
+    if (this.outgoingRecords.length === 0) {
+      this.showToast('لا توجد حوالات صادرة لمعاينتها', 'error');
+      return;
+    }
+    const msg = this.generateOutgoingMessage();
+    const textarea = document.getElementById('preview-outgoing-textarea');
+    if (textarea) textarea.value = msg;
+    if (this.outgoingPreviewModal) {
+      this.outgoingPreviewModal.classList.remove('hidden');
+    }
+  }
+
+  closeOutgoingPreviewModal() {
+    if (this.outgoingPreviewModal) {
+      this.outgoingPreviewModal.classList.add('hidden');
+    }
+  }
+
+  async copyFromOutgoingPreviewModal() {
+    const textarea = document.getElementById('preview-outgoing-textarea');
+    if (!textarea || !textarea.value) return;
+    try {
+      await navigator.clipboard.writeText(textarea.value);
+      this.showToast('تم نسخ رسالة الحوالات الصادرة بنجاح! جاهزة للإرسال في واتساب', 'success');
+      this.closeOutgoingPreviewModal();
+    } catch (err) {
+      textarea.select();
+      document.execCommand('copy');
+      this.showToast('تم النسخ للحافظة!', 'success');
+      this.closeOutgoingPreviewModal();
+    }
+  }
+
+  async copyOutgoingMessage() {
+    if (this.outgoingRecords.length === 0) {
+      this.showToast('لا توجد بيانات حوالات صادرة لنسخها', 'error');
+      return;
+    }
+    const msg = this.generateOutgoingMessage();
+    try {
+      await navigator.clipboard.writeText(msg);
+      this.showToast('تم نسخ رسالة كشف الحوالات الصادرة بنجاح!', 'success');
+    } catch (err) {
+      this.previewOutgoingMessage();
+    }
+  }
+
+  printOutgoingTable() {
+    window.print();
+  }
+
+  exportOutgoingExcel() {
+    if (this.outgoingRecords.length === 0) {
+      this.showToast('لا توجد بيانات حوالات صادرة لتصديرها، يرجى استيراد أو إضافة حوالات أولاً', 'error');
+      return;
+    }
+
+    if (typeof XLSX === 'undefined') {
+      this.showToast('جاري تحميل مكتبة إكسل، يرجى المحاولة بعد لحظات', 'error');
+      return;
+    }
+
+    const wb = XLSX.utils.book_new();
+    const title = 'كشف الحوالات الصادرة';
+
+    const headers = [
+      'م',
+      'التاريخ',
+      'اسم المستلم',
+      'اسم المرسل',
+      'رقم الحوالة / المرجع',
+      'اسم الشبكة (عبر)',
+      'المبلغ',
+      'العملة',
+      'العمولة',
+      'ملاحظات'
+    ];
+
+    const dataRows = [];
+    dataRows.push([title, '', '', '', '', '', '', '', '', '']);
+    dataRows.push(headers);
+
+    this.outgoingRecords.forEach((r, idx) => {
+      dataRows.push([
+        idx + 1,
+        r.date || '',
+        r.recipient || '',
+        r.sender || '',
+        r.transferNo || '',
+        r.network || '',
+        r.amount || 0,
+        r.currency || '',
+        r.commission || '',
+        r.notes || ''
+      ]);
+    });
+
+    const currMap = {};
+    this.outgoingRecords.forEach(r => {
+      const c = r.currency || 'غير محدد';
+      currMap[c] = (currMap[c] || 0) + (r.amount || 0);
+    });
+
+    dataRows.push(['', '', '', '', '', '', '', '', '', '']);
+    dataRows.push(['إجمالي الحوالات الصادرة', `العدد الكلي: ${this.outgoingRecords.length}`, '', '', '', '', '', '', '', '']);
+
+    for (const [curr, amt] of Object.entries(currMap)) {
+      dataRows.push(['', '', '', '', '', `إجمالي ${curr}:`, amt, curr, '', '']);
+    }
+
+    const ws = XLSX.utils.aoa_to_sheet(dataRows);
+    ws['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 9 } }];
+    ws['!views'] = [{ rightToLeft: true }];
+    ws['!cols'] = [
+      { wch: 6 },
+      { wch: 14 },
+      { wch: 28 },
+      { wch: 28 },
+      { wch: 20 },
+      { wch: 22 },
+      { wch: 16 },
+      { wch: 16 },
+      { wch: 18 },
+      { wch: 20 }
+    ];
+
+    XLSX.utils.book_append_sheet(wb, ws, 'الحوالات الصادرة');
+    const todayStr = new Date().toISOString().split('T')[0];
+    const fileName = `كشف_الحوالات_الصادرة_${todayStr}.xlsx`;
+    XLSX.writeFile(wb, fileName);
+    this.showToast(`تم تصدير ملف الإكسل: ${fileName}`, 'success');
   }
 }
 
