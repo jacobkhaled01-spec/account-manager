@@ -138,6 +138,63 @@ TEAME TESFAY HAGOS=4975 SAR
 
 1000181711713`;
 
+// نموذج رسائل واتساب المنسوخة جماعياً متعددة الأسطر والمجزأة
+const SAMPLE_WHATSAPP_TEXT = `[9/16, 1:39 AM] القسام: 1000712011867
+Gebrihiwet asefa
+[9/16, 1:39 AM] القسام: 500 ريال
+[9/16, 1:39 AM] القسام: TEAME TESFAY HAGOS=4975 SAR
+
+1000181711713
+[9/16, 1:39 AM] القسام: 1000248400157 tsegay mehari
+[9/16, 1:39 AM] القسام: Askol bsrat=
+
+
+59700 سعودي 
+
+1000197218529
+[9/16, 1:39 AM] القسام: 6000ryl
+[9/16, 1:39 AM] القسام: TEAME TESFAY HAGOS=1490
+
+1000181711713
+[9/16, 1:39 AM] القسام: 1000733766097
+
+8950
+
+aferyeme djana
+[9/16, 1:39 AM] القسام: awet gebremdhin 120,000.  بر بر بر
+[9/16, 1:39 AM] القسام: 1000194080208
+[9/16, 1:39 AM] القسام: senayt teklay
+[9/16, 1:39 AM] القسام: 100,000 bir
+[9/16, 1:39 AM] القسام: 1000191564441
+haftom fitwi
+1490
+[9/16, 1:39 AM] القسام: 1000191564441
+haftom fitwi
+1490 سعودي
+[9/16, 1:39 AM] القسام: 1000303100157
+liemet girmay 
+995 ريال
+[9/16, 1:39 AM] القسام: 1000164801954
+Hussen Abdulwahab Hassen
+[9/16, 1:39 AM] القسام: 1000239842007
+[9/16, 1:39 AM] القسام: Ali serale Abdu
+[9/16, 1:39 AM] القسام: 995 ريال سعودي
+[9/16, 1:39 AM] القسام: 1000596982542 selam gebremkie
+[9/16, 1:39 AM] القسام: 495 ريال
+[9/16, 1:39 AM] القسام: 1000532490298
+etsay mhery 350,000bir
+[9/16, 1:39 AM] القسام: 1000743024625
+Kamil Huseen Gandoo
+[9/16, 1:39 AM] القسام: 1900 سعودي
+[9/16, 1:39 AM] القسام: 1000033204837 
+Bet lihem kiros
+[9/16, 1:39 AM] القسام: 445 ريال
+[9/16, 1:43 AM] القسام: 1000027896597
+Shishay Ataklti
+
+
+10 مليون برررر`;
+
 class SharafApp {
   constructor() {
     this.records = this.loadIncomingRecords();
@@ -947,6 +1004,286 @@ class SharafApp {
     };
   }
 
+  // ==================== 4.1 خوارزمية تحليل رسائل واتساب المجمعة والمجزأة ====================
+  parseWhatsAppChatExport(text, options = {}) {
+    const rate = options.rate || this.settings.defaultRate || 48;
+    const defaultCurrency = options.currency || this.settings.defaultCurrency || 'ريال سعودي';
+    const autoDate = options.autoDate !== undefined ? options.autoDate : true;
+    let customDate = options.customDate || '';
+
+    let detectedDate = customDate;
+    if (!detectedDate && autoDate) {
+      const dateMatch = text.match(/(?:\[|\b)(\d{1,2}[\/\-\.]\d{1,2}(?:[\/\-\.]\d{2,4})?)/);
+      if (dateMatch) {
+        let rawD = dateMatch[1];
+        if (!/\d{4}/.test(rawD)) {
+          const yr = new Date().getFullYear();
+          detectedDate = `${yr}/${rawD}`;
+        } else {
+          detectedDate = rawD;
+        }
+      }
+    }
+    if (!detectedDate) {
+      detectedDate = new Date().toLocaleDateString('en-CA');
+    }
+
+    const cleanInvisible = (str) => {
+      if (!str) return '';
+      return str.replace(/[\u200E\u200F\u202A-\u202E\u202F\u00A0]/g, ' ').trim();
+    };
+
+    const parseAmountAndCurrency = (bubbleText) => {
+      let cleaned = cleanInvisible(bubbleText);
+      
+      // 1. الملايين: 10 مليون برررر
+      const millionMatch = cleaned.match(/(\d+(?:\.\d+)?)\s*مليون(?:\s*(بر+|birr?|ريال|سعودي|sar))?/i);
+      if (millionMatch) {
+        const num = parseFloat(millionMatch[1]) * 1000000;
+        const rawCurr = millionMatch[2] || '';
+        let currency = 'ETB';
+        if (/ريال|سعودي|sar/i.test(rawCurr)) currency = 'SAR';
+        return { amount: num, currency, original: millionMatch[0] };
+      }
+
+      // 2. مبالغ مع عملة صريحة
+      const currMatch = cleaned.match(/([\d,]+(?:\.\d+)?)\s*(?:[.\s]*)(ريال\s*سعودي|سعودي|ريال|sar|ryl|بر(?:\s*بر)*|بر+|birr?|\$|دولار)/i);
+      if (currMatch) {
+        const rawNum = currMatch[1].replace(/,/g, '');
+        const num = parseFloat(rawNum);
+        const currStr = currMatch[2].toLowerCase();
+        let currency = 'SAR';
+        if (/بر|bir/i.test(currStr)) currency = 'ETB';
+        else if (/\$|دولار/i.test(currStr)) currency = 'USD';
+        else currency = 'SAR';
+        return { amount: num, currency, original: currMatch[0] };
+      }
+
+      // 3. رقم بعد علامة =
+      const equalNumMatch = cleaned.match(/=\s*([\d,]+(?:\.\d+)?)/);
+      if (equalNumMatch) {
+        const num = parseFloat(equalNumMatch[1].replace(/,/g, ''));
+        return { amount: num, currency: 'SAR', original: equalNumMatch[0] };
+      }
+
+      // 4. رقم مستقل في سطر منفرد
+      const lines = cleaned.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+      for (const line of lines) {
+        const lineNumMatch = line.match(/^([\d,]{2,9}(?:\.\d+)?)$/);
+        if (lineNumMatch) {
+          const raw = lineNumMatch[1].replace(/,/g, '');
+          const num = parseFloat(raw);
+          if (raw.length < 10) {
+            return { amount: num, currency: 'SAR', original: line };
+          }
+        }
+      }
+
+      return null;
+    };
+
+    const cleanPersonName = (nameCandidate, account, amountObj) => {
+      let cleaned = nameCandidate;
+      if (account) {
+        cleaned = cleaned.replace(account, ' ');
+      }
+      if (amountObj && amountObj.original) {
+        cleaned = cleaned.replace(amountObj.original, ' ');
+      }
+      
+      cleaned = cleaned
+        .replace(/=/g, ' ')
+        .replace(/10\s*مليون/g, ' ')
+        .replace(/\bمليون\b/g, ' ')
+        .replace(/\b(SAR|ryl|birr?|سعودي|ريال)\b/gi, ' ')
+        .replace(/بر+/g, ' ')
+        .replace(/[.,]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+
+      if (/[a-zA-Z\u0600-\u06FF]/.test(cleaned)) {
+        return cleaned;
+      }
+      return '';
+    };
+
+    const rawClean = cleanInvisible(text);
+    const headerRegex = /(?:^|\n)(?:\[\d{1,4}[\/\-\.]\d{1,2}(?:[\/\-\.]\d{2,4})?,?[^\]]*\]|\b\d{1,4}[\/\-\.]\d{1,2}(?:[\/\-\.]\d{2,4})?,?[^-\n]*-)\s*[^:\n]+:\s*/gi;
+    
+    let bubbles = [];
+    const matches = [];
+    let match;
+    while ((match = headerRegex.exec(rawClean)) !== null) {
+      matches.push({ index: match.index, length: match[0].length });
+    }
+
+    if (matches.length > 0) {
+      for (let i = 0; i < matches.length; i++) {
+        const start = matches[i].index + matches[i].length;
+        const end = (i + 1 < matches.length) ? matches[i + 1].index : rawClean.length;
+        const content = rawClean.slice(start, end).trim();
+        if (content) bubbles.push(content);
+      }
+    } else {
+      bubbles = rawClean.split(/\n\s*\n/).map(b => b.trim()).filter(Boolean);
+    }
+
+    const incomingItems = [];
+    const outgoingItems = [];
+    let unassignedPending = [];
+
+    for (let bIdx = 0; bIdx < bubbles.length; bIdx++) {
+      const bubble = bubbles[bIdx];
+
+      // هل هذه الفقاعة حوالة صادرة صريحة؟
+      if (/ارسال\s*حوال[ةه]|حوال[ةه]\s*صادرة|خصم\s*[\d,]+.*عمول[ةه]|(?:المستلم[\s\S]*?المرسل)/i.test(bubble)) {
+        const out = this.parseOutgoingText(bubble);
+        if (out.length > 0) {
+          outgoingItems.push(...out);
+          continue;
+        }
+      }
+
+      // استخراج رقم الحساب
+      let account = '';
+      const accMatch = bubble.match(/\b(1000\d{6,12}|\d{10,16})\b/);
+      if (accMatch) {
+        account = accMatch[1];
+      }
+
+      // استخراج المبلغ والعملة
+      const amountObj = parseAmountAndCurrency(bubble);
+
+      // استخراج الاسم
+      const cleanName = cleanPersonName(bubble, account, amountObj);
+
+      // حالة 1: مبلغ فقط
+      if (amountObj && !cleanName && !account) {
+        if (unassignedPending.length > 0) {
+          const target = unassignedPending.pop();
+          target.amount = amountObj.amount;
+          target.currency = amountObj.currency;
+          continue;
+        }
+      }
+
+      // حالة 2: حساب فقط
+      if (account && !cleanName && !amountObj) {
+        const matchNoAcc = unassignedPending.find(item => item.name && !item.account);
+        if (matchNoAcc) {
+          matchNoAcc.account = account;
+          unassignedPending = unassignedPending.filter(i => i !== matchNoAcc);
+        } else {
+          const item = { account, name: '', amount: null, currency: 'SAR' };
+          incomingItems.push(item);
+          unassignedPending.push(item);
+        }
+        continue;
+      }
+
+      // حالة 3: اسم فقط
+      if (cleanName && !account && !amountObj) {
+        const matchOnlyAcc = unassignedPending.find(item => item.account && !item.name);
+        if (matchOnlyAcc) {
+          matchOnlyAcc.name = cleanName;
+        } else {
+          const item = { account: '', name: cleanName, amount: null, currency: 'SAR' };
+          incomingItems.push(item);
+          unassignedPending.push(item);
+        }
+        continue;
+      }
+
+      // حالة 4: حساب واسم بدون مبلغ
+      if (account && cleanName && !amountObj) {
+        const item = { account, name: cleanName, amount: null, currency: 'SAR' };
+        incomingItems.push(item);
+        unassignedPending.push(item);
+        continue;
+      }
+
+      // حالة 5: اسم ومبلغ بدون حساب
+      if (cleanName && amountObj && !account) {
+        const matchOnlyAcc = unassignedPending.find(item => item.account && !item.name && !item.amount);
+        if (matchOnlyAcc) {
+          matchOnlyAcc.name = cleanName;
+          matchOnlyAcc.amount = amountObj.amount;
+          matchOnlyAcc.currency = amountObj.currency;
+          unassignedPending = unassignedPending.filter(i => i !== matchOnlyAcc);
+        } else {
+          incomingItems.push({
+            account: '',
+            name: cleanName,
+            amount: amountObj.amount,
+            currency: amountObj.currency
+          });
+        }
+        continue;
+      }
+
+      // حالة 6: حساب ومبلغ
+      if (amountObj && account) {
+        const item = {
+          account,
+          name: cleanName || '',
+          amount: amountObj.amount,
+          currency: amountObj.currency
+        };
+
+        const lastItem = incomingItems[incomingItems.length - 1];
+        if (lastItem && lastItem.account === item.account && lastItem.name.toLowerCase() === item.name.toLowerCase()) {
+          lastItem.amount = item.amount;
+          lastItem.currency = item.currency;
+        } else {
+          incomingItems.push(item);
+        }
+        continue;
+      }
+    }
+
+    // تشكيل سجلات الحوالات الواردة بالهيكل القياسي
+    const records = incomingItems.map((item, idx) => {
+      const amt = item.amount || 0;
+      let currName = 'ريال سعودي';
+      let birrEquivalent = 0;
+      let cutCents = 0;
+
+      if (item.currency === 'ETB') {
+        currName = 'بر إثيوبي';
+        birrEquivalent = amt;
+        cutCents = 0;
+      } else if (item.currency === 'USD') {
+        currName = 'دولار أمريكي';
+        const rawBirr = amt * rate;
+        birrEquivalent = Math.floor(rawBirr / 100) * 100;
+        cutCents = Math.round((rawBirr - birrEquivalent) * 100) / 100;
+      } else {
+        currName = defaultCurrency || 'ريال سعودي';
+        const rawBirr = amt * rate;
+        birrEquivalent = Math.floor(rawBirr / 100) * 100;
+        cutCents = Math.round((rawBirr - birrEquivalent) * 100) / 100;
+      }
+
+      return {
+        originalSeq: idx + 1,
+        date: detectedDate,
+        name: item.name,
+        id: item.account,
+        amount: amt,
+        currency: currName,
+        rate: rate,
+        birrEquivalent: birrEquivalent,
+        cutCents: cutCents
+      };
+    });
+
+    return {
+      incomingRecords: records,
+      outgoingRecords: outgoingItems,
+      detectedDate
+    };
+  }
+
   processRawText() {
     const rawText = this.rawTextInput.value.trim();
     if (!rawText) {
@@ -971,7 +1308,77 @@ class SharafApp {
     const batchCurr = document.getElementById('input-batch-currency')?.value.trim() || this.settings.defaultCurrency;
     const batchRate = parseFloat(document.getElementById('input-batch-rate')?.value) || this.settings.defaultRate;
 
-    // 1. الاكتشاف المختلط الذكي إذا كان الخيار تلقائي
+    // 1. الاكتشاف الذكي لرسائل محادثات واتساب المنسوخة جماعياً
+    const isWhatsAppExport = /(?:\[\d{1,4}[\/\-\.]\d{1,2}(?:[\/\-\.]\d{2,4})?,?[^\]]*\]|\b\d{1,4}[\/\-\.]\d{1,2}(?:[\/\-\.]\d{2,4})?,?[^-\n]*-)\s*[^:\n]+:/i.test(rawText);
+
+    if (isWhatsAppExport) {
+      const waResult = this.parseWhatsAppChatExport(rawText, {
+        rate: batchRate,
+        currency: batchCurr,
+        autoDate: autoDate,
+        customDate: customDate
+      });
+
+      const inCount = waResult.incomingRecords.length;
+      const outCount = waResult.outgoingRecords.length;
+
+      if (inCount > 0 || outCount > 0) {
+        if (inCount > 0) {
+          if (importMode === 'append') {
+            const startSeq = this.records.length;
+            const newRows = waResult.incomingRecords.map((r, i) => ({
+              ...r,
+              originalSeq: startSeq + i + 1
+            }));
+            this.records = [...this.records, ...newRows];
+          } else {
+            this.records = waResult.incomingRecords;
+          }
+          this.saveIncomingRecords();
+          this.render();
+        }
+
+        if (outCount > 0) {
+          if (importMode === 'append') {
+            this.outgoingRecords = [...this.outgoingRecords, ...waResult.outgoingRecords];
+          } else {
+            this.outgoingRecords = waResult.outgoingRecords;
+          }
+          this.saveOutgoingRecords();
+          this.renderOutgoing();
+        }
+
+        const tags = [];
+        if (inCount > 0) tags.push(`واردة: ${inCount}`);
+        if (outCount > 0) tags.push(`صادرة: ${outCount}`);
+        tags.push('محادثة واتساب');
+        tags.push(importMode === 'append' ? 'إضافة متتابعة' : 'استبدال');
+
+        this.addAuditLog({
+          type: 'import',
+          title: 'استيراد رسائل واتساب مجمعة',
+          description: `تم استخراج وتجميع ${inCount} حوالة واردة ${outCount > 0 ? `و ${outCount} حوالة صادرة` : ''} من محادثة واتساب بنجاح.`,
+          tags
+        });
+
+        this.parseStatusMsg.textContent = `تم بنجاح استخراج وتجميع ${inCount} حوالة واردة ${outCount > 0 ? `و ${outCount} صادرة` : ''} من رسائل واتساب ✓ (${importMode === 'append' ? 'إضافة متتابعة' : 'استبدال'})`;
+        this.parseStatusMsg.className = 'status-msg success';
+        this.parseStatusMsg.classList.remove('hidden');
+
+        this.showToast(`تم استيراد ${inCount} حوالة من رسائل واتساب بنجاح`, 'success');
+
+        setTimeout(() => {
+          if (inCount >= outCount) {
+            this.switchTab('tab-table');
+          } else {
+            this.switchTab('tab-outgoing');
+          }
+        }, 600);
+        return;
+      }
+    }
+
+    // 2. الاكتشاف المختلط الذكي (واردة + صادرة) إذا كان الخيار تلقائي
     if (targetType === 'auto') {
       const split = this.splitMixedText(rawText);
       if (split.hasIncoming && split.hasOutgoing) {
@@ -1039,7 +1446,7 @@ class SharafApp {
       }
     }
 
-    // 2. معالجة الحوالات الصادرة إذا تطابق النمط أو تم تحديدها صراحة
+    // 3. معالجة الحوالات الصادرة إذا تطابق النمط أو تم تحديدها صراحة
     const isOutgoing = targetType === 'outgoing' || (targetType === 'auto' && (
       /ارسال\s*حوال[ةه]|حوال[ةه]\s*صادرة|خصم\s*[\d,]+/i.test(rawText) ||
       (/المستلم/i.test(rawText) && /المرسل/i.test(rawText))
@@ -1078,7 +1485,7 @@ class SharafApp {
       return;
     }
 
-    // 3. معالجة الحوالات الواردة
+    // 4. معالجة الحوالات الواردة
     const result = this.parseFinancialText(rawText, {
       rate: batchRate,
       currency: batchCurr,
@@ -1087,7 +1494,48 @@ class SharafApp {
     });
 
     if (result.count === 0) {
-      this.showToast('لم يتم العثور على سجلات مطابقة في النص. تأكد من وجود علامة = بين الاسم والمبلغ', 'error');
+      // محاولة تحليل بديلة للرسائل المجزأة متعددة الأسطر بدون ترويسات
+      const fallbackResult = this.parseWhatsAppChatExport(rawText, {
+        rate: batchRate,
+        currency: batchCurr,
+        autoDate: autoDate,
+        customDate: customDate
+      });
+
+      if (fallbackResult.incomingRecords.length > 0) {
+        const inCount = fallbackResult.incomingRecords.length;
+        if (importMode === 'append') {
+          const startSeq = this.records.length;
+          const newRows = fallbackResult.incomingRecords.map((r, i) => ({
+            ...r,
+            originalSeq: startSeq + i + 1
+          }));
+          this.records = [...this.records, ...newRows];
+        } else {
+          this.records = fallbackResult.incomingRecords;
+        }
+        this.saveIncomingRecords();
+        this.render();
+
+        this.addAuditLog({
+          type: 'import',
+          title: 'استيراد رسائل مجمعة ومجزأة',
+          description: `تم استخراج ${inCount} حوالة واردة من النص المجزأ بنجاح (${importMode === 'append' ? 'إضافة متتابعة' : 'استبدال'}).`,
+          tags: [`واردة: ${inCount}`, importMode === 'append' ? 'إضافة متتابعة' : 'استبدال']
+        });
+
+        this.parseStatusMsg.textContent = `تم استخراج ${inCount} حوالة واردة بنجاح ✓ (${importMode === 'append' ? 'إضافة متتابعة' : 'استبدال'})`;
+        this.parseStatusMsg.className = 'status-msg success';
+        this.parseStatusMsg.classList.remove('hidden');
+
+        this.showToast(`تم استيراد ${inCount} حساب بنجاح`, 'success');
+        setTimeout(() => {
+          this.switchTab('tab-table');
+        }, 600);
+        return;
+      }
+
+      this.showToast('لم يتم العثور على سجلات مطابقة في النص. تأكد من وجود علامة = أو أرقام الحسابات والمبالغ', 'error');
       return;
     }
 
@@ -1153,6 +1601,13 @@ class SharafApp {
     this.rawTextInput.value = SAMPLE_OUTGOING_TEXT;
     const outgoingRadio = document.querySelector('input[name="parse-target-type"][value="outgoing"]');
     if (outgoingRadio) outgoingRadio.checked = true;
+    this.processRawText();
+  }
+
+  loadWhatsAppSampleAndSwitch() {
+    this.rawTextInput.value = SAMPLE_WHATSAPP_TEXT;
+    const autoRadio = document.querySelector('input[name="parse-target-type"][value="auto"]');
+    if (autoRadio) autoRadio.checked = true;
     this.processRawText();
   }
 
