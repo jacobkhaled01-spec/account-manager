@@ -1284,6 +1284,267 @@ class SharafApp {
     };
   }
 
+  // ==================== 5. معالج النصوص الرئيسي (Orchestrator + Helpers) ====================
+
+  /**
+   * _readParseOptions — يقرأ خيارات الاستيراد من واجهة المستخدم
+   * @returns {{ targetType, importMode, autoDate, customDate, batchCurr, batchRate }}
+   */
+  _readParseOptions() {
+    const targetRadios = document.getElementsByName('parse-target-type');
+    let targetType = 'auto';
+    for (const r of targetRadios) {
+      if (r.checked) { targetType = r.value; break; }
+    }
+
+    return {
+      targetType,
+      importMode:  this.getImportMode(),
+      autoDate:    document.getElementById('opt-auto-date')?.checked ?? true,
+      customDate:  document.getElementById('input-custom-date')?.value.trim() || '',
+      batchCurr:   document.getElementById('input-batch-currency')?.value.trim() || this.settings.defaultCurrency,
+      batchRate:   parseFloat(document.getElementById('input-batch-rate')?.value) || this.settings.defaultRate,
+    };
+  }
+
+  /**
+   * _commitIncomingRecords — يضيف سجلات واردة للكشف ويحفظ ويعرض
+   * @param {Array} newRecords
+   * @param {'append'|'replace'} importMode
+   */
+  _commitIncomingRecords(newRecords, importMode) {
+    if (importMode === 'append') {
+      const startSeq = this.records.length;
+      this.records = [
+        ...this.records,
+        ...newRecords.map((r, i) => ({ ...r, originalSeq: startSeq + i + 1 }))
+      ];
+    } else {
+      this.records = newRecords;
+    }
+    this.saveIncomingRecords();
+    this.render();
+  }
+
+  /**
+   * _commitOutgoingRecords — يضيف سجلات صادرة للكشف ويحفظ ويعرض
+   * @param {Array} newRecords
+   * @param {'append'|'replace'} importMode
+   */
+  _commitOutgoingRecords(newRecords, importMode) {
+    if (importMode === 'append') {
+      this.outgoingRecords = [...this.outgoingRecords, ...newRecords];
+    } else {
+      this.outgoingRecords = newRecords;
+    }
+    this.saveOutgoingRecords();
+    this.renderOutgoing();
+  }
+
+  /**
+   * _setStatusMsg — يضبط رسالة الحالة تحت الزر
+   * @param {string} text
+   * @param {'success'|'error'} type
+   */
+  _setStatusMsg(text, type = 'success') {
+    this.parseStatusMsg.textContent = text;
+    this.parseStatusMsg.className = `status-msg ${type}`;
+    this.parseStatusMsg.classList.remove('hidden');
+  }
+
+  /**
+   * _handleWhatsAppImport — يعالج نصوص محادثة واتساب المجمعة
+   * @returns {boolean} — true إذا نجح الاستيراد
+   */
+  _handleWhatsAppImport(rawText, opts) {
+    const { importMode, batchRate, batchCurr, autoDate, customDate } = opts;
+
+    const waResult = this.parseWhatsAppChatExport(rawText, {
+      rate: batchRate, currency: batchCurr, autoDate, customDate
+    });
+
+    const inCount  = waResult.incomingRecords.length;
+    const outCount = waResult.outgoingRecords.length;
+
+    if (inCount === 0 && outCount === 0) return false;
+
+    if (inCount > 0)  this._commitIncomingRecords(waResult.incomingRecords, importMode);
+    if (outCount > 0) this._commitOutgoingRecords(waResult.outgoingRecords, importMode);
+
+    const modeLabel = importMode === 'append' ? 'إضافة متتابعة' : 'استبدال';
+    const tags = [
+      ...(inCount  > 0 ? [`واردة: ${inCount}`]  : []),
+      ...(outCount > 0 ? [`صادرة: ${outCount}`] : []),
+      'محادثة واتساب',
+      modeLabel
+    ];
+
+    this.addAuditLog({
+      type: 'import',
+      title: 'استيراد رسائل واتساب مجمعة',
+      description: `تم استخراج وتجميع ${inCount} حوالة واردة ${outCount > 0 ? `و ${outCount} حوالة صادرة` : ''} من محادثة واتساب بنجاح.`,
+      tags
+    });
+
+    this._setStatusMsg(
+      `تم بنجاح استخراج وتجميع ${inCount} حوالة واردة ${outCount > 0 ? `و ${outCount} صادرة` : ''} من رسائل واتساب ✓ (${modeLabel})`
+    );
+
+    this.showToast(`تم استيراد ${inCount} حوالة من رسائل واتساب بنجاح`, 'success');
+    setTimeout(() => this.switchTab(inCount >= outCount ? 'tab-table' : 'tab-outgoing'), 600);
+    return true;
+  }
+
+  /**
+   * _handleMixedImport — يعالج النصوص المختلطة (واردة + صادرة في نفس النص)
+   * @returns {boolean} — true إذا نجح الاستيراد
+   */
+  _handleMixedImport(rawText, opts) {
+    const { importMode, batchRate, batchCurr, autoDate, customDate } = opts;
+
+    const split = this.splitMixedText(rawText);
+    if (!split.hasIncoming || !split.hasOutgoing) return false;
+
+    const outRecords = this.parseOutgoingText(split.outgoingText);
+    const inResult   = this.parseFinancialText(split.incomingText, {
+      rate: batchRate, currency: batchCurr, autoDate, customDate
+    });
+
+    if (outRecords.length === 0 && inResult.count === 0) return false;
+
+    if (inResult.count > 0)    this._commitIncomingRecords(inResult.records, importMode);
+    if (outRecords.length > 0) this._commitOutgoingRecords(outRecords, importMode);
+
+    const modeLabel = importMode === 'append' ? 'إضافة متتابعة' : 'استبدال';
+    const tags = [
+      ...(inResult.count  > 0 ? [`واردة: ${inResult.count}`]   : []),
+      ...(outRecords.length > 0 ? [`صادرة: ${outRecords.length}`] : []),
+      modeLabel
+    ];
+
+    this.addAuditLog({
+      type: 'import',
+      title: 'استيراد كشف مختلط (واردة + صادرة)',
+      description: `تم تلقائياً فرز واستيراد ${inResult.count} حوالة واردة و ${outRecords.length} حوالة صادرة.`,
+      tags
+    });
+
+    this._setStatusMsg(
+      `تم كشف وتوزيع: ${inResult.count} حوالة واردة + ${outRecords.length} حوالة صادرة بنجاح ✓ (${modeLabel})`
+    );
+
+    this.showToast(`تم استيراد ${inResult.count} واردة و ${outRecords.length} صادرة بنجاح`, 'success');
+    setTimeout(() => this.switchTab(inResult.count >= outRecords.length ? 'tab-table' : 'tab-outgoing'), 600);
+    return true;
+  }
+
+  /**
+   * _handleOutgoingImport — يعالج نصوص الحوالات الصادرة الصريحة
+   * @returns {boolean} — true إذا نجح الاستيراد
+   */
+  _handleOutgoingImport(rawText, opts) {
+    const { importMode } = opts;
+    const outRecords = this.parseOutgoingText(rawText);
+
+    if (outRecords.length === 0) {
+      this.showToast('تعذر العثور على حوالات صادرة مطابقة في النص المدخل', 'error');
+      return true; // consumed — لا تمرر للمعالجات التالية
+    }
+
+    this._commitOutgoingRecords(outRecords, importMode);
+
+    const modeLabel = importMode === 'append' ? 'إضافة متتابعة' : 'استبدال';
+
+    this.addAuditLog({
+      type: 'import',
+      title: 'استيراد حوالات صادرة',
+      description: `تم استيراد ${outRecords.length} حوالة صادرة (${modeLabel}).`,
+      tags: [`صادرة: ${outRecords.length}`, modeLabel]
+    });
+
+    this._setStatusMsg(
+      `تم استخراج ${outRecords.length} حوالة صادرة بنجاح ✓ (${modeLabel})`
+    );
+
+    this.showToast(`تم استيراد ${outRecords.length} حوالة صادرة بنجاح`, 'success');
+    setTimeout(() => this.switchTab('tab-outgoing'), 600);
+    return true;
+  }
+
+  /**
+   * _handleIncomingImport — يعالج نصوص الحوالات الواردة (المسار الرئيسي)
+   * @returns {boolean} — true إذا نجح الاستيراد
+   */
+  _handleIncomingImport(rawText, opts) {
+    const { importMode, batchRate, batchCurr, autoDate, customDate } = opts;
+
+    const result = this.parseFinancialText(rawText, {
+      rate: batchRate, currency: batchCurr, autoDate, customDate
+    });
+
+    // Fallback: إذا لم يجد نتائج — جرب محلل واتساب كفولباك
+    if (result.count === 0) {
+      const fallback = this.parseWhatsAppChatExport(rawText, {
+        rate: batchRate, currency: batchCurr, autoDate, customDate
+      });
+
+      if (fallback.incomingRecords.length > 0) {
+        const inCount   = fallback.incomingRecords.length;
+        const modeLabel = importMode === 'append' ? 'إضافة متتابعة' : 'استبدال';
+
+        this._commitIncomingRecords(fallback.incomingRecords, importMode);
+
+        this.addAuditLog({
+          type: 'import',
+          title: 'استيراد رسائل مجمعة ومجزأة',
+          description: `تم استخراج ${inCount} حوالة واردة من النص المجزأ بنجاح (${modeLabel}).`,
+          tags: [`واردة: ${inCount}`, modeLabel]
+        });
+
+        this._setStatusMsg(`تم استخراج ${inCount} حوالة واردة بنجاح ✓ (${modeLabel})`);
+        this.showToast(`تم استيراد ${inCount} حساب بنجاح`, 'success');
+        setTimeout(() => this.switchTab('tab-table'), 600);
+        return true;
+      }
+
+      this.showToast('لم يتم العثور على سجلات مطابقة في النص. تأكد من وجود علامة = أو أرقام الحسابات والمبالغ', 'error');
+      return true; // consumed
+    }
+
+    this.originalHeaderText = result.detectedHeader || '';
+    this._commitIncomingRecords(result.records, importMode);
+
+    const modeLabel = importMode === 'append' ? 'إضافة متتابعة' : 'استبدال';
+
+    this.addAuditLog({
+      type: 'import',
+      title: 'استيراد حوالات واردة',
+      description: `تم استيراد ${result.count} حساب وارد بإجمالي ${this.formatNumber(result.calculatedTotalAmount)} ${batchCurr} (${modeLabel}).`,
+      tags: [`واردة: ${result.count}`, `${this.formatNumber(result.calculatedTotalAmount)} ${batchCurr}`, modeLabel]
+    });
+
+    // بناء رسالة الحالة مع تفاصيل السنتات والتحقق من المجموع
+    let msg = `تم استخراج ${result.count} سجلاً بنجاح! الإجمالي: ${this.formatNumber(result.calculatedTotalAmount)} ${batchCurr}`;
+    if (result.calculatedTotalCutCents > 0) {
+      msg += ` (السنتات المقطوعة: ${result.calculatedTotalCutCents.toFixed(2)} [${Math.round(result.calculatedTotalCutCents * 100)} سنت])`;
+    }
+    if (result.textTotal !== null) {
+      const diff = Math.abs(result.textTotal - result.calculatedTotalAmount);
+      msg += diff === 0
+        ? ` (مطابق لمجموع النص: ${this.formatNumber(result.textTotal)} ✓)`
+        : ` (تنبيه: مجموع النص المدون هو ${this.formatNumber(result.textTotal)})`;
+    }
+
+    this._setStatusMsg(msg);
+    this.showToast(`تم استيراد ${result.count} حساب بنجاح`, 'success');
+    setTimeout(() => this.switchTab('tab-table'), 600);
+    return true;
+  }
+
+  /**
+   * processRawText — المُنسق الرئيسي (Orchestrator)
+   * يقرأ الخيارات ويفوّض لأحد الـ 4 helpers بالترتيب الصحيح
+   */
   processRawText() {
     const rawText = this.rawTextInput.value.trim();
     if (!rawText) {
@@ -1292,297 +1553,31 @@ class SharafApp {
       return;
     }
 
-    // فحص خيار نوع الكشف المحدد (تلقائي ذكي / واردة / صادرة)
-    const targetRadios = document.getElementsByName('parse-target-type');
-    let targetType = 'auto';
-    for (let r of targetRadios) {
-      if (r.checked) {
-        targetType = r.value;
-        break;
-      }
-    }
+    const opts = this._readParseOptions();
+    const { targetType } = opts;
 
-    const importMode = this.getImportMode();
-    const autoDate = document.getElementById('opt-auto-date')?.checked ?? true;
-    const customDate = document.getElementById('input-custom-date')?.value.trim() || '';
-    const batchCurr = document.getElementById('input-batch-currency')?.value.trim() || this.settings.defaultCurrency;
-    const batchRate = parseFloat(document.getElementById('input-batch-rate')?.value) || this.settings.defaultRate;
-
-    // 1. الاكتشاف الذكي لرسائل محادثات واتساب المنسوخة جماعياً
+    // ① WhatsApp محادثة جماعية — أعلى أولوية
     const isWhatsAppExport = /(?:\[\d{1,4}[\/\-\.]\d{1,2}(?:[\/\-\.]\d{2,4})?,?[^\]]*\]|\b\d{1,4}[\/\-\.]\d{1,2}(?:[\/\-\.]\d{2,4})?,?[^-\n]*-)\s*[^:\n]+:/i.test(rawText);
-
     if (isWhatsAppExport) {
-      const waResult = this.parseWhatsAppChatExport(rawText, {
-        rate: batchRate,
-        currency: batchCurr,
-        autoDate: autoDate,
-        customDate: customDate
-      });
-
-      const inCount = waResult.incomingRecords.length;
-      const outCount = waResult.outgoingRecords.length;
-
-      if (inCount > 0 || outCount > 0) {
-        if (inCount > 0) {
-          if (importMode === 'append') {
-            const startSeq = this.records.length;
-            const newRows = waResult.incomingRecords.map((r, i) => ({
-              ...r,
-              originalSeq: startSeq + i + 1
-            }));
-            this.records = [...this.records, ...newRows];
-          } else {
-            this.records = waResult.incomingRecords;
-          }
-          this.saveIncomingRecords();
-          this.render();
-        }
-
-        if (outCount > 0) {
-          if (importMode === 'append') {
-            this.outgoingRecords = [...this.outgoingRecords, ...waResult.outgoingRecords];
-          } else {
-            this.outgoingRecords = waResult.outgoingRecords;
-          }
-          this.saveOutgoingRecords();
-          this.renderOutgoing();
-        }
-
-        const tags = [];
-        if (inCount > 0) tags.push(`واردة: ${inCount}`);
-        if (outCount > 0) tags.push(`صادرة: ${outCount}`);
-        tags.push('محادثة واتساب');
-        tags.push(importMode === 'append' ? 'إضافة متتابعة' : 'استبدال');
-
-        this.addAuditLog({
-          type: 'import',
-          title: 'استيراد رسائل واتساب مجمعة',
-          description: `تم استخراج وتجميع ${inCount} حوالة واردة ${outCount > 0 ? `و ${outCount} حوالة صادرة` : ''} من محادثة واتساب بنجاح.`,
-          tags
-        });
-
-        this.parseStatusMsg.textContent = `تم بنجاح استخراج وتجميع ${inCount} حوالة واردة ${outCount > 0 ? `و ${outCount} صادرة` : ''} من رسائل واتساب ✓ (${importMode === 'append' ? 'إضافة متتابعة' : 'استبدال'})`;
-        this.parseStatusMsg.className = 'status-msg success';
-        this.parseStatusMsg.classList.remove('hidden');
-
-        this.showToast(`تم استيراد ${inCount} حوالة من رسائل واتساب بنجاح`, 'success');
-
-        setTimeout(() => {
-          if (inCount >= outCount) {
-            this.switchTab('tab-table');
-          } else {
-            this.switchTab('tab-outgoing');
-          }
-        }, 600);
-        return;
-      }
+      if (this._handleWhatsAppImport(rawText, opts)) return;
     }
 
-    // 2. الاكتشاف المختلط الذكي (واردة + صادرة) إذا كان الخيار تلقائي
+    // ② كشف مختلط تلقائي (واردة + صادرة)
     if (targetType === 'auto') {
-      const split = this.splitMixedText(rawText);
-      if (split.hasIncoming && split.hasOutgoing) {
-        const outRecords = this.parseOutgoingText(split.outgoingText);
-        const inResult = this.parseFinancialText(split.incomingText, {
-          rate: batchRate,
-          currency: batchCurr,
-          autoDate: autoDate,
-          customDate: customDate
-        });
-
-        if (outRecords.length > 0 || inResult.count > 0) {
-          if (inResult.count > 0) {
-            if (importMode === 'append') {
-              const startSeq = this.records.length;
-              const newRows = inResult.records.map((r, i) => ({
-                ...r,
-                originalSeq: startSeq + i + 1
-              }));
-              this.records = [...this.records, ...newRows];
-            } else {
-              this.records = inResult.records;
-            }
-            this.saveIncomingRecords();
-            this.render();
-          }
-
-          if (outRecords.length > 0) {
-            if (importMode === 'append') {
-              this.outgoingRecords = [...this.outgoingRecords, ...outRecords];
-            } else {
-              this.outgoingRecords = outRecords;
-            }
-            this.saveOutgoingRecords();
-            this.renderOutgoing();
-          }
-
-          const tags = [];
-          if (inResult.count > 0) tags.push(`واردة: ${inResult.count}`);
-          if (outRecords.length > 0) tags.push(`صادرة: ${outRecords.length}`);
-          tags.push(importMode === 'append' ? 'إضافة للكشف' : 'استبدال الكشف');
-
-          this.addAuditLog({
-            type: 'import',
-            title: 'استيراد كشف مختلط (واردة + صادرة)',
-            description: `تم تلقائياً فرز واستيراد ${inResult.count} حوالة واردة و ${outRecords.length} حوالة صادرة.`,
-            tags
-          });
-
-          this.parseStatusMsg.textContent = `تم كشف وتوزيع: ${inResult.count} حوالة واردة + ${outRecords.length} حوالة صادرة بنجاح ✓ (${importMode === 'append' ? 'إضافة متتابعة' : 'استبدال'})`;
-          this.parseStatusMsg.className = 'status-msg success';
-          this.parseStatusMsg.classList.remove('hidden');
-
-          this.showToast(`تم استيراد ${inResult.count} واردة و ${outRecords.length} صادرة بنجاح`, 'success');
-
-          setTimeout(() => {
-            if (inResult.count >= outRecords.length) {
-              this.switchTab('tab-table');
-            } else {
-              this.switchTab('tab-outgoing');
-            }
-          }, 600);
-          return;
-        }
-      }
+      if (this._handleMixedImport(rawText, opts)) return;
     }
 
-    // 3. معالجة الحوالات الصادرة إذا تطابق النمط أو تم تحديدها صراحة
+    // ③ صادرة صريحة أو مكتشفة تلقائياً
     const isOutgoing = targetType === 'outgoing' || (targetType === 'auto' && (
       /ارسال\s*حوال[ةه]|حوال[ةه]\s*صادرة|خصم\s*[\d,]+/i.test(rawText) ||
       (/المستلم/i.test(rawText) && /المرسل/i.test(rawText))
     ));
-
     if (isOutgoing) {
-      const outRecords = this.parseOutgoingText(rawText);
-      if (outRecords.length === 0) {
-        this.showToast('تعذر العثور على حوالات صادرة مطابقة في النص المدخل', 'error');
-        return;
-      }
-
-      if (importMode === 'append') {
-        this.outgoingRecords = [...this.outgoingRecords, ...outRecords];
-      } else {
-        this.outgoingRecords = outRecords;
-      }
-      this.saveOutgoingRecords();
-      this.renderOutgoing();
-
-      this.addAuditLog({
-        type: 'import',
-        title: 'استيراد حوالات صادرة',
-        description: `تم استيراد ${outRecords.length} حوالة صادرة (${importMode === 'append' ? 'إضافة للكشف' : 'استبدال الكشف'}).`,
-        tags: [`صادرة: ${outRecords.length}`, importMode === 'append' ? 'إضافة متتابعة' : 'استبدال']
-      });
-
-      this.parseStatusMsg.textContent = `تم استخراج ${outRecords.length} حوالة صادرة بنجاح وتم توجيهك إلى كشف الحوالات الصادرة ✓ (${importMode === 'append' ? 'إضافة متتابعة' : 'استبدال'})`;
-      this.parseStatusMsg.className = 'status-msg success';
-      this.parseStatusMsg.classList.remove('hidden');
-
-      this.showToast(`تم استيراد ${outRecords.length} حوالة صادرة بنجاح`, 'success');
-      setTimeout(() => {
-        this.switchTab('tab-outgoing');
-      }, 600);
-      return;
+      if (this._handleOutgoingImport(rawText, opts)) return;
     }
 
-    // 4. معالجة الحوالات الواردة
-    const result = this.parseFinancialText(rawText, {
-      rate: batchRate,
-      currency: batchCurr,
-      autoDate: autoDate,
-      customDate: customDate
-    });
-
-    if (result.count === 0) {
-      // محاولة تحليل بديلة للرسائل المجزأة متعددة الأسطر بدون ترويسات
-      const fallbackResult = this.parseWhatsAppChatExport(rawText, {
-        rate: batchRate,
-        currency: batchCurr,
-        autoDate: autoDate,
-        customDate: customDate
-      });
-
-      if (fallbackResult.incomingRecords.length > 0) {
-        const inCount = fallbackResult.incomingRecords.length;
-        if (importMode === 'append') {
-          const startSeq = this.records.length;
-          const newRows = fallbackResult.incomingRecords.map((r, i) => ({
-            ...r,
-            originalSeq: startSeq + i + 1
-          }));
-          this.records = [...this.records, ...newRows];
-        } else {
-          this.records = fallbackResult.incomingRecords;
-        }
-        this.saveIncomingRecords();
-        this.render();
-
-        this.addAuditLog({
-          type: 'import',
-          title: 'استيراد رسائل مجمعة ومجزأة',
-          description: `تم استخراج ${inCount} حوالة واردة من النص المجزأ بنجاح (${importMode === 'append' ? 'إضافة متتابعة' : 'استبدال'}).`,
-          tags: [`واردة: ${inCount}`, importMode === 'append' ? 'إضافة متتابعة' : 'استبدال']
-        });
-
-        this.parseStatusMsg.textContent = `تم استخراج ${inCount} حوالة واردة بنجاح ✓ (${importMode === 'append' ? 'إضافة متتابعة' : 'استبدال'})`;
-        this.parseStatusMsg.className = 'status-msg success';
-        this.parseStatusMsg.classList.remove('hidden');
-
-        this.showToast(`تم استيراد ${inCount} حساب بنجاح`, 'success');
-        setTimeout(() => {
-          this.switchTab('tab-table');
-        }, 600);
-        return;
-      }
-
-      this.showToast('لم يتم العثور على سجلات مطابقة في النص. تأكد من وجود علامة = أو أرقام الحسابات والمبالغ', 'error');
-      return;
-    }
-
-    this.originalHeaderText = result.detectedHeader || '';
-
-    if (importMode === 'append') {
-      const startSeq = this.records.length;
-      const newRows = result.records.map((r, i) => ({
-        ...r,
-        originalSeq: startSeq + i + 1
-      }));
-      this.records = [...this.records, ...newRows];
-    } else {
-      this.records = result.records;
-    }
-
-    this.saveIncomingRecords();
-    this.render();
-
-    this.addAuditLog({
-      type: 'import',
-      title: 'استيراد حوالات واردة',
-      description: `تم استيراد ${result.count} حساب وارد بإجمالي ${this.formatNumber(result.calculatedTotalAmount)} ${batchCurr} (${importMode === 'append' ? 'إضافة للكشف' : 'استبدال الكشف'}).`,
-      tags: [`واردة: ${result.count}`, `${this.formatNumber(result.calculatedTotalAmount)} ${batchCurr}`, importMode === 'append' ? 'إضافة متتابعة' : 'استبدال']
-    });
-
-    let msg = `تم استخراج ${result.count} سجلاً بنجاح! الإجمالي: ${this.formatNumber(result.calculatedTotalAmount)} ${batchCurr}`;
-    if (result.calculatedTotalCutCents > 0) {
-      msg += ` (السنتات المقطوعة: ${result.calculatedTotalCutCents.toFixed(2)} [${Math.round(result.calculatedTotalCutCents * 100)} سنت])`;
-    }
-    if (result.textTotal !== null) {
-      if (Math.abs(result.textTotal - result.calculatedTotalAmount) === 0) {
-        msg += ` (مطابق لمجموع النص: ${this.formatNumber(result.textTotal)} ✓)`;
-      } else {
-        msg += ` (تنبيه: مجموع النص المدون هو ${this.formatNumber(result.textTotal)})`;
-      }
-    }
-
-    this.parseStatusMsg.textContent = msg;
-    this.parseStatusMsg.className = 'status-msg success';
-    this.parseStatusMsg.classList.remove('hidden');
-
-    this.showToast(`تم استيراد ${result.count} حساب بنجاح`, 'success');
-
-    setTimeout(() => {
-      this.switchTab('tab-table');
-    }, 600);
+    // ④ واردة — المسار الافتراضي
+    this._handleIncomingImport(rawText, opts);
   }
 
   loadSampleData() {
