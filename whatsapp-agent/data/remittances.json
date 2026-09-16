@@ -1,0 +1,27 @@
+[
+  {
+    "batchId": "REF-924379",
+    "timestamp": "2026-09-16T00:18:44.379Z",
+    "sourceJid": "120363000000000@g.us",
+    "senderName": "مجموعة العملاء أ",
+    "records": [
+      {
+        "seq": 1,
+        "date": "2026/09/16",
+        "name": "Gebrihiwet asefa",
+        "id": "1000712011867",
+        "amount": 500,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 24000,
+        "cutCents": 0
+      }
+    ],
+    "totals": {
+      "totalAmount": 500,
+      "totalBirr": 24000,
+      "totalCutCents": 0,
+      "count": 1
+    }
+  }
+]

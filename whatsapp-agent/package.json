@@ -1,0 +1,26 @@
+{
+  "name": "sharaf-whatsapp-agent",
+  "version": "1.0.0",
+  "description": "إيجنت واتساب ذكي ومجاني 100% لنظام القسام لقراءة الحوالات وإرسالها آلياً بين المجموعات",
+  "main": "agent.js",
+  "scripts": {
+    "start": "node agent.js",
+    "dev": "node --watch agent.js"
+  },
+  "keywords": [
+    "whatsapp",
+    "baileys",
+    "remittances",
+    "automation",
+    "agent"
+  ],
+  "author": "نظام القسام",
+  "license": "MIT",
+  "dependencies": {
+    "@whiskeysockets/baileys": "^6.7.9",
+    "pino": "^9.4.0",
+    "pino-pretty": "^11.2.2",
+    "qrcode-terminal": "^0.12.0",
+    "ws": "^8.18.0"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "sourceGroupName": "مجموعة العملاء (أ)",
+  "sourceGroupId": "",
+  "targetGroupName": "مجموعة الصرافين والمنفذين (ب)",
+  "targetGroupId": "",
+  "exchangeRate": 48,
+  "defaultCurrency": "ريال سعودي",
+  "autoReplyAcknowledge": true,
+  "listenToAllGroups": true,
+  "bridgeServerPort": 4124,
+  "messageTemplates": {
+    "outgoingReportHeader": "📋 *كشف حوالات جديد — نظام القسام*",
+    "outgoingReportFooter": "✅ *تم التحقق والتقفيل آلياً عبر نظام القسام الذكي*",
+    "acknowledgmentReply": "✅ تم استلام وقيد عدد ({count}) حوالات بنجاح.\n💰 إجمالي المقابل: {totalBirr} بر إثيوبي.\n🔢 رقم المعاملة: {batchId}"
+  }
+}
