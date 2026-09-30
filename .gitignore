@@ -9,3 +9,6 @@ Thumbs.db
 libs/
 backup/
 scratch/
+android-ndk-r27/
+*.apk
+*.zip

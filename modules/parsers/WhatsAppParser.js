@@ -22,12 +22,19 @@ class WhatsAppParser {
   }
 
   /**
-   * تقسيم النص الكامل إلى فقاعات رسائل منفصلة
+   * تقسيم النص الكامل إلى فقاعات رسائل منفصلة مع دعم التجزئة الذكية للبلوكات المركبة
    * @param {string} text
    * @returns {Array<string>}
    */
   static parseWhatsAppBubbles(text) {
-    const rawClean = this.cleanInvisible(text);
+    let rawClean = this.cleanInvisible(text);
+
+    // 1. استبعاد أسطر المجاميع الختامية (مثل total=227,620 أو المجموع: ...)
+    rawClean = rawClean.replace(/^\s*(?:total|المجموع|الإجمالي|الصافي|التقرير)\s*[:=].*$/gmi, '');
+
+    // 2. تحويل خطوط الفواصل النجمية أو الشرطات (مثل ***** أو ------) إلى فواصل فقرات
+    rawClean = rawClean.replace(/\n\s*[\*\-_=~]{3,}\s*(?=\n|$)/g, '\n\n');
+
     const regex = new RegExp(this.WHATSAPP_HEADER_REGEX.source, 'gi');
     const matches = [];
     let match;
@@ -36,19 +43,46 @@ class WhatsAppParser {
       matches.push({ index: match.index, length: match[0].length });
     }
 
-    const bubbles = [];
+    const rawBubbles = [];
     if (matches.length > 0) {
       for (let i = 0; i < matches.length; i++) {
         const start = matches[i].index + matches[i].length;
         const end = (i + 1 < matches.length) ? matches[i + 1].index : rawClean.length;
         const content = rawClean.slice(start, end).trim();
-        if (content) bubbles.push(content);
+        if (content) rawBubbles.push(content);
       }
     } else {
       // إذا لم تكن هناك ترويسات واتساب، التقسيم بأسطر فارغة
       const parts = rawClean.split(/\n\s*\n/).map(b => b.trim()).filter(Boolean);
-      bubbles.push(...parts);
+      rawBubbles.push(...parts);
     }
+
+    // 3. التجزئة الذكية للبلوكات التي تحتوي على عدة حوالات بدون أسطر فارغة بينها
+    const bubbles = [];
+    for (const block of rawBubbles) {
+      const accs = block.match(/\b(1000\d{6,12}|\d{10,16})\b/g);
+      if (accs && accs.length > 1) {
+        const lines = block.split('\n');
+        let currentItem = [];
+        for (const line of lines) {
+          if (/^\s*\d+['.,\)\-\s]/.test(line) && currentItem.length > 0) {
+            const currentText = currentItem.join('\n');
+            if (/\b(1000\d{6,12}|\d{10,16})\b/.test(currentText)) {
+              bubbles.push(currentText.trim());
+              currentItem = [line];
+              continue;
+            }
+          }
+          currentItem.push(line);
+        }
+        if (currentItem.length > 0) {
+          bubbles.push(currentItem.join('\n').trim());
+        }
+      } else {
+        bubbles.push(block);
+      }
+    }
+
     return bubbles;
   }
 
@@ -57,8 +91,11 @@ class WhatsAppParser {
    * @param {string} bubbleText
    * @returns {{ amount: number, currency: string, original: string } | null}
    */
-  static parseAmountAndCurrency(bubbleText) {
-    const cleaned = this.cleanInvisible(bubbleText);
+  static parseAmountAndCurrency(bubbleText, account = '') {
+    let cleaned = this.cleanInvisible(bubbleText);
+    if (account) {
+      cleaned = cleaned.replace(account, ' ');
+    }
 
     // 1. فحص الملايين: 10 مليون بر / 2.5 مليون
     const millionMatch = cleaned.match(/(\d+(?:\.\d+)?)\s*مليون(?:\s*(بر+|birr?|ريال|سعودي|sar))?/i);
@@ -103,18 +140,48 @@ class WhatsAppParser {
       }
     }
 
+    // 5. رقم مجرد مكون من 2 إلى 9 خانات في سطر مشترك (مثل: TEAME TESFAY 1000181711713 4975)
+    const standaloneMatch = cleaned.match(/\b([\d,]{2,9}(?:\.\d+)?)\b/);
+    if (standaloneMatch) {
+      const raw = standaloneMatch[1].replace(/,/g, '');
+      const num = parseFloat(raw);
+      if (raw.length < 10) {
+        return { amount: num, currency: 'SAR', original: standaloneMatch[0] };
+      }
+    }
+
     return null;
   }
 
   /**
-   * تنظيف واستخراج اسم المستفيد
+   * تنظيف واستخراج اسم المستفيد بدقة مع استبعاد الترقيم والتواريخ
    * @param {string} nameCandidate
    * @param {string} account
    * @param {object} amountObj
    * @returns {string}
    */
   static cleanPersonName(nameCandidate, account, amountObj) {
-    let cleaned = nameCandidate;
+    let lines = nameCandidate.split('\n').map(l => l.trim()).filter(Boolean);
+
+    // استبعاد السطور التي هي عبارة عن أرقام حسابات فقط أو تواريخ أو فواصل
+    lines = lines.filter(l => {
+      if (account && l.includes(account)) return false;
+      if (/^\d{1,4}[\/\-\.]\d{1,2}[\/\-\.]\d{1,4}$/.test(l)) return false;
+      if (/^[\*\-_=~]+$/.test(l)) return false;
+      return true;
+    });
+
+    // اختيار السطر الذي يحتوي على الاسم (الذي فيه علامة = أو حروف اسم)
+    let nameLine = '';
+    for (const l of lines) {
+      if (l.includes('=') || /[a-zA-Z\u0600-\u06FF]{2,}/.test(l)) {
+        nameLine = l;
+        break;
+      }
+    }
+    if (!nameLine && lines.length > 0) nameLine = lines[0];
+
+    let cleaned = nameLine || nameCandidate;
     if (account) {
       cleaned = cleaned.replace(account, ' ');
     }
@@ -124,6 +191,7 @@ class WhatsAppParser {
 
     cleaned = cleaned
       .replace(/=/g, ' ')
+      .replace(/^\s*\d+['.,\)\-\s]*/, '') // إزالة الترقيم التسلسلي من بداية الاسم مثل: 1' أو 2. أو 24'
       .replace(/10\s*مليون/g, ' ')
       .replace(/\bمليون\b/g, ' ')
       .replace(/\b(SAR|ryl|birr?|سعودي|ريال|دولار|usd|etb)\b/gi, ' ')
@@ -132,14 +200,43 @@ class WhatsAppParser {
       .replace(/\s+/g, ' ')
       .trim();
 
-    if (/[a-zA-Z\u0600-\u06FF]/.test(cleaned)) {
+    if (/[a-zA-Z\u0600-\u06FF]{2,}/.test(cleaned)) {
       return cleaned;
     }
     return '';
   }
 
   /**
-   * المحلل الرئيسي لرسائل واتساب المنسوخة (بما في ذلك الرسائل المفرقة والمتتالية)
+   * استخراج حقول الحوالة (الاسم، الحساب، المبلغ) من فقاعة رسالة أياً كان ترتيبها
+   * @param {string} bubble
+   * @returns {{ name: string, account: string, amount: number|null, currency: string }}
+   */
+  static extractFieldsFromBubble(bubble) {
+    const text = this.cleanInvisible(bubble).trim();
+
+    // 1. استخراج رقم الحساب (10 إلى 16 خانة، أو يبدأ بـ 100)
+    let account = '';
+    const accMatch = text.match(/\b(100\d{7,14}|\d{10,16})\b/);
+    if (accMatch) {
+      account = accMatch[1];
+    }
+
+    // 2. استخراج المبلغ والعملة مع عزل رقم الحساب
+    const amountObj = this.parseAmountAndCurrency(text, account);
+
+    // 3. استخراج الاسم المنقح
+    const cleanName = this.cleanPersonName(text, account, amountObj);
+
+    return {
+      name: cleanName,
+      account: account,
+      amount: amountObj ? amountObj.amount : null,
+      currency: amountObj ? amountObj.currency : 'SAR'
+    };
+  }
+
+  /**
+   * المحلل الرئيسي لرسائل واتساب المنسوخة (بما في ذلك الرسائل المفرقة والمتتالية بأي ترتيب كان)
    * @param {string} text النص المنسوخ من واتساب
    * @param {object} options خيارات (سعر الصرف، العملة، التاريخ)
    * @returns {Array<object>} سجلات الحوالات المعيارية
@@ -152,110 +249,74 @@ class WhatsAppParser {
 
     const bubbles = this.parseWhatsAppBubbles(text);
     const results = [];
-    let unassignedPending = []; // عناصر معلقة تنتظر مبالغ
+    let pending = null;
 
     for (let bIdx = 0; bIdx < bubbles.length; bIdx++) {
       const bubble = bubbles[bIdx];
+      const f = this.extractFieldsFromBubble(bubble);
 
-      // استخراج رقم الحساب (10 إلى 16 خانة غالباً تبدأ بـ 1000)
-      let account = '';
-      const accMatch = bubble.match(/\b(1000\d{6,12}|\d{10,16})\b/);
-      if (accMatch) {
-        account = accMatch[1];
-      }
-
-      // استخراج المبلغ والعملة
-      const amountObj = this.parseAmountAndCurrency(bubble);
-
-      // استخراج الاسم المنقح
-      const cleanName = this.cleanPersonName(bubble, account, amountObj);
-
-      // حالة 1: الفقاعة تحتوي على مبلغ فقط (بدون اسم وبدون حساب)
-      if (amountObj && !cleanName && !account) {
-        if (unassignedPending.length > 0) {
-          const target = unassignedPending.pop();
-          target.amount = amountObj.amount;
-          target.currency = amountObj.currency;
-          continue;
+      // إذا كانت الفقاعة مكتملة (اسم + حساب + مبلغ) أياً كان ترتيبها
+      if (f.name && f.account && f.amount !== null) {
+        if (pending) {
+          if (pending.name || pending.account || pending.amount !== null) {
+            results.push(pending);
+          }
+          pending = null;
         }
-      }
-
-      // حالة 2: الفقاعة تحتوي على حساب فقط
-      if (account && !cleanName && !amountObj) {
-        const matchNoAcc = unassignedPending.find(item => item.name && !item.account);
-        if (matchNoAcc) {
-          matchNoAcc.account = account;
-          unassignedPending = unassignedPending.filter(i => i !== matchNoAcc);
-        } else {
-          const item = { account, name: '', amount: null, currency: 'SAR' };
-          results.push(item);
-          unassignedPending.push(item);
-        }
+        results.push(f);
         continue;
       }
 
-      // حالة 3: الفقاعة تحتوي على اسم فقط (بدون حساب وبدون مبلغ)
-      if (cleanName && !account && !amountObj) {
-        const matchOnlyAcc = unassignedPending.find(item => item.account && !item.name);
-        if (matchOnlyAcc) {
-          matchOnlyAcc.name = cleanName;
-        } else {
-          const item = { account: '', name: cleanName, amount: null, currency: 'SAR' };
-          results.push(item);
-          unassignedPending.push(item);
-        }
-        continue;
-      }
-
-      // حالة 4: الفقاعة تحتوي على حساب واسم ولكن بدون مبلغ
-      if (account && cleanName && !amountObj) {
-        const item = { account, name: cleanName, amount: null, currency: 'SAR' };
-        results.push(item);
-        unassignedPending.push(item);
-        continue;
-      }
-
-      // حالة 5: الفقاعة تحتوي على اسم ومبلغ ولكن بدون حساب
-      if (cleanName && amountObj && !account) {
-        const matchOnlyAcc = unassignedPending.find(item => item.account && !item.name && !item.amount);
-        if (matchOnlyAcc) {
-          matchOnlyAcc.name = cleanName;
-          matchOnlyAcc.amount = amountObj.amount;
-          matchOnlyAcc.currency = amountObj.currency;
-          unassignedPending = unassignedPending.filter(i => i !== matchOnlyAcc);
-        } else {
-          results.push({
-            account: '',
-            name: cleanName,
-            amount: amountObj.amount,
-            currency: amountObj.currency
-          });
-        }
-        continue;
-      }
-
-      // حالة 6: الفقاعة مكتملة (حساب + مبلغ، وربما اسم أيضاً)
-      if (amountObj && account) {
-        const item = {
-          account: account,
-          name: cleanName || '',
-          amount: amountObj.amount,
-          currency: amountObj.currency
+      // إذا لم يكن هناك عنصر معلق، نبدأ به
+      if (!pending) {
+        pending = {
+          name: f.name || '',
+          account: f.account || '',
+          amount: f.amount,
+          currency: f.currency || 'SAR'
         };
+      } else {
+        // فحص التعارض: إذا كان العنصر المعلق يحتوي بالفعل على نفس الحقل ووصلت قيمة جديدة له،
+        // فهذا يعني أن الفقاعة تنتمي لحوالة تالية!
+        const hasConflict = (f.name && pending.name) ||
+                            (f.account && pending.account) ||
+                            (f.amount !== null && pending.amount !== null);
 
-        const lastItem = results[results.length - 1];
-        if (lastItem && lastItem.account === item.account && lastItem.name.toLowerCase() === item.name.toLowerCase()) {
-          lastItem.amount = item.amount;
-          lastItem.currency = item.currency;
+        if (hasConflict) {
+          results.push(pending);
+          pending = {
+            name: f.name || '',
+            account: f.account || '',
+            amount: f.amount,
+            currency: f.currency || 'SAR'
+          };
         } else {
-          results.push(item);
+          // دمج الحقول في العنصر المعلق أياً كان ترتيب وصولها
+          if (f.name) pending.name = f.name;
+          if (f.account) pending.account = f.account;
+          if (f.amount !== null) {
+            pending.amount = f.amount;
+            pending.currency = f.currency;
+          }
         }
-        continue;
+      }
+
+      // إذا اكتمل العنصر المعلق (اسم + حساب + مبلغ)
+      if (pending.name && pending.account && pending.amount !== null) {
+        results.push(pending);
+        pending = null;
       }
     }
 
+    if (pending && (pending.account || pending.amount !== null || pending.name)) {
+      results.push(pending);
+    }
+
+    // استبعاد أي عناصر فارغة لم يتم إقرانها
+    const validResults = results.filter(item => (item.amount > 0 || (item.name && item.account)));
+
     // تحويل النتائج إلى السجلات المعيارية للنظام
-    const standardRecords = results.map((item, idx) => {
+    const standardRecords = validResults.map((item, idx) => {
       const amt = item.amount || 0;
       let currName = 'ريال سعودي';
       let birrEquivalent = 0;

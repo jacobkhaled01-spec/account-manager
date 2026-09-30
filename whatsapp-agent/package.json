@@ -5,7 +5,9 @@
   "main": "agent.js",
   "scripts": {
     "start": "node agent.js",
-    "dev": "node --watch agent.js"
+    "dev": "node --watch agent.js",
+    "change-account": "node -e \"const fs=require('fs'); fs.rmSync('auth_session', {recursive:true, force:true}); console.log('✅ تم مسح بيانات الحساب السابق بنجاح. شغّل الآن npm start لمسح الرمز بالحساب الجديد!');\"",
+    "logout": "npm run change-account"
   },
   "keywords": [
     "whatsapp",

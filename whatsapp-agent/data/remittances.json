@@ -1,5 +1,3478 @@
 [
   {
+    "batchId": "REF-523182",
+    "type": "outgoing",
+    "timestamp": "2026-09-17T02:02:03.182Z",
+    "sourceJid": "120363430856944501@g.us",
+    "senderName": "العميل خالد",
+    "records": [
+      {
+        "type": "outgoing",
+        "recipient": "خالد العمري",
+        "sender": "العميل خالد",
+        "amount": 3000,
+        "currency": "ريال سعودي",
+        "commission": "-",
+        "network": "-",
+        "transferNo": "-",
+        "date": "2026-09-17",
+        "notes": ""
+      }
+    ],
+    "totals": {
+      "count": 1,
+      "totalAmount": 3000
+    }
+  },
+  {
+    "batchId": "REF-523177",
+    "type": "incoming",
+    "timestamp": "2026-09-17T02:02:03.177Z",
+    "sourceJid": "120363430856944501@g.us",
+    "senderName": "العميل سالم",
+    "records": [
+      {
+        "seq": 1,
+        "date": "2026/09/17",
+        "name": "سالم سعيد",
+        "id": "",
+        "amount": 2500,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 120000,
+        "cutCents": 0
+      }
+    ],
+    "totals": {
+      "totalAmount": 2500,
+      "totalBirr": 120000,
+      "totalCutCents": 0,
+      "count": 1
+    }
+  },
+  {
+    "batchId": "REF-523171",
+    "type": "outgoing",
+    "timestamp": "2026-09-17T02:02:03.171Z",
+    "sourceJid": "120363430856944501@g.us",
+    "senderName": "العميل سامي",
+    "records": [
+      {
+        "type": "outgoing",
+        "recipient": "عمر علي محمد",
+        "sender": "خالد أحمد",
+        "amount": 1000,
+        "currency": "ريال سعودي",
+        "commission": "25 ريال",
+        "network": "شبكة الاكوع",
+        "transferNo": "-",
+        "date": "2026-09-17",
+        "notes": ""
+      }
+    ],
+    "totals": {
+      "count": 1,
+      "totalAmount": 1000
+    }
+  },
+  {
+    "batchId": "REF-523135",
+    "type": "incoming",
+    "timestamp": "2026-09-17T02:02:03.135Z",
+    "sourceJid": "120363430856944501@g.us",
+    "senderName": "العميل أحمد",
+    "records": [
+      {
+        "seq": 1,
+        "date": "2026/09/17",
+        "name": "TEAME TESFAY HAGOS",
+        "id": "1000181711713",
+        "amount": 4975,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 238800,
+        "cutCents": 0
+      }
+    ],
+    "totals": {
+      "totalAmount": 4975,
+      "totalBirr": 238800,
+      "totalCutCents": 0,
+      "count": 1
+    }
+  },
+  {
+    "batchId": "REF-332655",
+    "type": "incoming",
+    "timestamp": "2026-09-17T01:08:52.655Z",
+    "sourceJid": "120363430856944501@g.us",
+    "senderName": "أحمد",
+    "records": [
+      {
+        "seq": 1,
+        "date": "2026/09/17",
+        "name": "TEAME TESFAY HAGOS",
+        "id": "1000181711713",
+        "amount": 4975,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 238800,
+        "cutCents": 0
+      }
+    ],
+    "totals": {
+      "totalAmount": 4975,
+      "totalBirr": 238800,
+      "totalCutCents": 0,
+      "count": 1
+    }
+  },
+  {
+    "batchId": "REF-123797",
+    "type": "incoming",
+    "timestamp": "2026-09-17T01:05:23.797Z",
+    "sourceJid": "120363430856944501@g.us",
+    "senderName": "أحمد",
+    "records": [
+      {
+        "seq": 1,
+        "date": "2026/09/17",
+        "name": "سالم سعيد",
+        "id": "",
+        "amount": 2500,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 120000,
+        "cutCents": 0
+      }
+    ],
+    "totals": {
+      "totalAmount": 2500,
+      "totalBirr": 120000,
+      "totalCutCents": 0,
+      "count": 1
+    }
+  },
+  {
+    "batchId": "REF-118930",
+    "type": "outgoing",
+    "timestamp": "2026-09-17T01:05:18.930Z",
+    "sourceJid": "120363430856944501@g.us",
+    "senderName": "العميل خالد",
+    "records": [
+      {
+        "type": "outgoing",
+        "recipient": "خالد العمري",
+        "sender": "العميل خالد",
+        "amount": 3000,
+        "currency": "ريال سعودي",
+        "commission": "-",
+        "network": "-",
+        "transferNo": "-",
+        "date": "2026-09-17",
+        "notes": ""
+      }
+    ],
+    "totals": {
+      "count": 1,
+      "totalAmount": 3000
+    }
+  },
+  {
+    "batchId": "REF-118926",
+    "type": "incoming",
+    "timestamp": "2026-09-17T01:05:18.926Z",
+    "sourceJid": "120363430856944501@g.us",
+    "senderName": "العميل سالم",
+    "records": [
+      {
+        "seq": 1,
+        "date": "2026/09/17",
+        "name": "سالم سعيد",
+        "id": "",
+        "amount": 2500,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 120000,
+        "cutCents": 0
+      }
+    ],
+    "totals": {
+      "totalAmount": 2500,
+      "totalBirr": 120000,
+      "totalCutCents": 0,
+      "count": 1
+    }
+  },
+  {
+    "batchId": "REF-118920",
+    "type": "outgoing",
+    "timestamp": "2026-09-17T01:05:18.920Z",
+    "sourceJid": "120363430856944501@g.us",
+    "senderName": "العميل سامي",
+    "records": [
+      {
+        "type": "outgoing",
+        "recipient": "عمر علي محمد",
+        "sender": "خالد أحمد",
+        "amount": 1000,
+        "currency": "ريال سعودي",
+        "commission": "25 ريال",
+        "network": "شبكة الاكوع",
+        "transferNo": "-",
+        "date": "2026-09-17",
+        "notes": ""
+      }
+    ],
+    "totals": {
+      "count": 1,
+      "totalAmount": 1000
+    }
+  },
+  {
+    "batchId": "REF-118890",
+    "type": "incoming",
+    "timestamp": "2026-09-17T01:05:18.890Z",
+    "sourceJid": "120363430856944501@g.us",
+    "senderName": "العميل أحمد",
+    "records": [
+      {
+        "seq": 1,
+        "date": "2026/09/17",
+        "name": "TEAME TESFAY HAGOS",
+        "id": "1000181711713",
+        "amount": 4975,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 238800,
+        "cutCents": 0
+      }
+    ],
+    "totals": {
+      "totalAmount": 4975,
+      "totalBirr": 238800,
+      "totalCutCents": 0,
+      "count": 1
+    }
+  },
+  {
+    "batchId": "REF-927179",
+    "type": "outgoing",
+    "timestamp": "2026-09-17T01:02:07.179Z",
+    "sourceJid": "967776500030@s.whatsapp.net",
+    "senderName": "أنا (المرسل)",
+    "records": [
+      {
+        "type": "outgoing",
+        "recipient": "مركز علي عبدالجليل للتحويلات",
+        "sender": "شركة اخوان قادر للصرافة والتحويلات",
+        "amount": 60000,
+        "currency": "سعودي",
+        "commission": "-",
+        "network": "الادارة دادية",
+        "transferNo": "9912478503",
+        "date": "2026-09-17",
+        "notes": ""
+      }
+    ],
+    "totals": {
+      "count": 1,
+      "totalAmount": 60000
+    }
+  },
+  {
+    "batchId": "REF-718659",
+    "type": "outgoing",
+    "timestamp": "2026-09-17T00:58:38.660Z",
+    "sourceJid": "967776500030@s.whatsapp.net",
+    "senderName": "أنا (المرسل)",
+    "records": [
+      {
+        "type": "outgoing",
+        "recipient": "مركز علي عبدالجليل للتحويلات",
+        "sender": "شركة اخوان قادر للصرافة والتحويلات",
+        "amount": 60000,
+        "currency": "سعودي",
+        "commission": "-",
+        "network": "الادارة دادية",
+        "transferNo": "9912478503",
+        "date": "2026-09-17",
+        "notes": ""
+      }
+    ],
+    "totals": {
+      "count": 1,
+      "totalAmount": 60000
+    }
+  },
+  {
+    "batchId": "REF-666313",
+    "type": "incoming",
+    "timestamp": "2026-09-17T00:57:46.313Z",
+    "sourceJid": "test@g.us",
+    "senderName": "أحمد",
+    "records": [
+      {
+        "seq": 1,
+        "date": "2026/09/17",
+        "name": "TEAME TESFAY HAGOS",
+        "id": "1000181711713",
+        "amount": 4975,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 238800,
+        "cutCents": 0
+      }
+    ],
+    "totals": {
+      "totalAmount": 4975,
+      "totalBirr": 238800,
+      "totalCutCents": 0,
+      "count": 1
+    }
+  },
+  {
+    "batchId": "REF-536351",
+    "type": "incoming",
+    "timestamp": "2026-09-17T00:38:56.351Z",
+    "sourceJid": "120363432623869284@g.us",
+    "senderName": "!!!!!!!!",
+    "records": [
+      {
+        "seq": 1,
+        "date": "2026/09/17",
+        "name": "'Brhane destaalem",
+        "id": "1000308640241",
+        "amount": 67000,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 3216000,
+        "cutCents": 0
+      }
+    ],
+    "totals": {
+      "totalAmount": 67000,
+      "totalBirr": 3216000,
+      "totalCutCents": 0,
+      "count": 1
+    }
+  },
+  {
+    "batchId": "REF-676962",
+    "type": "outgoing",
+    "timestamp": "2026-09-17T00:24:36.963Z",
+    "sourceJid": "120363430856944501@g.us",
+    "senderName": "ע إປ إע اພ ܩܟܩܒ ހސܠ اພ☝🏻",
+    "records": [
+      {
+        "type": "outgoing",
+        "recipient": "مركز علي عبدالجليل للتحويلات",
+        "sender": "شركة اخوان قادر للصرافة والتحويلات",
+        "amount": 60000,
+        "currency": "سعودي",
+        "commission": "-",
+        "network": "الادارة دادية",
+        "transferNo": "9912478503",
+        "date": "2026-09-17",
+        "notes": ""
+      }
+    ],
+    "totals": {
+      "count": 1,
+      "totalAmount": 60000
+    }
+  },
+  {
+    "batchId": "REF-598864",
+    "type": "outgoing",
+    "timestamp": "2026-09-17T00:23:18.864Z",
+    "sourceJid": "120363430856944501@g.us",
+    "senderName": "ע إປ إע اພ ܩܟܩܒ ހސܠ اພ☝🏻",
+    "records": [
+      {
+        "type": "outgoing",
+        "recipient": "",
+        "sender": "عبدالله يوسف احمد عبدالله",
+        "amount": 0,
+        "currency": "ريال سعودي",
+        "commission": "-",
+        "network": "*رقم السند**126952*",
+        "transferNo": "-",
+        "date": "2026-09-17",
+        "notes": ""
+      }
+    ],
+    "totals": {
+      "count": 1,
+      "totalAmount": 0
+    }
+  },
+  {
+    "batchId": "REF-231509",
+    "type": "incoming",
+    "timestamp": "2026-09-17T00:17:11.509Z",
+    "sourceJid": "120363430856944501@g.us",
+    "senderName": "!!!!!!!!",
+    "records": [
+      {
+        "seq": 1,
+        "date": "2026/09/17",
+        "name": "'Brhane destaalem",
+        "id": "1000308640241",
+        "amount": 67000,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 3216000,
+        "cutCents": 0
+      }
+    ],
+    "totals": {
+      "totalAmount": 67000,
+      "totalBirr": 3216000,
+      "totalCutCents": 0,
+      "count": 1
+    }
+  },
+  {
+    "batchId": "REF-184913",
+    "type": "outgoing",
+    "timestamp": "2026-09-17T00:16:24.914Z",
+    "sourceJid": "191572805201984@lid",
+    "senderName": "ע إປ إע اພ ܩܟܩܒ ހސܠ اພ☝🏻",
+    "records": [
+      {
+        "type": "outgoing",
+        "recipient": "مركز علي عبدالجليل للتحويلات",
+        "sender": "شركة اخوان قادر للصرافة والتحويلات",
+        "amount": 60000,
+        "currency": "سعودي",
+        "commission": "-",
+        "network": "الادارة دادية",
+        "transferNo": "9912478503",
+        "date": "2026-09-17",
+        "notes": ""
+      }
+    ],
+    "totals": {
+      "count": 1,
+      "totalAmount": 60000
+    }
+  },
+  {
+    "batchId": "REF-174982",
+    "type": "incoming",
+    "timestamp": "2026-09-17T00:16:14.982Z",
+    "sourceJid": "120363432623869284@g.us",
+    "senderName": "!!!!!!!!",
+    "records": [
+      {
+        "seq": 1,
+        "date": "2026/09/17",
+        "name": "'Brhane destaalem",
+        "id": "1000308640241",
+        "amount": 67000,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 3216000,
+        "cutCents": 0
+      }
+    ],
+    "totals": {
+      "totalAmount": 67000,
+      "totalBirr": 3216000,
+      "totalCutCents": 0,
+      "count": 1
+    }
+  },
+  {
+    "batchId": "REF-785737",
+    "type": "outgoing",
+    "timestamp": "2026-09-17T00:09:45.738Z",
+    "sourceJid": "120363430856944501@g.us",
+    "senderName": "Yaaqob almahajeri",
+    "records": [
+      {
+        "type": "outgoing",
+        "recipient": "مركز علي عبدالجليل للتحويلات",
+        "sender": "شركة اخوان قادر للصرافة والتحويلات",
+        "amount": 60000,
+        "currency": "سعودي",
+        "commission": "-",
+        "network": "الادارة دادية",
+        "transferNo": "9912478503",
+        "date": "2026-09-17",
+        "notes": ""
+      }
+    ],
+    "totals": {
+      "count": 1,
+      "totalAmount": 60000
+    }
+  },
+  {
+    "batchId": "REF-658122",
+    "type": "incoming",
+    "timestamp": "2026-09-16T01:37:38.122Z",
+    "sourceJid": "120363430856944501@g.us",
+    "senderName": "Yaaqob almahajeri",
+    "records": [
+      {
+        "seq": 1,
+        "date": "2026/09/16",
+        "name": "Bet lihem kiros",
+        "id": "1000033204837",
+        "amount": 0,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 0,
+        "cutCents": 0
+      }
+    ],
+    "totals": {
+      "totalAmount": 0,
+      "totalBirr": 0,
+      "totalCutCents": 0,
+      "count": 1
+    }
+  },
+  {
+    "batchId": "REF-565865",
+    "type": "incoming",
+    "timestamp": "2026-09-16T01:36:05.865Z",
+    "sourceJid": "120363430856944501@g.us",
+    "senderName": "Yaaqob almahajeri",
+    "records": [
+      {
+        "seq": 1,
+        "date": "2026/09/16",
+        "name": "Shishay Ataklti",
+        "id": "",
+        "amount": 10000000,
+        "currency": "بر إثيوبي",
+        "rate": 48,
+        "birrEquivalent": 10000000,
+        "cutCents": 0
+      }
+    ],
+    "totals": {
+      "totalAmount": 10000000,
+      "totalBirr": 10000000,
+      "totalCutCents": 0,
+      "count": 1
+    }
+  },
+  {
+    "batchId": "REF-534966",
+    "type": "incoming",
+    "timestamp": "2026-09-16T01:35:34.966Z",
+    "sourceJid": "120363430856944501@g.us",
+    "senderName": "Yaaqob almahajeri",
+    "records": [
+      {
+        "seq": 1,
+        "date": "2026/09/16",
+        "name": "senayt teklay",
+        "id": "1000194080208",
+        "amount": 100000,
+        "currency": "بر إثيوبي",
+        "rate": 48,
+        "birrEquivalent": 100000,
+        "cutCents": 0
+      }
+    ],
+    "totals": {
+      "totalAmount": 100000,
+      "totalBirr": 100000,
+      "totalCutCents": 0,
+      "count": 1
+    }
+  },
+  {
+    "batchId": "REF-442608",
+    "type": "incoming",
+    "timestamp": "2026-09-16T01:34:02.608Z",
+    "sourceJid": "120363430856944501@g.us",
+    "senderName": "Yaaqob almahajeri",
+    "records": [
+      {
+        "seq": 1,
+        "date": "2026/09/16",
+        "name": "Bet lihem kiros",
+        "id": "1000033204837",
+        "amount": 0,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 0,
+        "cutCents": 0
+      }
+    ],
+    "totals": {
+      "totalAmount": 0,
+      "totalBirr": 0,
+      "totalCutCents": 0,
+      "count": 1
+    }
+  },
+  {
+    "batchId": "REF-402250",
+    "type": "incoming",
+    "timestamp": "2026-09-16T01:33:22.250Z",
+    "sourceJid": "120363430856944501@g.us",
+    "senderName": "Yaaqob almahajeri",
+    "records": [
+      {
+        "seq": 1,
+        "date": "2026/09/16",
+        "name": "Shishay Ataklti",
+        "id": "1000027896597",
+        "amount": 10000000,
+        "currency": "بر إثيوبي",
+        "rate": 48,
+        "birrEquivalent": 10000000,
+        "cutCents": 0
+      }
+    ],
+    "totals": {
+      "totalAmount": 10000000,
+      "totalBirr": 10000000,
+      "totalCutCents": 0,
+      "count": 1
+    }
+  },
+  {
+    "batchId": "REF-349213",
+    "type": "outgoing",
+    "timestamp": "2026-09-16T01:32:29.213Z",
+    "sourceJid": "120363430856944501@g.us",
+    "senderName": "العميل خالد",
+    "records": [
+      {
+        "type": "outgoing",
+        "recipient": "خالد العمري",
+        "sender": "العميل خالد",
+        "amount": 3000,
+        "currency": "ريال سعودي",
+        "commission": "-",
+        "network": "-",
+        "transferNo": "-",
+        "date": "2026-09-16",
+        "notes": ""
+      }
+    ],
+    "totals": {
+      "count": 1,
+      "totalAmount": 3000
+    }
+  },
+  {
+    "batchId": "REF-349207",
+    "type": "incoming",
+    "timestamp": "2026-09-16T01:32:29.207Z",
+    "sourceJid": "120363430856944501@g.us",
+    "senderName": "العميل سالم",
+    "records": [
+      {
+        "seq": 1,
+        "date": "2026/09/16",
+        "name": "سالم سعيد",
+        "id": "",
+        "amount": 2500,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 120000,
+        "cutCents": 0
+      }
+    ],
+    "totals": {
+      "totalAmount": 2500,
+      "totalBirr": 120000,
+      "totalCutCents": 0,
+      "count": 1
+    }
+  },
+  {
+    "batchId": "REF-349199",
+    "type": "outgoing",
+    "timestamp": "2026-09-16T01:32:29.199Z",
+    "sourceJid": "120363430856944501@g.us",
+    "senderName": "العميل سامي",
+    "records": [
+      {
+        "type": "outgoing",
+        "recipient": "عمر علي محمد",
+        "sender": "خالد أحمد",
+        "amount": 1000,
+        "currency": "ريال سعودي",
+        "commission": "25 ريال",
+        "network": "شبكة الاكوع",
+        "transferNo": "-",
+        "date": "2026-09-16",
+        "notes": ""
+      }
+    ],
+    "totals": {
+      "count": 1,
+      "totalAmount": 1000
+    }
+  },
+  {
+    "batchId": "REF-349139",
+    "type": "incoming",
+    "timestamp": "2026-09-16T01:32:29.139Z",
+    "sourceJid": "120363430856944501@g.us",
+    "senderName": "العميل أحمد",
+    "records": [
+      {
+        "seq": 1,
+        "date": "2026/09/16",
+        "name": "TEAME TESFAY HAGOS",
+        "id": "1000181711713",
+        "amount": 4975,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 238800,
+        "cutCents": 0
+      }
+    ],
+    "totals": {
+      "totalAmount": 4975,
+      "totalBirr": 238800,
+      "totalCutCents": 0,
+      "count": 1
+    }
+  },
+  {
+    "batchId": "REF-875016",
+    "type": "incoming",
+    "timestamp": "2026-09-16T01:24:35.016Z",
+    "sourceJid": "120363430856944501@g.us",
+    "senderName": "Yaaqob almahajeri",
+    "records": [
+      {
+        "seq": 1,
+        "date": "2026/09/16",
+        "name": "Bet lihem kiros",
+        "id": "1000033204837",
+        "amount": 0,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 0,
+        "cutCents": 0
+      }
+    ],
+    "totals": {
+      "totalAmount": 0,
+      "totalBirr": 0,
+      "totalCutCents": 0,
+      "count": 1
+    }
+  },
+  {
+    "batchId": "REF-748434",
+    "type": "incoming",
+    "timestamp": "2026-09-16T01:22:28.434Z",
+    "sourceJid": "120363430856944501@g.us",
+    "senderName": "تجربة",
+    "records": [
+      {
+        "seq": 1,
+        "date": "2026/09/16",
+        "name": "Kamil Huseen",
+        "id": "1000743024625",
+        "amount": 1900,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 91200,
+        "cutCents": 0
+      }
+    ],
+    "totals": {
+      "totalAmount": 1900,
+      "totalBirr": 91200,
+      "totalCutCents": 0,
+      "count": 1
+    }
+  },
+  {
+    "batchId": "REF-735823",
+    "type": "incoming",
+    "timestamp": "2026-09-16T01:22:15.823Z",
+    "sourceJid": "120363430856944501@g.us",
+    "senderName": "أحمد",
+    "records": [
+      {
+        "seq": 1,
+        "date": "2026/09/16",
+        "name": "محمد علي",
+        "id": "",
+        "amount": 500,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 24000,
+        "cutCents": 0
+      }
+    ],
+    "totals": {
+      "totalAmount": 500,
+      "totalBirr": 24000,
+      "totalCutCents": 0,
+      "count": 1
+    }
+  },
+  {
+    "batchId": "REF-735793",
+    "type": "incoming",
+    "timestamp": "2026-09-16T01:22:15.793Z",
+    "sourceJid": "120363430856944501@g.us",
+    "senderName": "أحمد",
+    "records": [
+      {
+        "seq": 1,
+        "date": "2026/09/16",
+        "name": "احمد سالم",
+        "id": "",
+        "amount": 1000,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 48000,
+        "cutCents": 0
+      }
+    ],
+    "totals": {
+      "totalAmount": 1000,
+      "totalBirr": 48000,
+      "totalCutCents": 0,
+      "count": 1
+    }
+  },
+  {
+    "batchId": "REF-360458",
+    "type": "incoming",
+    "timestamp": "2026-09-16T01:16:00.458Z",
+    "sourceJid": "120363430856944501@g.us",
+    "senderName": "Yaaqob almahajeri",
+    "records": [
+      {
+        "seq": 1,
+        "date": "2026/09/16",
+        "name": "Kamil Huseen Gandoo",
+        "id": "1000743024625",
+        "amount": 1900,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 91200,
+        "cutCents": 0
+      }
+    ],
+    "totals": {
+      "totalAmount": 1900,
+      "totalBirr": 91200,
+      "totalCutCents": 0,
+      "count": 1
+    }
+  },
+  {
+    "batchId": "REF-243069",
+    "type": "incoming",
+    "timestamp": "2026-09-16T01:14:03.069Z",
+    "sourceJid": "120363430856944501@g.us",
+    "senderName": "أحمد",
+    "records": [
+      {
+        "seq": 1,
+        "date": "2026/09/16",
+        "name": "محمد علي",
+        "id": "",
+        "amount": 500,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 24000,
+        "cutCents": 0
+      }
+    ],
+    "totals": {
+      "totalAmount": 500,
+      "totalBirr": 24000,
+      "totalCutCents": 0,
+      "count": 1
+    }
+  },
+  {
+    "batchId": "REF-243038",
+    "type": "incoming",
+    "timestamp": "2026-09-16T01:14:03.038Z",
+    "sourceJid": "120363430856944501@g.us",
+    "senderName": "أحمد",
+    "records": [
+      {
+        "seq": 1,
+        "date": "2026/09/16",
+        "name": "احمد سالم",
+        "id": "",
+        "amount": 1000,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 48000,
+        "cutCents": 0
+      }
+    ],
+    "totals": {
+      "totalAmount": 1000,
+      "totalBirr": 48000,
+      "totalCutCents": 0,
+      "count": 1
+    }
+  },
+  {
+    "batchId": "REF-217302",
+    "type": "incoming",
+    "timestamp": "2026-09-16T01:13:37.302Z",
+    "sourceJid": "120363430856944501@g.us",
+    "senderName": "أحمد",
+    "records": [
+      {
+        "seq": 1,
+        "date": "2026/09/16",
+        "name": "محمد علي",
+        "id": "",
+        "amount": 500,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 24000,
+        "cutCents": 0
+      }
+    ],
+    "totals": {
+      "totalAmount": 500,
+      "totalBirr": 24000,
+      "totalCutCents": 0,
+      "count": 1
+    }
+  },
+  {
+    "batchId": "REF-217273",
+    "type": "incoming",
+    "timestamp": "2026-09-16T01:13:37.273Z",
+    "sourceJid": "120363430856944501@g.us",
+    "senderName": "أحمد",
+    "records": [
+      {
+        "seq": 1,
+        "date": "2026/09/16",
+        "name": "احمد سالم",
+        "id": "",
+        "amount": 1000,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 48000,
+        "cutCents": 0
+      }
+    ],
+    "totals": {
+      "totalAmount": 1000,
+      "totalBirr": 48000,
+      "totalCutCents": 0,
+      "count": 1
+    }
+  },
+  {
+    "batchId": "REF-104493",
+    "type": "incoming",
+    "timestamp": "2026-09-16T01:11:44.493Z",
+    "sourceJid": "120363430856944501@g.us",
+    "senderName": "Yaaqob almahajeri",
+    "records": [
+      {
+        "seq": 1,
+        "date": "2026/09/16",
+        "name": "Kamil Huseen Gandoo",
+        "id": "1000743024625",
+        "amount": 1900,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 91200,
+        "cutCents": 0
+      }
+    ],
+    "totals": {
+      "totalAmount": 1900,
+      "totalBirr": 91200,
+      "totalCutCents": 0,
+      "count": 1
+    }
+  },
+  {
+    "batchId": "REF-191047",
+    "type": "incoming",
+    "timestamp": "2026-09-16T00:56:31.047Z",
+    "sourceJid": "120363430856944501@g.us",
+    "senderName": "Yaaqob almahajeri",
+    "records": [
+      {
+        "seq": 1,
+        "date": "2026/09/16",
+        "name": "Kamil Huseen Gandoo",
+        "id": "1000743024625",
+        "amount": 1900,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 91200,
+        "cutCents": 0
+      }
+    ],
+    "totals": {
+      "totalAmount": 1900,
+      "totalBirr": 91200,
+      "totalCutCents": 0,
+      "count": 1
+    }
+  },
+  {
+    "batchId": "REF-156768",
+    "type": "incoming",
+    "timestamp": "2026-09-16T00:55:56.768Z",
+    "sourceJid": "120363430856944501@g.us",
+    "senderName": "Yaaqob almahajeri",
+    "records": [
+      {
+        "seq": 1,
+        "date": "2026/09/16",
+        "name": "Shishay Ataklti",
+        "id": "1000027896597",
+        "amount": 10000000,
+        "currency": "بر إثيوبي",
+        "rate": 48,
+        "birrEquivalent": 10000000,
+        "cutCents": 0
+      }
+    ],
+    "totals": {
+      "totalAmount": 10000000,
+      "totalBirr": 10000000,
+      "totalCutCents": 0,
+      "count": 1
+    }
+  },
+  {
+    "batchId": "REF-089224",
+    "type": "incoming",
+    "timestamp": "2026-09-16T00:54:49.225Z",
+    "sourceJid": "120363430856944501@g.us",
+    "senderName": "Yaaqob almahajeri",
+    "records": [
+      {
+        "seq": 1,
+        "date": "2026/09/16",
+        "name": "TEAME TESFAY HAGOS",
+        "id": "",
+        "amount": 4975,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 238800,
+        "cutCents": 0
+      },
+      {
+        "seq": 2,
+        "date": "2026/09/16",
+        "name": "",
+        "id": "1000181711713",
+        "amount": 0,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 0,
+        "cutCents": 0
+      }
+    ],
+    "totals": {
+      "totalAmount": 4975,
+      "totalBirr": 238800,
+      "totalCutCents": 0,
+      "count": 2
+    }
+  },
+  {
+    "batchId": "REF-015503",
+    "type": "incoming",
+    "timestamp": "2026-09-16T00:53:35.504Z",
+    "sourceJid": "120363430856944501@g.us",
+    "senderName": "Yaaqob almahajeri",
+    "records": [
+      {
+        "seq": 1,
+        "date": "2026/09/16",
+        "name": "Maekelesh Ftwi",
+        "id": "1000608369582",
+        "amount": 7667,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 368000,
+        "cutCents": 16
+      },
+      {
+        "seq": 2,
+        "date": "2026/09/16",
+        "name": "kiros berhe",
+        "id": "1000039884996",
+        "amount": 9584,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 460000,
+        "cutCents": 32
+      },
+      {
+        "seq": 3,
+        "date": "2026/09/16",
+        "name": "Letay Grmay",
+        "id": "1000256679896",
+        "amount": 1917,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 92000,
+        "cutCents": 16
+      },
+      {
+        "seq": 4,
+        "date": "2026/09/16",
+        "name": "Tesfay G/hiwet G/kidan",
+        "id": "1000266078033",
+        "amount": 9584,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 460000,
+        "cutCents": 32
+      },
+      {
+        "seq": 5,
+        "date": "2026/09/16",
+        "name": "mahlet Mengsh",
+        "id": "1000774822066",
+        "amount": 9584,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 460000,
+        "cutCents": 32
+      },
+      {
+        "seq": 6,
+        "date": "2026/09/16",
+        "name": "Tuem Berhe",
+        "id": "1000701515618",
+        "amount": 14375,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 690000,
+        "cutCents": 0
+      },
+      {
+        "seq": 7,
+        "date": "2026/09/16",
+        "name": "Shushay G/anenya",
+        "id": "1000264694508",
+        "amount": 14375,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 690000,
+        "cutCents": 0
+      },
+      {
+        "seq": 8,
+        "date": "2026/09/16",
+        "name": "Guesh Legish",
+        "id": "1000415408882",
+        "amount": 9584,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 460000,
+        "cutCents": 32
+      },
+      {
+        "seq": 9,
+        "date": "2026/09/16",
+        "name": "Natsnet Abebe",
+        "id": "1000355462707",
+        "amount": 23959,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 1150000,
+        "cutCents": 32
+      },
+      {
+        "seq": 10,
+        "date": "2026/09/16",
+        "name": "bahabolom Tesfaalem",
+        "id": "1000726934847",
+        "amount": 4792,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 230000,
+        "cutCents": 16
+      },
+      {
+        "seq": 11,
+        "date": "2026/09/16",
+        "name": "Teklit G/medhn",
+        "id": "1000768396225",
+        "amount": 4792,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 230000,
+        "cutCents": 16
+      },
+      {
+        "seq": 12,
+        "date": "2026/09/16",
+        "name": "brhane W/maryam",
+        "id": "1000692127084",
+        "amount": 6709,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 322000,
+        "cutCents": 32
+      },
+      {
+        "seq": 13,
+        "date": "2026/09/16",
+        "name": "Ethiopia G/tnsaa",
+        "id": "1000318461019",
+        "amount": 4313,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 207000,
+        "cutCents": 24
+      },
+      {
+        "seq": 14,
+        "date": "2026/09/16",
+        "name": "Binyam Ftsum",
+        "id": "1000632937087",
+        "amount": 480,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 23000,
+        "cutCents": 40
+      },
+      {
+        "seq": 15,
+        "date": "2026/09/16",
+        "name": "G/libanos G/slase",
+        "id": "1000601393518",
+        "amount": 9584,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 460000,
+        "cutCents": 32
+      },
+      {
+        "seq": 16,
+        "date": "2026/09/16",
+        "name": "mebrhit G/tsadk",
+        "id": "1000295993891",
+        "amount": 19167,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 920000,
+        "cutCents": 16
+      },
+      {
+        "seq": 17,
+        "date": "2026/09/16",
+        "name": "mebrahtu K/maryam",
+        "id": "1000021000659",
+        "amount": 4792,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 230000,
+        "cutCents": 16
+      },
+      {
+        "seq": 18,
+        "date": "2026/09/16",
+        "name": "kidane Berhe",
+        "id": "1000601202852",
+        "amount": 4792,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 230000,
+        "cutCents": 16
+      },
+      {
+        "seq": 19,
+        "date": "2026/09/16",
+        "name": "Saba G/maryam",
+        "id": "1000018869679",
+        "amount": 9584,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 460000,
+        "cutCents": 32
+      },
+      {
+        "seq": 20,
+        "date": "2026/09/16",
+        "name": "Mulu g/slase",
+        "id": "1000547946808",
+        "amount": 9584,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 460000,
+        "cutCents": 32
+      },
+      {
+        "seq": 21,
+        "date": "2026/09/16",
+        "name": "Merhawi berih",
+        "id": "1000593852249",
+        "amount": 959,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 46000,
+        "cutCents": 32
+      },
+      {
+        "seq": 22,
+        "date": "2026/09/16",
+        "name": "Tblets Adhanom",
+        "id": "1000505052726",
+        "amount": 4792,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 230000,
+        "cutCents": 16
+      },
+      {
+        "seq": 23,
+        "date": "2026/09/16",
+        "name": "Asefa Brhane",
+        "id": "1000537665304",
+        "amount": 7667,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 368000,
+        "cutCents": 16
+      },
+      {
+        "seq": 24,
+        "date": "2026/09/16",
+        "name": "Teklit tekleslasye",
+        "id": "1000542835153",
+        "amount": 7188,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 345000,
+        "cutCents": 24
+      },
+      {
+        "seq": 25,
+        "date": "2026/09/16",
+        "name": "Desaley Hntsa",
+        "id": "1000711754818",
+        "amount": 2396,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 115000,
+        "cutCents": 8
+      },
+      {
+        "seq": 26,
+        "date": "2026/09/16",
+        "name": "Berhe Mahari Welu",
+        "id": "1000212261479",
+        "amount": 1917,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 92000,
+        "cutCents": 16
+      },
+      {
+        "seq": 27,
+        "date": "2026/09/16",
+        "name": "Rahwa G/hiwet",
+        "id": "1000696250093",
+        "amount": 1917,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 92000,
+        "cutCents": 16
+      },
+      {
+        "seq": 28,
+        "date": "2026/09/16",
+        "name": "merhawi welu",
+        "id": "1000580337329",
+        "amount": 1917,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 92000,
+        "cutCents": 16
+      },
+      {
+        "seq": 29,
+        "date": "2026/09/16",
+        "name": "G/wahd Brhane",
+        "id": "1000782289978",
+        "amount": 3834,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 184000,
+        "cutCents": 32
+      },
+      {
+        "seq": 30,
+        "date": "2026/09/16",
+        "name": "Melat G/medhn",
+        "id": "1000353789612",
+        "amount": 4792,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 230000,
+        "cutCents": 16
+      },
+      {
+        "seq": 31,
+        "date": "2026/09/16",
+        "name": "Tsega H/maryam",
+        "id": "1000783440478",
+        "amount": 480,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 23000,
+        "cutCents": 40
+      },
+      {
+        "seq": 32,
+        "date": "2026/09/16",
+        "name": "Tsegay kahsay",
+        "id": "1000338021888",
+        "amount": 959,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 46000,
+        "cutCents": 32
+      },
+      {
+        "seq": 33,
+        "date": "2026/09/16",
+        "name": "Mlete Adhanom",
+        "id": "1000215464998",
+        "amount": 4792,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 230000,
+        "cutCents": 16
+      },
+      {
+        "seq": 34,
+        "date": "2026/09/16",
+        "name": "Orjinal Angesom Mezgebo",
+        "id": "1000738510465",
+        "amount": 4792,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 230000,
+        "cutCents": 16
+      }
+    ],
+    "totals": {
+      "totalAmount": 227620,
+      "totalBirr": 10925000,
+      "totalCutCents": 760,
+      "count": 34
+    }
+  },
+  {
+    "batchId": "REF-991235",
+    "type": "incoming",
+    "timestamp": "2026-09-16T00:53:11.236Z",
+    "sourceJid": "120363430856944501@g.us",
+    "senderName": "أحمد",
+    "records": [
+      {
+        "seq": 1,
+        "date": "2026/09/16",
+        "name": "Maekelesh Ftwi",
+        "id": "1000608369582",
+        "amount": 7667,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 368000,
+        "cutCents": 16
+      }
+    ],
+    "totals": {
+      "totalAmount": 7667,
+      "totalBirr": 368000,
+      "totalCutCents": 16,
+      "count": 1
+    }
+  },
+  {
+    "batchId": "REF-991204",
+    "type": "incoming",
+    "timestamp": "2026-09-16T00:53:11.204Z",
+    "sourceJid": "120363430856944501@g.us",
+    "senderName": "أحمد",
+    "records": [
+      {
+        "seq": 1,
+        "date": "2026/09/16",
+        "name": "Maekelesh Ftwi",
+        "id": "1000608369582",
+        "amount": 7667,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 368000,
+        "cutCents": 16
+      },
+      {
+        "seq": 2,
+        "date": "2026/09/16",
+        "name": "kiros berhe",
+        "id": "1000039884996",
+        "amount": 9584,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 460000,
+        "cutCents": 32
+      }
+    ],
+    "totals": {
+      "totalAmount": 17251,
+      "totalBirr": 828000,
+      "totalCutCents": 48,
+      "count": 2
+    }
+  },
+  {
+    "batchId": "REF-804532",
+    "type": "incoming",
+    "timestamp": "2026-09-16T00:50:04.532Z",
+    "sourceJid": "120363412919589824@g.us",
+    "senderName": "أحمد",
+    "records": [
+      {
+        "seq": 1,
+        "date": "2026/09/16",
+        "name": "Maekelesh Ftwi",
+        "id": "1000608369582",
+        "amount": 7667,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 368000,
+        "cutCents": 16
+      }
+    ],
+    "totals": {
+      "totalAmount": 7667,
+      "totalBirr": 368000,
+      "totalCutCents": 16,
+      "count": 1
+    }
+  },
+  {
+    "batchId": "REF-804503",
+    "type": "incoming",
+    "timestamp": "2026-09-16T00:50:04.503Z",
+    "sourceJid": "120363412919589824@g.us",
+    "senderName": "أحمد",
+    "records": [
+      {
+        "seq": 1,
+        "date": "2026/09/16",
+        "name": "Maekelesh Ftwi",
+        "id": "1000608369582",
+        "amount": 7667,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 368000,
+        "cutCents": 16
+      },
+      {
+        "seq": 2,
+        "date": "2026/09/16",
+        "name": "kiros berhe",
+        "id": "1000039884996",
+        "amount": 9584,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 460000,
+        "cutCents": 32
+      }
+    ],
+    "totals": {
+      "totalAmount": 17251,
+      "totalBirr": 828000,
+      "totalCutCents": 48,
+      "count": 2
+    }
+  },
+  {
+    "batchId": "REF-767633",
+    "type": "incoming",
+    "timestamp": "2026-09-16T00:49:27.634Z",
+    "sourceJid": "120363412919589824@g.us",
+    "senderName": "أحمد",
+    "records": [
+      {
+        "seq": 1,
+        "date": "2026/09/16",
+        "name": "Maekelesh Ftwi",
+        "id": "1000608369582",
+        "amount": 7667,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 368000,
+        "cutCents": 16
+      },
+      {
+        "seq": 2,
+        "date": "2026/09/16",
+        "name": "kiros berhe",
+        "id": "1000039884996",
+        "amount": 9584,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 460000,
+        "cutCents": 32
+      }
+    ],
+    "totals": {
+      "totalAmount": 17251,
+      "totalBirr": 828000,
+      "totalCutCents": 48,
+      "count": 2
+    }
+  },
+  {
+    "batchId": "REF-340252",
+    "timestamp": "2026-09-16T00:42:20.252Z",
+    "sourceJid": "120363412919589824@g.us",
+    "senderName": "ע إປ إע اພ ܩܟܩܒ ހސܠ اພ☝🏻",
+    "records": [
+      {
+        "seq": 1,
+        "date": "2026/09/16",
+        "name": "ዓዲ ዝሕወሎም ዝርዝር 01/13/18 1 'Maekelesh Ftwi",
+        "id": "1000608369582",
+        "amount": 7667,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 368000,
+        "cutCents": 16
+      },
+      {
+        "seq": 2,
+        "date": "2026/09/16",
+        "name": "2 kiros berhe",
+        "id": "1000039884996",
+        "amount": 9584,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 460000,
+        "cutCents": 32
+      },
+      {
+        "seq": 3,
+        "date": "2026/09/16",
+        "name": "3 Letay Grmay",
+        "id": "1000256679896",
+        "amount": 1917,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 92000,
+        "cutCents": 16
+      },
+      {
+        "seq": 4,
+        "date": "2026/09/16",
+        "name": "4'Tesfay G/hiwet G/kidan",
+        "id": "1000266078033",
+        "amount": 9584,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 460000,
+        "cutCents": 32
+      },
+      {
+        "seq": 5,
+        "date": "2026/09/16",
+        "name": "5 mahlet Mengsh",
+        "id": "1000774822066",
+        "amount": 9584,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 460000,
+        "cutCents": 32
+      },
+      {
+        "seq": 6,
+        "date": "2026/09/16",
+        "name": "6 Tuem Berhe",
+        "id": "1000701515618",
+        "amount": 14375,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 690000,
+        "cutCents": 0
+      },
+      {
+        "seq": 7,
+        "date": "2026/09/16",
+        "name": "7 Shushay G/anenya",
+        "id": "1000264694508",
+        "amount": 14375,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 690000,
+        "cutCents": 0
+      },
+      {
+        "seq": 8,
+        "date": "2026/09/16",
+        "name": "8 'Guesh Legish",
+        "id": "1000415408882",
+        "amount": 9584,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 460000,
+        "cutCents": 32
+      },
+      {
+        "seq": 9,
+        "date": "2026/09/16",
+        "name": "9'Natsnet Abebe",
+        "id": "1000355462707",
+        "amount": 23959,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 1150000,
+        "cutCents": 32
+      },
+      {
+        "seq": 10,
+        "date": "2026/09/16",
+        "name": "10'bahabolom Tesfaalem",
+        "id": "1000726934847",
+        "amount": 4792,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 230000,
+        "cutCents": 16
+      },
+      {
+        "seq": 11,
+        "date": "2026/09/16",
+        "name": "11'Teklit G/medhn",
+        "id": "1000768396225",
+        "amount": 4792,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 230000,
+        "cutCents": 16
+      },
+      {
+        "seq": 12,
+        "date": "2026/09/16",
+        "name": "12'brhane W/maryam",
+        "id": "1000692127084",
+        "amount": 6709,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 322000,
+        "cutCents": 32
+      },
+      {
+        "seq": 13,
+        "date": "2026/09/16",
+        "name": "13'Ethiopia G/tnsaa",
+        "id": "1000318461019",
+        "amount": 4313,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 207000,
+        "cutCents": 24
+      },
+      {
+        "seq": 14,
+        "date": "2026/09/16",
+        "name": "14'Binyam Ftsum",
+        "id": "1000632937087",
+        "amount": 480,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 23000,
+        "cutCents": 40
+      },
+      {
+        "seq": 15,
+        "date": "2026/09/16",
+        "name": "15'G/libanos G/slase",
+        "id": "1000601393518",
+        "amount": 9584,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 460000,
+        "cutCents": 32
+      },
+      {
+        "seq": 16,
+        "date": "2026/09/16",
+        "name": "16'mebrhit G/tsadk",
+        "id": "1000295993891",
+        "amount": 19167,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 920000,
+        "cutCents": 16
+      },
+      {
+        "seq": 17,
+        "date": "2026/09/16",
+        "name": "17'mebrahtu K/maryam",
+        "id": "1000021000659",
+        "amount": 4792,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 230000,
+        "cutCents": 16
+      },
+      {
+        "seq": 18,
+        "date": "2026/09/16",
+        "name": "18'kidane Berhe",
+        "id": "1000601202852",
+        "amount": 4792,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 230000,
+        "cutCents": 16
+      },
+      {
+        "seq": 19,
+        "date": "2026/09/16",
+        "name": "19 Saba G/maryam",
+        "id": "1000018869679",
+        "amount": 9584,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 460000,
+        "cutCents": 32
+      },
+      {
+        "seq": 20,
+        "date": "2026/09/16",
+        "name": "20'Mulu g/slase",
+        "id": "1000547946808",
+        "amount": 9584,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 460000,
+        "cutCents": 32
+      },
+      {
+        "seq": 21,
+        "date": "2026/09/16",
+        "name": "21 Merhawi berih",
+        "id": "1000593852249",
+        "amount": 959,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 46000,
+        "cutCents": 32
+      },
+      {
+        "seq": 22,
+        "date": "2026/09/16",
+        "name": "22'Tblets Adhanom",
+        "id": "1000505052726",
+        "amount": 4792,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 230000,
+        "cutCents": 16
+      },
+      {
+        "seq": 23,
+        "date": "2026/09/16",
+        "name": "23'Asefa Brhane ***** 24'Teklit tekleslasye 7 188 1000542835153",
+        "id": "1000537665304",
+        "amount": 7667,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 368000,
+        "cutCents": 16
+      },
+      {
+        "seq": 24,
+        "date": "2026/09/16",
+        "name": "25'Desaley Hntsa",
+        "id": "1000711754818",
+        "amount": 2396,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 115000,
+        "cutCents": 8
+      },
+      {
+        "seq": 25,
+        "date": "2026/09/16",
+        "name": "26'Berhe Mahari Welu",
+        "id": "1000212261479",
+        "amount": 1917,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 92000,
+        "cutCents": 16
+      },
+      {
+        "seq": 26,
+        "date": "2026/09/16",
+        "name": "27'Rahwa G/hiwet",
+        "id": "1000696250093",
+        "amount": 1917,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 92000,
+        "cutCents": 16
+      },
+      {
+        "seq": 27,
+        "date": "2026/09/16",
+        "name": "28'merhawi welu",
+        "id": "1000580337329",
+        "amount": 1917,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 92000,
+        "cutCents": 16
+      },
+      {
+        "seq": 28,
+        "date": "2026/09/16",
+        "name": "29'G/wahd Brhane ******** 30'Melat G/medhn 4 792 1000353789612",
+        "id": "1000782289978",
+        "amount": 3834,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 184000,
+        "cutCents": 32
+      },
+      {
+        "seq": 29,
+        "date": "2026/09/16",
+        "name": "31'Tsega H/maryam",
+        "id": "1000783440478",
+        "amount": 480,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 23000,
+        "cutCents": 40
+      },
+      {
+        "seq": 30,
+        "date": "2026/09/16",
+        "name": "32'Tsegay kahsay",
+        "id": "1000338021888",
+        "amount": 959,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 46000,
+        "cutCents": 32
+      },
+      {
+        "seq": 31,
+        "date": "2026/09/16",
+        "name": "33' Mlete Adhanom",
+        "id": "1000215464998",
+        "amount": 4792,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 230000,
+        "cutCents": 16
+      },
+      {
+        "seq": 32,
+        "date": "2026/09/16",
+        "name": "34'Orjinal Angesom Mezgebo total 227 620",
+        "id": "1000738510465",
+        "amount": 4792,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 230000,
+        "cutCents": 16
+      }
+    ],
+    "totals": {
+      "totalAmount": 215640,
+      "totalBirr": 10350000,
+      "totalCutCents": 720,
+      "count": 32
+    }
+  },
+  {
+    "batchId": "REF-282935",
+    "timestamp": "2026-09-16T00:41:22.935Z",
+    "sourceJid": "120363412919589824@g.us",
+    "senderName": "Yaaqob almahajeri",
+    "records": [
+      {
+        "seq": 1,
+        "date": "2026/09/16",
+        "name": "ዓዲ ዝሕወሎም ዝርዝር 01/13/18 1 'Maekelesh Ftwi",
+        "id": "1000608369582",
+        "amount": 7667,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 368000,
+        "cutCents": 16
+      },
+      {
+        "seq": 2,
+        "date": "2026/09/16",
+        "name": "2 kiros berhe",
+        "id": "1000039884996",
+        "amount": 9584,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 460000,
+        "cutCents": 32
+      },
+      {
+        "seq": 3,
+        "date": "2026/09/16",
+        "name": "3 Letay Grmay",
+        "id": "1000256679896",
+        "amount": 1917,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 92000,
+        "cutCents": 16
+      },
+      {
+        "seq": 4,
+        "date": "2026/09/16",
+        "name": "4'Tesfay G/hiwet G/kidan",
+        "id": "1000266078033",
+        "amount": 9584,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 460000,
+        "cutCents": 32
+      },
+      {
+        "seq": 5,
+        "date": "2026/09/16",
+        "name": "5 mahlet Mengsh",
+        "id": "1000774822066",
+        "amount": 9584,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 460000,
+        "cutCents": 32
+      },
+      {
+        "seq": 6,
+        "date": "2026/09/16",
+        "name": "6 Tuem Berhe",
+        "id": "1000701515618",
+        "amount": 14375,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 690000,
+        "cutCents": 0
+      },
+      {
+        "seq": 7,
+        "date": "2026/09/16",
+        "name": "7 Shushay G/anenya",
+        "id": "1000264694508",
+        "amount": 14375,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 690000,
+        "cutCents": 0
+      },
+      {
+        "seq": 8,
+        "date": "2026/09/16",
+        "name": "8 'Guesh Legish",
+        "id": "1000415408882",
+        "amount": 9584,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 460000,
+        "cutCents": 32
+      },
+      {
+        "seq": 9,
+        "date": "2026/09/16",
+        "name": "9'Natsnet Abebe",
+        "id": "1000355462707",
+        "amount": 23959,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 1150000,
+        "cutCents": 32
+      },
+      {
+        "seq": 10,
+        "date": "2026/09/16",
+        "name": "10'bahabolom Tesfaalem",
+        "id": "1000726934847",
+        "amount": 4792,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 230000,
+        "cutCents": 16
+      },
+      {
+        "seq": 11,
+        "date": "2026/09/16",
+        "name": "11'Teklit G/medhn",
+        "id": "1000768396225",
+        "amount": 4792,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 230000,
+        "cutCents": 16
+      },
+      {
+        "seq": 12,
+        "date": "2026/09/16",
+        "name": "12'brhane W/maryam",
+        "id": "1000692127084",
+        "amount": 6709,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 322000,
+        "cutCents": 32
+      },
+      {
+        "seq": 13,
+        "date": "2026/09/16",
+        "name": "13'Ethiopia G/tnsaa",
+        "id": "1000318461019",
+        "amount": 4313,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 207000,
+        "cutCents": 24
+      },
+      {
+        "seq": 14,
+        "date": "2026/09/16",
+        "name": "14'Binyam Ftsum",
+        "id": "1000632937087",
+        "amount": 480,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 23000,
+        "cutCents": 40
+      },
+      {
+        "seq": 15,
+        "date": "2026/09/16",
+        "name": "15'G/libanos G/slase",
+        "id": "1000601393518",
+        "amount": 9584,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 460000,
+        "cutCents": 32
+      },
+      {
+        "seq": 16,
+        "date": "2026/09/16",
+        "name": "16'mebrhit G/tsadk",
+        "id": "1000295993891",
+        "amount": 19167,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 920000,
+        "cutCents": 16
+      },
+      {
+        "seq": 17,
+        "date": "2026/09/16",
+        "name": "17'mebrahtu K/maryam",
+        "id": "1000021000659",
+        "amount": 4792,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 230000,
+        "cutCents": 16
+      },
+      {
+        "seq": 18,
+        "date": "2026/09/16",
+        "name": "18'kidane Berhe",
+        "id": "1000601202852",
+        "amount": 4792,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 230000,
+        "cutCents": 16
+      },
+      {
+        "seq": 19,
+        "date": "2026/09/16",
+        "name": "19 Saba G/maryam",
+        "id": "1000018869679",
+        "amount": 9584,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 460000,
+        "cutCents": 32
+      },
+      {
+        "seq": 20,
+        "date": "2026/09/16",
+        "name": "20'Mulu g/slase",
+        "id": "1000547946808",
+        "amount": 9584,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 460000,
+        "cutCents": 32
+      },
+      {
+        "seq": 21,
+        "date": "2026/09/16",
+        "name": "21 Merhawi berih",
+        "id": "1000593852249",
+        "amount": 959,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 46000,
+        "cutCents": 32
+      },
+      {
+        "seq": 22,
+        "date": "2026/09/16",
+        "name": "22'Tblets Adhanom",
+        "id": "1000505052726",
+        "amount": 4792,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 230000,
+        "cutCents": 16
+      },
+      {
+        "seq": 23,
+        "date": "2026/09/16",
+        "name": "23'Asefa Brhane ***** 24'Teklit tekleslasye 7 188 1000542835153",
+        "id": "1000537665304",
+        "amount": 7667,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 368000,
+        "cutCents": 16
+      },
+      {
+        "seq": 24,
+        "date": "2026/09/16",
+        "name": "25'Desaley Hntsa",
+        "id": "1000711754818",
+        "amount": 2396,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 115000,
+        "cutCents": 8
+      },
+      {
+        "seq": 25,
+        "date": "2026/09/16",
+        "name": "26'Berhe Mahari Welu",
+        "id": "1000212261479",
+        "amount": 1917,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 92000,
+        "cutCents": 16
+      },
+      {
+        "seq": 26,
+        "date": "2026/09/16",
+        "name": "27'Rahwa G/hiwet",
+        "id": "1000696250093",
+        "amount": 1917,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 92000,
+        "cutCents": 16
+      },
+      {
+        "seq": 27,
+        "date": "2026/09/16",
+        "name": "28'merhawi welu",
+        "id": "1000580337329",
+        "amount": 1917,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 92000,
+        "cutCents": 16
+      },
+      {
+        "seq": 28,
+        "date": "2026/09/16",
+        "name": "29'G/wahd Brhane ******** 30'Melat G/medhn 4 792 1000353789612",
+        "id": "1000782289978",
+        "amount": 3834,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 184000,
+        "cutCents": 32
+      },
+      {
+        "seq": 29,
+        "date": "2026/09/16",
+        "name": "31'Tsega H/maryam",
+        "id": "1000783440478",
+        "amount": 480,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 23000,
+        "cutCents": 40
+      },
+      {
+        "seq": 30,
+        "date": "2026/09/16",
+        "name": "32'Tsegay kahsay",
+        "id": "1000338021888",
+        "amount": 959,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 46000,
+        "cutCents": 32
+      },
+      {
+        "seq": 31,
+        "date": "2026/09/16",
+        "name": "33' Mlete Adhanom",
+        "id": "1000215464998",
+        "amount": 4792,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 230000,
+        "cutCents": 16
+      },
+      {
+        "seq": 32,
+        "date": "2026/09/16",
+        "name": "34'Orjinal Angesom Mezgebo total 227 620",
+        "id": "1000738510465",
+        "amount": 4792,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 230000,
+        "cutCents": 16
+      }
+    ],
+    "totals": {
+      "totalAmount": 215640,
+      "totalBirr": 10350000,
+      "totalCutCents": 720,
+      "count": 32
+    }
+  },
+  {
+    "batchId": "REF-233946",
+    "timestamp": "2026-09-16T00:40:33.946Z",
+    "sourceJid": "120363412919589824@g.us",
+    "senderName": "Yaaqob almahajeri",
+    "records": [
+      {
+        "seq": 1,
+        "date": "2026/09/16",
+        "name": "ዓዲ ዝሕወሎም ዝርዝር 01/13/18 1 'Maekelesh Ftwi",
+        "id": "1000608369582",
+        "amount": 7667,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 368000,
+        "cutCents": 16
+      },
+      {
+        "seq": 2,
+        "date": "2026/09/16",
+        "name": "2 kiros berhe",
+        "id": "1000039884996",
+        "amount": 9584,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 460000,
+        "cutCents": 32
+      },
+      {
+        "seq": 3,
+        "date": "2026/09/16",
+        "name": "3 Letay Grmay",
+        "id": "1000256679896",
+        "amount": 1917,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 92000,
+        "cutCents": 16
+      },
+      {
+        "seq": 4,
+        "date": "2026/09/16",
+        "name": "4'Tesfay G/hiwet G/kidan",
+        "id": "1000266078033",
+        "amount": 9584,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 460000,
+        "cutCents": 32
+      },
+      {
+        "seq": 5,
+        "date": "2026/09/16",
+        "name": "5 mahlet Mengsh",
+        "id": "1000774822066",
+        "amount": 9584,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 460000,
+        "cutCents": 32
+      },
+      {
+        "seq": 6,
+        "date": "2026/09/16",
+        "name": "6 Tuem Berhe",
+        "id": "1000701515618",
+        "amount": 14375,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 690000,
+        "cutCents": 0
+      },
+      {
+        "seq": 7,
+        "date": "2026/09/16",
+        "name": "7 Shushay G/anenya",
+        "id": "1000264694508",
+        "amount": 14375,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 690000,
+        "cutCents": 0
+      },
+      {
+        "seq": 8,
+        "date": "2026/09/16",
+        "name": "8 'Guesh Legish",
+        "id": "1000415408882",
+        "amount": 9584,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 460000,
+        "cutCents": 32
+      },
+      {
+        "seq": 9,
+        "date": "2026/09/16",
+        "name": "9'Natsnet Abebe",
+        "id": "1000355462707",
+        "amount": 23959,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 1150000,
+        "cutCents": 32
+      },
+      {
+        "seq": 10,
+        "date": "2026/09/16",
+        "name": "10'bahabolom Tesfaalem",
+        "id": "1000726934847",
+        "amount": 4792,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 230000,
+        "cutCents": 16
+      },
+      {
+        "seq": 11,
+        "date": "2026/09/16",
+        "name": "11'Teklit G/medhn",
+        "id": "1000768396225",
+        "amount": 4792,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 230000,
+        "cutCents": 16
+      },
+      {
+        "seq": 12,
+        "date": "2026/09/16",
+        "name": "12'brhane W/maryam",
+        "id": "1000692127084",
+        "amount": 6709,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 322000,
+        "cutCents": 32
+      },
+      {
+        "seq": 13,
+        "date": "2026/09/16",
+        "name": "13'Ethiopia G/tnsaa",
+        "id": "1000318461019",
+        "amount": 4313,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 207000,
+        "cutCents": 24
+      },
+      {
+        "seq": 14,
+        "date": "2026/09/16",
+        "name": "14'Binyam Ftsum",
+        "id": "1000632937087",
+        "amount": 480,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 23000,
+        "cutCents": 40
+      },
+      {
+        "seq": 15,
+        "date": "2026/09/16",
+        "name": "15'G/libanos G/slase",
+        "id": "1000601393518",
+        "amount": 9584,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 460000,
+        "cutCents": 32
+      },
+      {
+        "seq": 16,
+        "date": "2026/09/16",
+        "name": "16'mebrhit G/tsadk",
+        "id": "1000295993891",
+        "amount": 19167,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 920000,
+        "cutCents": 16
+      },
+      {
+        "seq": 17,
+        "date": "2026/09/16",
+        "name": "17'mebrahtu K/maryam",
+        "id": "1000021000659",
+        "amount": 4792,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 230000,
+        "cutCents": 16
+      },
+      {
+        "seq": 18,
+        "date": "2026/09/16",
+        "name": "18'kidane Berhe",
+        "id": "1000601202852",
+        "amount": 4792,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 230000,
+        "cutCents": 16
+      },
+      {
+        "seq": 19,
+        "date": "2026/09/16",
+        "name": "19 Saba G/maryam",
+        "id": "1000018869679",
+        "amount": 9584,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 460000,
+        "cutCents": 32
+      },
+      {
+        "seq": 20,
+        "date": "2026/09/16",
+        "name": "20'Mulu g/slase",
+        "id": "1000547946808",
+        "amount": 9584,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 460000,
+        "cutCents": 32
+      },
+      {
+        "seq": 21,
+        "date": "2026/09/16",
+        "name": "21 Merhawi berih",
+        "id": "1000593852249",
+        "amount": 959,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 46000,
+        "cutCents": 32
+      },
+      {
+        "seq": 22,
+        "date": "2026/09/16",
+        "name": "22'Tblets Adhanom",
+        "id": "1000505052726",
+        "amount": 4792,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 230000,
+        "cutCents": 16
+      },
+      {
+        "seq": 23,
+        "date": "2026/09/16",
+        "name": "23'Asefa Brhane ***** 24'Teklit tekleslasye 7 188 1000542835153",
+        "id": "1000537665304",
+        "amount": 7667,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 368000,
+        "cutCents": 16
+      },
+      {
+        "seq": 24,
+        "date": "2026/09/16",
+        "name": "25'Desaley Hntsa",
+        "id": "1000711754818",
+        "amount": 2396,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 115000,
+        "cutCents": 8
+      },
+      {
+        "seq": 25,
+        "date": "2026/09/16",
+        "name": "26'Berhe Mahari Welu",
+        "id": "1000212261479",
+        "amount": 1917,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 92000,
+        "cutCents": 16
+      },
+      {
+        "seq": 26,
+        "date": "2026/09/16",
+        "name": "27'Rahwa G/hiwet",
+        "id": "1000696250093",
+        "amount": 1917,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 92000,
+        "cutCents": 16
+      },
+      {
+        "seq": 27,
+        "date": "2026/09/16",
+        "name": "28'merhawi welu",
+        "id": "1000580337329",
+        "amount": 1917,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 92000,
+        "cutCents": 16
+      },
+      {
+        "seq": 28,
+        "date": "2026/09/16",
+        "name": "29'G/wahd Brhane ******** 30'Melat G/medhn 4 792 1000353789612",
+        "id": "1000782289978",
+        "amount": 3834,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 184000,
+        "cutCents": 32
+      },
+      {
+        "seq": 29,
+        "date": "2026/09/16",
+        "name": "31'Tsega H/maryam",
+        "id": "1000783440478",
+        "amount": 480,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 23000,
+        "cutCents": 40
+      },
+      {
+        "seq": 30,
+        "date": "2026/09/16",
+        "name": "32'Tsegay kahsay",
+        "id": "1000338021888",
+        "amount": 959,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 46000,
+        "cutCents": 32
+      },
+      {
+        "seq": 31,
+        "date": "2026/09/16",
+        "name": "33' Mlete Adhanom",
+        "id": "1000215464998",
+        "amount": 4792,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 230000,
+        "cutCents": 16
+      },
+      {
+        "seq": 32,
+        "date": "2026/09/16",
+        "name": "34'Orjinal Angesom Mezgebo total 227 620",
+        "id": "1000738510465",
+        "amount": 4792,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 230000,
+        "cutCents": 16
+      }
+    ],
+    "totals": {
+      "totalAmount": 215640,
+      "totalBirr": 10350000,
+      "totalCutCents": 720,
+      "count": 32
+    }
+  },
+  {
+    "batchId": "REF-183278",
+    "timestamp": "2026-09-16T00:39:43.278Z",
+    "sourceJid": "120363412919589824@g.us",
+    "senderName": "Yaaqob almahajeri",
+    "records": [
+      {
+        "seq": 1,
+        "date": "2026/09/16",
+        "name": "ዓዲ ዝሕወሎም ዝርዝር 01/13/18 1 'Maekelesh Ftwi",
+        "id": "1000608369582",
+        "amount": 7667,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 368000,
+        "cutCents": 16
+      },
+      {
+        "seq": 2,
+        "date": "2026/09/16",
+        "name": "2 kiros berhe",
+        "id": "1000039884996",
+        "amount": 9584,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 460000,
+        "cutCents": 32
+      },
+      {
+        "seq": 3,
+        "date": "2026/09/16",
+        "name": "3 Letay Grmay",
+        "id": "1000256679896",
+        "amount": 1917,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 92000,
+        "cutCents": 16
+      },
+      {
+        "seq": 4,
+        "date": "2026/09/16",
+        "name": "4'Tesfay G/hiwet G/kidan",
+        "id": "1000266078033",
+        "amount": 9584,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 460000,
+        "cutCents": 32
+      },
+      {
+        "seq": 5,
+        "date": "2026/09/16",
+        "name": "5 mahlet Mengsh",
+        "id": "1000774822066",
+        "amount": 9584,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 460000,
+        "cutCents": 32
+      },
+      {
+        "seq": 6,
+        "date": "2026/09/16",
+        "name": "6 Tuem Berhe",
+        "id": "1000701515618",
+        "amount": 14375,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 690000,
+        "cutCents": 0
+      },
+      {
+        "seq": 7,
+        "date": "2026/09/16",
+        "name": "7 Shushay G/anenya",
+        "id": "1000264694508",
+        "amount": 14375,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 690000,
+        "cutCents": 0
+      },
+      {
+        "seq": 8,
+        "date": "2026/09/16",
+        "name": "8 'Guesh Legish",
+        "id": "1000415408882",
+        "amount": 9584,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 460000,
+        "cutCents": 32
+      },
+      {
+        "seq": 9,
+        "date": "2026/09/16",
+        "name": "9'Natsnet Abebe",
+        "id": "1000355462707",
+        "amount": 23959,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 1150000,
+        "cutCents": 32
+      },
+      {
+        "seq": 10,
+        "date": "2026/09/16",
+        "name": "10'bahabolom Tesfaalem",
+        "id": "1000726934847",
+        "amount": 4792,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 230000,
+        "cutCents": 16
+      },
+      {
+        "seq": 11,
+        "date": "2026/09/16",
+        "name": "11'Teklit G/medhn",
+        "id": "1000768396225",
+        "amount": 4792,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 230000,
+        "cutCents": 16
+      },
+      {
+        "seq": 12,
+        "date": "2026/09/16",
+        "name": "12'brhane W/maryam",
+        "id": "1000692127084",
+        "amount": 6709,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 322000,
+        "cutCents": 32
+      },
+      {
+        "seq": 13,
+        "date": "2026/09/16",
+        "name": "13'Ethiopia G/tnsaa",
+        "id": "1000318461019",
+        "amount": 4313,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 207000,
+        "cutCents": 24
+      },
+      {
+        "seq": 14,
+        "date": "2026/09/16",
+        "name": "14'Binyam Ftsum",
+        "id": "1000632937087",
+        "amount": 480,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 23000,
+        "cutCents": 40
+      },
+      {
+        "seq": 15,
+        "date": "2026/09/16",
+        "name": "15'G/libanos G/slase",
+        "id": "1000601393518",
+        "amount": 9584,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 460000,
+        "cutCents": 32
+      },
+      {
+        "seq": 16,
+        "date": "2026/09/16",
+        "name": "16'mebrhit G/tsadk",
+        "id": "1000295993891",
+        "amount": 19167,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 920000,
+        "cutCents": 16
+      },
+      {
+        "seq": 17,
+        "date": "2026/09/16",
+        "name": "17'mebrahtu K/maryam",
+        "id": "1000021000659",
+        "amount": 4792,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 230000,
+        "cutCents": 16
+      },
+      {
+        "seq": 18,
+        "date": "2026/09/16",
+        "name": "18'kidane Berhe",
+        "id": "1000601202852",
+        "amount": 4792,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 230000,
+        "cutCents": 16
+      },
+      {
+        "seq": 19,
+        "date": "2026/09/16",
+        "name": "19 Saba G/maryam",
+        "id": "1000018869679",
+        "amount": 9584,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 460000,
+        "cutCents": 32
+      },
+      {
+        "seq": 20,
+        "date": "2026/09/16",
+        "name": "20'Mulu g/slase",
+        "id": "1000547946808",
+        "amount": 9584,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 460000,
+        "cutCents": 32
+      },
+      {
+        "seq": 21,
+        "date": "2026/09/16",
+        "name": "21 Merhawi berih",
+        "id": "1000593852249",
+        "amount": 959,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 46000,
+        "cutCents": 32
+      },
+      {
+        "seq": 22,
+        "date": "2026/09/16",
+        "name": "22'Tblets Adhanom",
+        "id": "1000505052726",
+        "amount": 4792,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 230000,
+        "cutCents": 16
+      },
+      {
+        "seq": 23,
+        "date": "2026/09/16",
+        "name": "23'Asefa Brhane ***** 24'Teklit tekleslasye 7 188 1000542835153",
+        "id": "1000537665304",
+        "amount": 7667,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 368000,
+        "cutCents": 16
+      },
+      {
+        "seq": 24,
+        "date": "2026/09/16",
+        "name": "25'Desaley Hntsa",
+        "id": "1000711754818",
+        "amount": 2396,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 115000,
+        "cutCents": 8
+      },
+      {
+        "seq": 25,
+        "date": "2026/09/16",
+        "name": "26'Berhe Mahari Welu",
+        "id": "1000212261479",
+        "amount": 1917,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 92000,
+        "cutCents": 16
+      },
+      {
+        "seq": 26,
+        "date": "2026/09/16",
+        "name": "27'Rahwa G/hiwet",
+        "id": "1000696250093",
+        "amount": 1917,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 92000,
+        "cutCents": 16
+      },
+      {
+        "seq": 27,
+        "date": "2026/09/16",
+        "name": "28'merhawi welu",
+        "id": "1000580337329",
+        "amount": 1917,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 92000,
+        "cutCents": 16
+      },
+      {
+        "seq": 28,
+        "date": "2026/09/16",
+        "name": "29'G/wahd Brhane ******** 30'Melat G/medhn 4 792 1000353789612",
+        "id": "1000782289978",
+        "amount": 3834,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 184000,
+        "cutCents": 32
+      },
+      {
+        "seq": 29,
+        "date": "2026/09/16",
+        "name": "31'Tsega H/maryam",
+        "id": "1000783440478",
+        "amount": 480,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 23000,
+        "cutCents": 40
+      },
+      {
+        "seq": 30,
+        "date": "2026/09/16",
+        "name": "32'Tsegay kahsay",
+        "id": "1000338021888",
+        "amount": 959,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 46000,
+        "cutCents": 32
+      },
+      {
+        "seq": 31,
+        "date": "2026/09/16",
+        "name": "33' Mlete Adhanom",
+        "id": "1000215464998",
+        "amount": 4792,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 230000,
+        "cutCents": 16
+      },
+      {
+        "seq": 32,
+        "date": "2026/09/16",
+        "name": "34'Orjinal Angesom Mezgebo total 227 620",
+        "id": "1000738510465",
+        "amount": 4792,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 230000,
+        "cutCents": 16
+      }
+    ],
+    "totals": {
+      "totalAmount": 215640,
+      "totalBirr": 10350000,
+      "totalCutCents": 720,
+      "count": 32
+    }
+  },
+  {
+    "batchId": "REF-071711",
+    "timestamp": "2026-09-16T00:37:51.711Z",
+    "sourceJid": "120363412919589824@g.us",
+    "senderName": "Yaaqob almahajeri",
+    "records": [
+      {
+        "seq": 1,
+        "date": "2026/09/16",
+        "name": "ዓዲ ዝሕወሎም ዝርዝር 01/13/18 1 'Maekelesh Ftwi",
+        "id": "1000608369582",
+        "amount": 7667,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 368000,
+        "cutCents": 16
+      },
+      {
+        "seq": 2,
+        "date": "2026/09/16",
+        "name": "2 kiros berhe",
+        "id": "1000039884996",
+        "amount": 9584,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 460000,
+        "cutCents": 32
+      },
+      {
+        "seq": 3,
+        "date": "2026/09/16",
+        "name": "3 Letay Grmay",
+        "id": "1000256679896",
+        "amount": 1917,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 92000,
+        "cutCents": 16
+      },
+      {
+        "seq": 4,
+        "date": "2026/09/16",
+        "name": "4'Tesfay G/hiwet G/kidan",
+        "id": "1000266078033",
+        "amount": 9584,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 460000,
+        "cutCents": 32
+      },
+      {
+        "seq": 5,
+        "date": "2026/09/16",
+        "name": "5 mahlet Mengsh",
+        "id": "1000774822066",
+        "amount": 9584,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 460000,
+        "cutCents": 32
+      },
+      {
+        "seq": 6,
+        "date": "2026/09/16",
+        "name": "6 Tuem Berhe",
+        "id": "1000701515618",
+        "amount": 14375,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 690000,
+        "cutCents": 0
+      },
+      {
+        "seq": 7,
+        "date": "2026/09/16",
+        "name": "7 Shushay G/anenya",
+        "id": "1000264694508",
+        "amount": 14375,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 690000,
+        "cutCents": 0
+      },
+      {
+        "seq": 8,
+        "date": "2026/09/16",
+        "name": "8 'Guesh Legish",
+        "id": "1000415408882",
+        "amount": 9584,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 460000,
+        "cutCents": 32
+      },
+      {
+        "seq": 9,
+        "date": "2026/09/16",
+        "name": "9'Natsnet Abebe",
+        "id": "1000355462707",
+        "amount": 23959,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 1150000,
+        "cutCents": 32
+      },
+      {
+        "seq": 10,
+        "date": "2026/09/16",
+        "name": "10'bahabolom Tesfaalem",
+        "id": "1000726934847",
+        "amount": 4792,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 230000,
+        "cutCents": 16
+      },
+      {
+        "seq": 11,
+        "date": "2026/09/16",
+        "name": "11'Teklit G/medhn",
+        "id": "1000768396225",
+        "amount": 4792,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 230000,
+        "cutCents": 16
+      },
+      {
+        "seq": 12,
+        "date": "2026/09/16",
+        "name": "12'brhane W/maryam",
+        "id": "1000692127084",
+        "amount": 6709,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 322000,
+        "cutCents": 32
+      },
+      {
+        "seq": 13,
+        "date": "2026/09/16",
+        "name": "13'Ethiopia G/tnsaa",
+        "id": "1000318461019",
+        "amount": 4313,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 207000,
+        "cutCents": 24
+      },
+      {
+        "seq": 14,
+        "date": "2026/09/16",
+        "name": "14'Binyam Ftsum",
+        "id": "1000632937087",
+        "amount": 480,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 23000,
+        "cutCents": 40
+      },
+      {
+        "seq": 15,
+        "date": "2026/09/16",
+        "name": "15'G/libanos G/slase",
+        "id": "1000601393518",
+        "amount": 9584,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 460000,
+        "cutCents": 32
+      },
+      {
+        "seq": 16,
+        "date": "2026/09/16",
+        "name": "16'mebrhit G/tsadk",
+        "id": "1000295993891",
+        "amount": 19167,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 920000,
+        "cutCents": 16
+      },
+      {
+        "seq": 17,
+        "date": "2026/09/16",
+        "name": "17'mebrahtu K/maryam",
+        "id": "1000021000659",
+        "amount": 4792,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 230000,
+        "cutCents": 16
+      },
+      {
+        "seq": 18,
+        "date": "2026/09/16",
+        "name": "18'kidane Berhe",
+        "id": "1000601202852",
+        "amount": 4792,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 230000,
+        "cutCents": 16
+      },
+      {
+        "seq": 19,
+        "date": "2026/09/16",
+        "name": "19 Saba G/maryam",
+        "id": "1000018869679",
+        "amount": 9584,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 460000,
+        "cutCents": 32
+      },
+      {
+        "seq": 20,
+        "date": "2026/09/16",
+        "name": "20'Mulu g/slase",
+        "id": "1000547946808",
+        "amount": 9584,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 460000,
+        "cutCents": 32
+      },
+      {
+        "seq": 21,
+        "date": "2026/09/16",
+        "name": "21 Merhawi berih",
+        "id": "1000593852249",
+        "amount": 959,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 46000,
+        "cutCents": 32
+      },
+      {
+        "seq": 22,
+        "date": "2026/09/16",
+        "name": "22'Tblets Adhanom",
+        "id": "1000505052726",
+        "amount": 4792,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 230000,
+        "cutCents": 16
+      },
+      {
+        "seq": 23,
+        "date": "2026/09/16",
+        "name": "23'Asefa Brhane ***** 24'Teklit tekleslasye 7 188 1000542835153",
+        "id": "1000537665304",
+        "amount": 7667,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 368000,
+        "cutCents": 16
+      },
+      {
+        "seq": 24,
+        "date": "2026/09/16",
+        "name": "25'Desaley Hntsa",
+        "id": "1000711754818",
+        "amount": 2396,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 115000,
+        "cutCents": 8
+      },
+      {
+        "seq": 25,
+        "date": "2026/09/16",
+        "name": "26'Berhe Mahari Welu",
+        "id": "1000212261479",
+        "amount": 1917,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 92000,
+        "cutCents": 16
+      },
+      {
+        "seq": 26,
+        "date": "2026/09/16",
+        "name": "27'Rahwa G/hiwet",
+        "id": "1000696250093",
+        "amount": 1917,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 92000,
+        "cutCents": 16
+      },
+      {
+        "seq": 27,
+        "date": "2026/09/16",
+        "name": "28'merhawi welu",
+        "id": "1000580337329",
+        "amount": 1917,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 92000,
+        "cutCents": 16
+      },
+      {
+        "seq": 28,
+        "date": "2026/09/16",
+        "name": "29'G/wahd Brhane ******** 30'Melat G/medhn 4 792 1000353789612",
+        "id": "1000782289978",
+        "amount": 3834,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 184000,
+        "cutCents": 32
+      },
+      {
+        "seq": 29,
+        "date": "2026/09/16",
+        "name": "31'Tsega H/maryam",
+        "id": "1000783440478",
+        "amount": 480,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 23000,
+        "cutCents": 40
+      },
+      {
+        "seq": 30,
+        "date": "2026/09/16",
+        "name": "32'Tsegay kahsay",
+        "id": "1000338021888",
+        "amount": 959,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 46000,
+        "cutCents": 32
+      },
+      {
+        "seq": 31,
+        "date": "2026/09/16",
+        "name": "33' Mlete Adhanom",
+        "id": "1000215464998",
+        "amount": 4792,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 230000,
+        "cutCents": 16
+      },
+      {
+        "seq": 32,
+        "date": "2026/09/16",
+        "name": "34'Orjinal Angesom Mezgebo total 227 620",
+        "id": "1000738510465",
+        "amount": 4792,
+        "currency": "ريال سعودي",
+        "rate": 48,
+        "birrEquivalent": 230000,
+        "cutCents": 16
+      }
+    ],
+    "totals": {
+      "totalAmount": 215640,
+      "totalBirr": 10350000,
+      "totalCutCents": 720,
+      "count": 32
+    }
+  },
+  {
     "batchId": "REF-924379",
     "timestamp": "2026-09-16T00:18:44.379Z",
     "sourceJid": "120363000000000@g.us",

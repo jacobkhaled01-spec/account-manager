@@ -1,16 +1,22 @@
 {
-  "sourceGroupName": "مجموعة العملاء (أ)",
-  "sourceGroupId": "",
-  "targetGroupName": "مجموعة الصرافين والمنفذين (ب)",
-  "targetGroupId": "",
+  "sourceGroupName": "مجموعة استقبال الرسائل",
+  "sourceGroupId": "120363430856944501@g.us",
+  "incomingGroupName": "مجموعة الحوالات الواردة",
+  "incomingGroupId": "120363411224927564@g.us",
+  "outgoingGroupName": "مجموعة الحوالات الصادرة",
+  "outgoingGroupId": "120363432623869284@g.us",
+  "targetGroupName": "مجموعة الحوالات الواردة",
+  "targetGroupId": "120363411224927564@g.us",
   "exchangeRate": 48,
   "defaultCurrency": "ريال سعودي",
   "autoReplyAcknowledge": true,
-  "listenToAllGroups": true,
+  "listenToAllGroups": false,
   "bridgeServerPort": 4124,
   "messageTemplates": {
-    "outgoingReportHeader": "📋 *كشف حوالات جديد — نظام القسام*",
-    "outgoingReportFooter": "✅ *تم التحقق والتقفيل آلياً عبر نظام القسام الذكي*",
-    "acknowledgmentReply": "✅ تم استلام وقيد عدد ({count}) حوالات بنجاح.\n💰 إجمالي المقابل: {totalBirr} بر إثيوبي.\n🔢 رقم المعاملة: {batchId}"
+    "incomingReportHeader": "📋 *كشف حوالات واردة جديد — نظام القسام*",
+    "outgoingReportHeader": "📤 *كشف حوالات صادرة (شبكات) — نظام القسام*",
+    "reportFooter": "✅ *تم التحقق والتقفيل آلياً عبر نظام القسام الذكي*",
+    "acknowledgmentReply": "✅ تم استلام وقيد عدد ({count}) حوالات بنجاح.\n💰 إجمالي المقابل: {totalBirr} بر إثيوبي.\n🔢 رقم المعاملة: {batchId}",
+    "outgoingAcknowledgmentReply": "✅ تم استلام وقيد عدد ({count}) حوالات صادرة بنجاح.\n🔢 رقم المعاملة: {batchId}"
   }
 }
