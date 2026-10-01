@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../core/storage/local_storage_service.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../auth/providers/auth_provider.dart';
@@ -765,105 +766,369 @@ class SettingsScreen extends ConsumerWidget {
   ) {
     showModalBottomSheet(
       context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
       builder: (ctx) {
-        return SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      'تبديل الحساب وقاعدة البيانات',
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.close_rounded),
-                      onPressed: () => Navigator.pop(ctx),
-                    ),
-                  ],
+        return Directionality(
+          textDirection: TextDirection.rtl,
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 540),
+              child: Container(
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
                 ),
-                const SizedBox(height: 6),
-                const Text(
-                  'كل حساب يمتلك قاعدة بيانات ومجلد تخزين مستقل تماماً:',
-                  style: TextStyle(fontSize: 12, color: Colors.grey),
-                ),
-                const SizedBox(height: 12),
-                Flexible(
-                  child: ListView.separated(
-                    shrinkWrap: true,
-                    itemCount: accounts.length,
-                    separatorBuilder: (_, __) => const Divider(height: 1),
-                    itemBuilder: (context, idx) {
-                      final acc = accounts[idx];
-                      final isCurrent = acc.id == activeId;
-                      return ListTile(
-                        leading: CircleAvatar(
-                          backgroundColor: isCurrent ? AppTheme.primaryEmerald : Colors.grey.shade200,
-                          child: Icon(
-                            Icons.person_rounded,
-                            color: isCurrent ? Colors.white : Colors.grey.shade700,
+                padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+                child: SafeArea(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      // Drag handle
+                      Center(
+                        child: Container(
+                          width: 44,
+                          height: 4,
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade300,
+                            borderRadius: BorderRadius.circular(2),
                           ),
                         ),
-                        title: Text(
-                          acc.username,
-                          style: TextStyle(
-                            fontWeight: isCurrent ? FontWeight.bold : FontWeight.normal,
+                      ),
+                      const SizedBox(height: 14),
+
+                      // Header
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: AppTheme.primaryEmerald.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: const Icon(
+                              Icons.manage_accounts_rounded,
+                              color: AppTheme.primaryEmerald,
+                              size: 22,
+                            ),
                           ),
-                        ),
-                        subtitle: Text('${acc.bureauName} • #${acc.id}'),
-                        trailing: isCurrent
-                            ? const Chip(
-                                label: Text('نشط الآن', style: TextStyle(fontSize: 10, color: Colors.white)),
-                                backgroundColor: AppTheme.primaryEmerald,
-                              )
-                            : OutlinedButton(
-                                style: OutlinedButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'إدارة الحسابات وقواعد البيانات',
+                                  style: GoogleFonts.cairo(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                    color: AppTheme.textMainLight,
+                                  ),
                                 ),
-                                onPressed: () async {
-                                  Navigator.pop(ctx);
-                                  await ref.read(authStateProvider.notifier).switchAccount(acc.id);
-                                  if (context.mounted) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text('تم التحويل إلى حساب: ${acc.username} بنجاح'),
-                                        backgroundColor: AppTheme.primaryEmerald,
-                                      ),
-                                    );
-                                  }
-                                },
-                                child: const Text('تبديل'),
+                                Text(
+                                  'كل حساب يمتلك قاعدة بيانات ومجلد تخزين مستقل تماماً',
+                                  style: GoogleFonts.cairo(
+                                    fontSize: 11,
+                                    color: AppTheme.textSubLight,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.close_rounded, color: Colors.grey),
+                            onPressed: () => Navigator.pop(ctx),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      const Divider(height: 1, color: Color(0xFFF1F5F9)),
+                      const SizedBox(height: 12),
+
+                      // Accounts List
+                      Flexible(
+                        child: ListView.separated(
+                          shrinkWrap: true,
+                          itemCount: accounts.length,
+                          separatorBuilder: (_, __) => const SizedBox(height: 10),
+                          itemBuilder: (context, idx) {
+                            final acc = accounts[idx];
+                            final isCurrent = acc.id == activeId;
+                            return Container(
+                              decoration: BoxDecoration(
+                                color: isCurrent ? AppTheme.primaryEmerald.withOpacity(0.04) : Colors.white,
+                                borderRadius: BorderRadius.circular(14),
+                                border: Border.all(
+                                  color: isCurrent ? AppTheme.primaryEmerald : const Color(0xFFE2E8F0),
+                                  width: isCurrent ? 1.5 : 1,
+                                ),
                               ),
-                      );
-                    },
+                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                              child: Row(
+                                children: [
+                                  // Avatar
+                                  Container(
+                                    width: 44,
+                                    height: 44,
+                                    decoration: BoxDecoration(
+                                      color: isCurrent ? AppTheme.primaryEmerald : Colors.grey.shade100,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Icon(
+                                      Icons.person_rounded,
+                                      color: isCurrent ? Colors.white : Colors.grey.shade600,
+                                      size: 24,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+
+                                  // Name and Bureau
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Text(
+                                              acc.username,
+                                              style: GoogleFonts.cairo(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 15,
+                                                color: AppTheme.textMainLight,
+                                              ),
+                                            ),
+                                            if (acc.id == 'default') ...[
+                                              const SizedBox(width: 6),
+                                              Container(
+                                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                                decoration: BoxDecoration(
+                                                  color: Colors.amber.shade100,
+                                                  borderRadius: BorderRadius.circular(6),
+                                                ),
+                                                child: Text(
+                                                  'الرئيسي',
+                                                  style: GoogleFonts.cairo(fontSize: 10, color: Colors.amber.shade900, fontWeight: FontWeight.bold),
+                                                ),
+                                              ),
+                                            ],
+                                          ],
+                                        ),
+                                        const SizedBox(height: 2),
+                                        Row(
+                                          children: [
+                                            Icon(Icons.store_rounded, size: 13, color: Colors.grey.shade500),
+                                            const SizedBox(width: 4),
+                                            Expanded(
+                                              child: Text(
+                                                acc.bureauName,
+                                                style: GoogleFonts.cairo(
+                                                  fontSize: 12,
+                                                  color: AppTheme.textSubLight,
+                                                ),
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+
+                                  // Status / Action Button
+                                  if (isCurrent)
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                      decoration: BoxDecoration(
+                                        color: AppTheme.primaryEmerald,
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          const Icon(Icons.check_circle_rounded, size: 14, color: Colors.white),
+                                          const SizedBox(width: 4),
+                                          Text(
+                                            'نشط الآن',
+                                            style: GoogleFonts.cairo(
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    )
+                                  else
+                                    ElevatedButton.icon(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: AppTheme.primaryEmerald,
+                                        foregroundColor: Colors.white,
+                                        elevation: 0,
+                                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                      ),
+                                      onPressed: () {
+                                        _handleSwitchAccount(context, ref, ctx, acc);
+                                      },
+                                      icon: const Icon(Icons.swap_horiz_rounded, size: 16),
+                                      label: Text(
+                                        'دخول',
+                                        style: GoogleFonts.cairo(fontSize: 12, fontWeight: FontWeight.bold),
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                      const SizedBox(height: 18),
+
+                      // Two distinct action buttons
+                      ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppTheme.surfaceDark,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                        onPressed: () {
+                          Navigator.pop(ctx);
+                          ref.read(authStateProvider.notifier).logout();
+                        },
+                        icon: const Icon(Icons.person_add_alt_1_rounded, size: 18),
+                        label: Text(
+                          'إنشاء حساب مستقل جديد',
+                          style: GoogleFonts.cairo(fontSize: 13, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      OutlinedButton.icon(
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: AppTheme.dangerRed,
+                          side: BorderSide(color: AppTheme.dangerRed.withOpacity(0.3)),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                        onPressed: () {
+                          Navigator.pop(ctx);
+                          ref.read(authStateProvider.notifier).logout();
+                        },
+                        icon: const Icon(Icons.logout_rounded, size: 18),
+                        label: Text(
+                          'تسجيل الخروج من الحساب الحالي',
+                          style: GoogleFonts.cairo(fontSize: 13, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 16),
-                ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.surfaceDark,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                  ),
-                  onPressed: () {
-                    Navigator.pop(ctx);
-                    ref.read(authStateProvider.notifier).logout();
-                  },
-                  icon: const Icon(Icons.person_add_alt_1_rounded, size: 18),
-                  label: const Text('إنشاء حساب جديد أو تسجيل الخروج'),
-                ),
-              ],
+              ),
             ),
           ),
         );
       },
+    );
+  }
+
+  void _handleSwitchAccount(
+    BuildContext parentContext,
+    WidgetRef ref,
+    BuildContext sheetContext,
+    dynamic targetAccount,
+  ) {
+    // If account has PIN, prompt for PIN verification
+    final pinController = TextEditingController();
+    String? errorText;
+
+    showDialog(
+      context: sheetContext,
+      builder: (dialogCtx) => StatefulBuilder(
+        builder: (ctx, setDialogState) {
+          return Directionality(
+            textDirection: TextDirection.rtl,
+            child: AlertDialog(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              title: Row(
+                children: [
+                  const Icon(Icons.lock_outline_rounded, color: AppTheme.primaryEmerald),
+                  const SizedBox(width: 8),
+                  Text(
+                    'التحقق من كلمة المرور',
+                    style: GoogleFonts.cairo(fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
+                ],
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'يرجى إدخال رمز PIN للدخول إلى حساب "${targetAccount.username}":',
+                    style: GoogleFonts.cairo(fontSize: 13),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: pinController,
+                    obscureText: true,
+                    autofocus: true,
+                    keyboardType: TextInputType.text,
+                    decoration: InputDecoration(
+                      hintText: 'رمز PIN',
+                      errorText: errorText,
+                      prefixIcon: const Icon(Icons.key_rounded, size: 20),
+                    ),
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(dialogCtx),
+                  child: Text('إلغاء', style: GoogleFonts.cairo()),
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.primaryEmerald,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  ),
+                  onPressed: () async {
+                    final entered = pinController.text.trim();
+                    if (entered != targetAccount.pin) {
+                      setDialogState(() {
+                        errorText = 'رمز PIN غير صحيح';
+                      });
+                      return;
+                    }
+
+                    Navigator.pop(dialogCtx); // Close PIN dialog
+                    Navigator.pop(sheetContext); // Close account sheet
+
+                    await ref.read(authStateProvider.notifier).switchAccount(targetAccount.id);
+
+                    if (parentContext.mounted) {
+                      ScaffoldMessenger.of(parentContext).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            'تم التبديل بنجاح إلى حساب: ${targetAccount.username}',
+                            style: GoogleFonts.cairo(),
+                          ),
+                          backgroundColor: AppTheme.primaryEmerald,
+                        ),
+                      );
+                    }
+                  },
+                  child: Text('تأكيد الدخول', style: GoogleFonts.cairo(fontWeight: FontWeight.bold)),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
 }
