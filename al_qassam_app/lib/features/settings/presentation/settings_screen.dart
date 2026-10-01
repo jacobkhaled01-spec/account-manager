@@ -27,6 +27,9 @@ class SettingsScreen extends ConsumerWidget {
     final spread = (buyRate - sellRate).abs();
     final profitPer1000 = spread * 1000;
 
+    final currentAccount = ref.watch(currentAccountProvider);
+    final accountsList = ref.watch(accountsListProvider);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('إعدادات النظام'),
@@ -34,6 +37,127 @@ class SettingsScreen extends ConsumerWidget {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
+          // Section: Active Account Info
+          if (currentAccount != null) ...[
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [AppTheme.primaryEmerald, Color(0xFF064E3B)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppTheme.primaryEmerald.withOpacity(0.25),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.15),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(Icons.person_outline_rounded, color: Colors.white, size: 24),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              currentAccount.username,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              currentAccount.bureauName,
+                              style: TextStyle(
+                                color: Colors.white.withOpacity(0.85),
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: AppTheme.accentAmber.withOpacity(0.9),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.shield_rounded, size: 12, color: Colors.black87),
+                            SizedBox(width: 4),
+                            Text(
+                              'قاعدة بيانات معزولة',
+                              style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.black87),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  const Divider(color: Colors.white24, height: 1),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'إجمالي الحسابات بالنظام: ${accountsList.length}',
+                        style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 11),
+                      ),
+                      Row(
+                        children: [
+                          TextButton.icon(
+                            style: TextButton.styleFrom(
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                              backgroundColor: Colors.white.withOpacity(0.15),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                            ),
+                            onPressed: () => _showAccountSwitchSheet(context, ref, accountsList, currentAccount.id),
+                            icon: const Icon(Icons.swap_horiz_rounded, size: 16),
+                            label: const Text('تبديل الحساب', style: TextStyle(fontSize: 11)),
+                          ),
+                          const SizedBox(width: 8),
+                          TextButton.icon(
+                            style: TextButton.styleFrom(
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                              backgroundColor: Colors.redAccent.withOpacity(0.3),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                            ),
+                            onPressed: () {
+                              ref.read(authStateProvider.notifier).logout();
+                            },
+                            icon: const Icon(Icons.logout_rounded, size: 16),
+                            label: const Text('خروج', style: TextStyle(fontSize: 11)),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+          ],
           // Section: General Settings
           _buildSectionHeader('إعدادات الحساب والصرف'),
           Card(
@@ -630,6 +754,116 @@ class SettingsScreen extends ConsumerWidget {
           );
         },
       ),
+    );
+  }
+
+  void _showAccountSwitchSheet(
+    BuildContext context,
+    WidgetRef ref,
+    List<dynamic> accounts,
+    String activeId,
+  ) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'تبديل الحساب وقاعدة البيانات',
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close_rounded),
+                      onPressed: () => Navigator.pop(ctx),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                const Text(
+                  'كل حساب يمتلك قاعدة بيانات ومجلد تخزين مستقل تماماً:',
+                  style: TextStyle(fontSize: 12, color: Colors.grey),
+                ),
+                const SizedBox(height: 12),
+                Flexible(
+                  child: ListView.separated(
+                    shrinkWrap: true,
+                    itemCount: accounts.length,
+                    separatorBuilder: (_, __) => const Divider(height: 1),
+                    itemBuilder: (context, idx) {
+                      final acc = accounts[idx];
+                      final isCurrent = acc.id == activeId;
+                      return ListTile(
+                        leading: CircleAvatar(
+                          backgroundColor: isCurrent ? AppTheme.primaryEmerald : Colors.grey.shade200,
+                          child: Icon(
+                            Icons.person_rounded,
+                            color: isCurrent ? Colors.white : Colors.grey.shade700,
+                          ),
+                        ),
+                        title: Text(
+                          acc.username,
+                          style: TextStyle(
+                            fontWeight: isCurrent ? FontWeight.bold : FontWeight.normal,
+                          ),
+                        ),
+                        subtitle: Text('${acc.bureauName} • #${acc.id}'),
+                        trailing: isCurrent
+                            ? const Chip(
+                                label: Text('نشط الآن', style: TextStyle(fontSize: 10, color: Colors.white)),
+                                backgroundColor: AppTheme.primaryEmerald,
+                              )
+                            : OutlinedButton(
+                                style: OutlinedButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                                ),
+                                onPressed: () async {
+                                  Navigator.pop(ctx);
+                                  await ref.read(authStateProvider.notifier).switchAccount(acc.id);
+                                  if (context.mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text('تم التحويل إلى حساب: ${acc.username} بنجاح'),
+                                        backgroundColor: AppTheme.primaryEmerald,
+                                      ),
+                                    );
+                                  }
+                                },
+                                child: const Text('تبديل'),
+                              ),
+                      );
+                    },
+                  ),
+                ),
+                const SizedBox(height: 16),
+                ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.surfaceDark,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  ),
+                  onPressed: () {
+                    Navigator.pop(ctx);
+                    ref.read(authStateProvider.notifier).logout();
+                  },
+                  icon: const Icon(Icons.person_add_alt_1_rounded, size: 18),
+                  label: const Text('إنشاء حساب جديد أو تسجيل الخروج'),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

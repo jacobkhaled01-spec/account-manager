@@ -1,5 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:uuid/uuid.dart';
+import '../../features/auth/domain/models/app_user_account.dart';
 import '../../features/financial_engine/domain/models/batch_record.dart';
 import '../../features/financial_engine/domain/models/incoming_remittance.dart';
 import '../../features/financial_engine/domain/models/outgoing_transfer.dart';
@@ -27,17 +29,19 @@ class ImportResult {
   });
 }
 
-/// Offline-first local storage service powered by Hive.
+/// Offline-first local storage service powered by Hive with Multi-Account DB Isolation.
 /// Guarantees zero-latency persistence, cross-batch deduplication,
-/// and strict paste batch isolation.
+/// and strict database isolation per account.
 class LocalStorageService {
-  static const String _batchesBoxName = 'batches_v1';
-  static const String _incomingBoxName = 'incoming_v1';
-  static const String _outgoingBoxName = 'outgoing_v1';
-  static const String _fingerprintsBoxName = 'fingerprints_v1';
-  static const String _settingsBoxName = 'settings_v1';
-  static const String _templatesBoxName = 'templates_v1';
+  static const String _accountsBoxName = 'accounts_meta_v1';
+  static const String _batchesBaseName = 'batches';
+  static const String _incomingBaseName = 'incoming';
+  static const String _outgoingBaseName = 'outgoing';
+  static const String _fingerprintsBaseName = 'fingerprints';
+  static const String _settingsBaseName = 'settings';
+  static const String _templatesBaseName = 'templates';
 
+  late Box _accountsBox;
   late Box _batchesBox;
   late Box _incomingBox;
   late Box _outgoingBox;
@@ -45,12 +49,21 @@ class LocalStorageService {
   late Box _settingsBox;
   late Box _templatesBox;
 
+  String _currentAccountId = 'default';
+  String get currentAccountId => _currentAccountId;
+
   bool _isInitialized = false;
   bool get isInitialized => _isInitialized;
 
   static final LocalStorageService instance = LocalStorageService._internal();
 
   LocalStorageService._internal();
+
+  static String _getBoxName(String baseName, String accountId) {
+    if (accountId == 'default') return '${baseName}_v1';
+    final cleanId = accountId.replaceAll(RegExp(r'[^a-zA-Z0-9_]'), '_');
+    return '${baseName}_u_$cleanId';
+  }
 
   /// Initialize Hive and open all operational boxes.
   Future<void> init([String? customPath]) async {
@@ -60,13 +73,37 @@ class LocalStorageService {
       await Hive.initFlutter();
     }
 
-    _batchesBox = await Hive.openBox(_batchesBoxName);
-    _incomingBox = await Hive.openBox(_incomingBoxName);
-    _outgoingBox = await Hive.openBox(_outgoingBoxName);
-    _fingerprintsBox = await Hive.openBox(_fingerprintsBoxName);
-    _settingsBox = await Hive.openBox(_settingsBoxName);
-    _templatesBox = await Hive.openBox(_templatesBoxName);
+    _accountsBox = await Hive.openBox(_accountsBoxName);
+
+    // Seed default admin account if accounts meta box is empty
+    if (_accountsBox.isEmpty) {
+      final defaultAccount = AppUserAccount(
+        id: 'default',
+        username: 'مدير النظام',
+        pin: '1234',
+        bureauName: 'نظام القسام للصرافة والتحويلات',
+        createdAt: DateTime.now(),
+      );
+      await _accountsBox.put(defaultAccount.id, defaultAccount.toMap());
+    }
+
+    final activeId = _accountsBox.get('active_account_id', defaultValue: 'default') as String;
+    await _openBoxesForAccount(activeId);
     _isInitialized = true;
+
+    debugPrint('LocalStorageService initialized successfully with Hive. Active account: $_currentAccountId');
+  }
+
+  Future<void> _openBoxesForAccount(String accountId) async {
+    _currentAccountId = accountId;
+    await _accountsBox.put('active_account_id', accountId);
+
+    _batchesBox = await Hive.openBox(_getBoxName(_batchesBaseName, accountId));
+    _incomingBox = await Hive.openBox(_getBoxName(_incomingBaseName, accountId));
+    _outgoingBox = await Hive.openBox(_getBoxName(_outgoingBaseName, accountId));
+    _fingerprintsBox = await Hive.openBox(_getBoxName(_fingerprintsBaseName, accountId));
+    _settingsBox = await Hive.openBox(_getBoxName(_settingsBaseName, accountId));
+    _templatesBox = await Hive.openBox(_getBoxName(_templatesBaseName, accountId));
 
     // Seed default templates if empty
     if (_templatesBox.isEmpty) {
@@ -75,10 +112,33 @@ class LocalStorageService {
       }
     }
 
+    // Initialize default bureau name and currency if not set
+    final acc = getCurrentAccount();
+    if (acc != null) {
+      if (_settingsBox.get('bureauName') == null) {
+        await _settingsBox.put('bureauName', acc.bureauName);
+      }
+      if (_settingsBox.get('defaultCurrency') == null) {
+        await _settingsBox.put('defaultCurrency', acc.defaultCurrency);
+      }
+    }
+
     // Auto-recover any unparsed or empty legacy batches
     await recoverUnparsedBatches();
+  }
 
-    debugPrint('LocalStorageService initialized successfully with Hive.');
+  Future<void> switchAccount(String accountId) async {
+    if (!_isInitialized) return;
+    if (_currentAccountId == accountId && _batchesBox.isOpen) return;
+
+    if (_batchesBox.isOpen) await _batchesBox.close();
+    if (_incomingBox.isOpen) await _incomingBox.close();
+    if (_outgoingBox.isOpen) await _outgoingBox.close();
+    if (_fingerprintsBox.isOpen) await _fingerprintsBox.close();
+    if (_settingsBox.isOpen) await _settingsBox.close();
+    if (_templatesBox.isOpen) await _templatesBox.close();
+
+    await _openBoxesForAccount(accountId);
   }
 
   // ---------------------------------------------------------
@@ -681,50 +741,133 @@ class LocalStorageService {
   }
 
   // ---------------------------------------------------------
-  // Authentication & Security (تسجيل الدخول وإدارة الجلسات)
+  // Multi-Account Management (إدارة الحسابات وقواعد البيانات المستقلة)
   // ---------------------------------------------------------
+
+  List<AppUserAccount> getAllAccounts() {
+    if (!_isInitialized) return [];
+    final accounts = <AppUserAccount>[];
+    for (final key in _accountsBox.keys) {
+      if (key == 'active_account_id' || key == 'is_logged_in') continue;
+      final val = _accountsBox.get(key);
+      if (val is Map) {
+        accounts.add(AppUserAccount.fromMap(val));
+      }
+    }
+    accounts.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+    return accounts;
+  }
+
+  AppUserAccount? getCurrentAccount() {
+    if (!_isInitialized) return null;
+    final val = _accountsBox.get(_currentAccountId);
+    if (val is Map) {
+      return AppUserAccount.fromMap(val);
+    }
+    return null;
+  }
+
+  Future<AppUserAccount> createAccount({
+    required String username,
+    required String pin,
+    required String bureauName,
+    String defaultCurrency = 'سعودي',
+  }) async {
+    final cleanUser = username.trim();
+    if (cleanUser.isEmpty) {
+      throw Exception('اسم المستخدم مطلوب');
+    }
+    if (pin.trim().isEmpty) {
+      throw Exception('الرمز السري مطلوب');
+    }
+
+    // Check duplicate username
+    final existing = getAllAccounts().where(
+      (a) => a.username.trim().toLowerCase() == cleanUser.toLowerCase(),
+    );
+    if (existing.isNotEmpty) {
+      throw Exception('اسم المستخدم "$cleanUser" مسجل مسبقاً، يرجى اختيار اسم آخر');
+    }
+
+    final id = const Uuid().v4().replaceAll('-', '').substring(0, 10);
+    final newAccount = AppUserAccount(
+      id: id,
+      username: cleanUser,
+      pin: pin.trim(),
+      bureauName: bureauName.trim().isNotEmpty
+          ? bureauName.trim()
+          : 'نظام القسام للصرافة والتحويلات',
+      defaultCurrency: defaultCurrency.trim().isNotEmpty
+          ? defaultCurrency.trim()
+          : 'سعودي',
+      createdAt: DateTime.now(),
+      lastLoginAt: DateTime.now(),
+    );
+
+    await _accountsBox.put(newAccount.id, newAccount.toMap());
+    await switchAccount(newAccount.id);
+    await setLoggedIn(true);
+
+    return newAccount;
+  }
+
+  AppUserAccount? findAccountByCredentials(String username, String pin) {
+    final u = username.trim().toLowerCase();
+    final p = pin.trim();
+    final accounts = getAllAccounts();
+
+    for (final acc in accounts) {
+      final accUser = acc.username.trim().toLowerCase();
+      final userMatches = (acc.id == 'default' && (u.isEmpty || u == 'admin' || u == 'مدير' || u == 'المدير' || u == 'مدير النظام')) ||
+          accUser == u;
+      final pinMatches = acc.pin.trim() == p || (acc.id == 'default' && p == '1234');
+      if (userMatches && pinMatches) {
+        return acc;
+      }
+    }
+    return null;
+  }
 
   bool isLoggedIn() {
     if (!_isInitialized) return false;
-    return _settingsBox.get('is_logged_in', defaultValue: false);
+    return _accountsBox.get('is_logged_in', defaultValue: false) as bool;
   }
 
   Future<void> setLoggedIn(bool value) async {
     if (!_isInitialized) return;
-    await _settingsBox.put('is_logged_in', value);
+    await _accountsBox.put('is_logged_in', value);
   }
 
   String getAuthUsername() {
-    if (!_isInitialized) return 'مدير النظام';
-    return _settingsBox.get('auth_username', defaultValue: 'مدير النظام');
+    final acc = getCurrentAccount();
+    if (acc != null) return acc.username;
+    return 'مدير النظام';
   }
 
   Future<void> setAuthUsername(String username) async {
-    if (!_isInitialized) return;
-    await _settingsBox.put('auth_username', username);
+    final acc = getCurrentAccount();
+    if (acc != null) {
+      final updated = acc.copyWith(username: username.trim());
+      await _accountsBox.put(acc.id, updated.toMap());
+    }
   }
 
   String getSecurityPin() {
-    if (!_isInitialized) return '1234';
-    return _settingsBox.get('auth_pin', defaultValue: '1234');
+    final acc = getCurrentAccount();
+    if (acc != null) return acc.pin;
+    return '1234';
   }
 
   Future<void> setSecurityPin(String pin) async {
-    if (!_isInitialized) return;
-    await _settingsBox.put('auth_pin', pin);
+    final acc = getCurrentAccount();
+    if (acc != null) {
+      final updated = acc.copyWith(pin: pin.trim());
+      await _accountsBox.put(acc.id, updated.toMap());
+    }
   }
 
   bool validateCredentials(String username, String pin) {
-    final validPin = getSecurityPin();
-    final validUser = getAuthUsername();
-    final u = username.trim();
-    final userMatches = u.isEmpty ||
-        u.toLowerCase() == 'admin' ||
-        u == 'مدير' ||
-        u == 'المدير' ||
-        u == validUser;
-    final pinMatches = pin.trim() == validPin || pin.trim() == '1234';
-    return userMatches && pinMatches;
+    return findAccountByCredentials(username, pin) != null;
   }
 }
 
