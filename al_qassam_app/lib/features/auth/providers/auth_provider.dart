@@ -2,20 +2,18 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/storage/local_storage_service.dart';
 import '../../batch_import/providers/batches_provider.dart';
 import '../../settings/providers/settings_provider.dart';
+import '../../templates/providers/templates_provider.dart';
 import '../domain/models/app_user_account.dart';
 
 final authStateProvider = StateNotifierProvider<AuthNotifier, bool>((ref) {
   return AuthNotifier(ref);
 });
 
-final currentAccountProvider = Provider<AppUserAccount?>((ref) {
-  // Watch auth state to update when switching accounts
-  ref.watch(authStateProvider);
+final currentAccountProvider = StateProvider<AppUserAccount?>((ref) {
   return LocalStorageService.instance.getCurrentAccount();
 });
 
-final accountsListProvider = Provider<List<AppUserAccount>>((ref) {
-  ref.watch(authStateProvider);
+final accountsListProvider = StateProvider<List<AppUserAccount>>((ref) {
   return LocalStorageService.instance.getAllAccounts();
 });
 
@@ -24,19 +22,27 @@ class AuthNotifier extends StateNotifier<bool> {
 
   AuthNotifier(this._ref) : super(LocalStorageService.instance.isLoggedIn());
 
+  void _refreshAllAccountState() {
+    _ref.read(currentAccountProvider.notifier).state = LocalStorageService.instance.getCurrentAccount();
+    _ref.read(accountsListProvider.notifier).state = LocalStorageService.instance.getAllAccounts();
+    _ref.read(batchesProvider.notifier).loadBatches();
+    _ref.read(bureauNameProvider.notifier).reload();
+    _ref.read(exchangeRateProvider.notifier).reload();
+    _ref.read(buyRateProvider.notifier).reload();
+    _ref.read(sellRateProvider.notifier).reload();
+    _ref.read(defaultCurrencyProvider.notifier).reload();
+    _ref.read(isDarkModeProvider.notifier).reload();
+    _ref.read(sizeClassificationEnabledProvider.notifier).reload();
+    _ref.read(largeThresholdProvider.notifier).reload();
+    _ref.read(templatesProvider.notifier).refresh();
+  }
+
   Future<bool> login(String username, String pin) async {
     final account = LocalStorageService.instance.findAccountByCredentials(username, pin);
     if (account != null) {
       await LocalStorageService.instance.switchAccount(account.id);
       await LocalStorageService.instance.setLoggedIn(true);
-
-      // Refresh batches & settings to load the new account's isolated database
-      _ref.read(batchesProvider.notifier).loadBatches();
-      _ref.read(bureauNameProvider.notifier).state = LocalStorageService.instance.getBureauName();
-      _ref.read(exchangeRateProvider.notifier).state = LocalStorageService.instance.getExchangeRate();
-      _ref.read(defaultCurrencyProvider.notifier).state = LocalStorageService.instance.getDefaultCurrency();
-      _ref.read(isDarkModeProvider.notifier).state = LocalStorageService.instance.isDarkMode();
-
+      _refreshAllAccountState();
       state = true;
       return true;
     }
@@ -45,11 +51,7 @@ class AuthNotifier extends StateNotifier<bool> {
 
   Future<void> switchAccount(String accountId) async {
     await LocalStorageService.instance.switchAccount(accountId);
-    _ref.read(batchesProvider.notifier).loadBatches();
-    _ref.read(bureauNameProvider.notifier).state = LocalStorageService.instance.getBureauName();
-    _ref.read(exchangeRateProvider.notifier).state = LocalStorageService.instance.getExchangeRate();
-    _ref.read(defaultCurrencyProvider.notifier).state = LocalStorageService.instance.getDefaultCurrency();
-    _ref.read(isDarkModeProvider.notifier).state = LocalStorageService.instance.isDarkMode();
+    _refreshAllAccountState();
     state = true;
   }
 
@@ -66,18 +68,14 @@ class AuthNotifier extends StateNotifier<bool> {
       defaultCurrency: defaultCurrency,
     );
 
-    // Refresh state for new account
-    _ref.read(batchesProvider.notifier).loadBatches();
-    _ref.read(bureauNameProvider.notifier).state = LocalStorageService.instance.getBureauName();
-    _ref.read(exchangeRateProvider.notifier).state = LocalStorageService.instance.getExchangeRate();
-    _ref.read(defaultCurrencyProvider.notifier).state = LocalStorageService.instance.getDefaultCurrency();
-
+    _refreshAllAccountState();
     state = true;
     return newAccount;
   }
 
   Future<void> logout() async {
     await LocalStorageService.instance.setLoggedIn(false);
+    _refreshAllAccountState();
     state = false;
   }
 }

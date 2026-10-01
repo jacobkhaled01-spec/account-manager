@@ -8,6 +8,10 @@ final exchangeRateProvider = StateNotifierProvider<ExchangeRateNotifier, double>
 class ExchangeRateNotifier extends StateNotifier<double> {
   ExchangeRateNotifier() : super(LocalStorageService.instance.getExchangeRate());
 
+  void reload() {
+    state = LocalStorageService.instance.getExchangeRate();
+  }
+
   Future<void> updateRate(double newRate) async {
     state = newRate;
     await LocalStorageService.instance.setExchangeRate(newRate);
@@ -20,6 +24,10 @@ final buyRateProvider = StateNotifierProvider<BuyRateNotifier, double>((ref) {
 
 class BuyRateNotifier extends StateNotifier<double> {
   BuyRateNotifier() : super(LocalStorageService.instance.getBuyRate());
+
+  void reload() {
+    state = LocalStorageService.instance.getBuyRate();
+  }
 
   Future<void> updateBuyRate(double newRate) async {
     state = newRate;
@@ -35,6 +43,10 @@ class SellRateNotifier extends StateNotifier<double> {
   final Ref _ref;
   SellRateNotifier(this._ref) : super(LocalStorageService.instance.getSellRate());
 
+  void reload() {
+    state = LocalStorageService.instance.getSellRate();
+  }
+
   Future<void> updateSellRate(double newRate) async {
     state = newRate;
     await LocalStorageService.instance.setSellRate(newRate);
@@ -49,6 +61,10 @@ final defaultCurrencyProvider = StateNotifierProvider<DefaultCurrencyNotifier, S
 class DefaultCurrencyNotifier extends StateNotifier<String> {
   DefaultCurrencyNotifier() : super(LocalStorageService.instance.getDefaultCurrency());
 
+  void reload() {
+    state = LocalStorageService.instance.getDefaultCurrency();
+  }
+
   Future<void> updateCurrency(String newCurrency) async {
     state = newCurrency;
     await LocalStorageService.instance.setDefaultCurrency(newCurrency);
@@ -61,6 +77,10 @@ final bureauNameProvider = StateNotifierProvider<BureauNameNotifier, String>((re
 
 class BureauNameNotifier extends StateNotifier<String> {
   BureauNameNotifier() : super(LocalStorageService.instance.getBureauName());
+
+  void reload() {
+    state = LocalStorageService.instance.getBureauName();
+  }
 
   Future<void> updateName(String newName) async {
     state = newName;
@@ -75,6 +95,10 @@ final isDarkModeProvider = StateNotifierProvider<ThemeModeNotifier, bool>((ref) 
 class ThemeModeNotifier extends StateNotifier<bool> {
   ThemeModeNotifier() : super(LocalStorageService.instance.isDarkMode());
 
+  void reload() {
+    state = LocalStorageService.instance.isDarkMode();
+  }
+
   Future<void> toggleTheme() async {
     state = !state;
     await LocalStorageService.instance.setDarkMode(state);
@@ -87,6 +111,10 @@ final sizeClassificationEnabledProvider = StateNotifierProvider<SizeClassificati
 
 class SizeClassificationEnabledNotifier extends StateNotifier<bool> {
   SizeClassificationEnabledNotifier() : super(LocalStorageService.instance.isSizeClassificationEnabled());
+
+  void reload() {
+    state = LocalStorageService.instance.isSizeClassificationEnabled();
+  }
 
   Future<void> toggle() async {
     state = !state;
@@ -105,6 +133,10 @@ final largeThresholdProvider = StateNotifierProvider<LargeThresholdNotifier, dou
 
 class LargeThresholdNotifier extends StateNotifier<double> {
   LargeThresholdNotifier() : super(LocalStorageService.instance.getLargeRemittanceThreshold());
+
+  void reload() {
+    state = LocalStorageService.instance.getLargeRemittanceThreshold();
+  }
 
   Future<void> updateThreshold(double newThreshold) async {
     state = newThreshold;

@@ -77,7 +77,7 @@ class SettingsScreen extends ConsumerWidget {
                           children: [
                             Text(
                               currentAccount.username,
-                              style: const TextStyle(
+                              style: GoogleFonts.cairo(
                                 color: Colors.white,
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -85,7 +85,7 @@ class SettingsScreen extends ConsumerWidget {
                             ),
                             Text(
                               currentAccount.bureauName,
-                              style: TextStyle(
+                              style: GoogleFonts.cairo(
                                 color: Colors.white.withOpacity(0.85),
                                 fontSize: 12,
                               ),
